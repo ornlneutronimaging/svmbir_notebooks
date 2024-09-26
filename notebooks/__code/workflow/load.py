@@ -11,21 +11,26 @@ import logging
 from imars3d.backend.dataio.data import load_data
 
 from __code import DataType
+from __code import DEBUG, debug_folder
 from __code.parent import Parent
 # from __code import NCORE
 from __code.utilities.file_folder_browser import FileFolderBrowser
-from __code.utilities.files import retrieve_list_of_files
-from __code.utilities.system import print_memory_usage
+# from __code.utilities.files import retrieve_list_of_files_from_folders
+# from __code.utilities.system import print_memory_usage
 
 
 class Load(Parent):
 
     def select_folder(self, data_type=DataType.sample, multiple_flag=False):
+
         self.parent.current_data_type = data_type
         self.data_type = data_type
-   
         working_dir = self.parent.working_dir[DataType.top]
- 
+
+        if DEBUG:
+            self.data_selected(debug_folder[data_type])
+            return
+
         if not os.path.exists(working_dir):
             working_dir = os.path.abspath(os.path.expanduser("~"))
 
@@ -37,6 +42,7 @@ class Load(Parent):
     def data_selected(self, top_folder):
         logging.info(f"{self.parent.current_data_type} top folder selected: {top_folder}")
         self.parent.working_dir[self.data_type] = top_folder
+        print(f"Top {self.data_type} folder selected: {top_folder}")
         
         # self.parent.input_data_folders[self.parent.current_data_type] = list_folders
 

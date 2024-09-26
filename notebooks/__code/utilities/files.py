@@ -3,8 +3,7 @@ import os
 import json
 
 
-@staticmethod
-def retrieve_list_of_files(list_folders):
+def retrieve_list_of_files_from_folders(list_folders):
     list_files = []
     for _folder in list_folders:
         _tiff_files = glob.glob(os.path.join(_folder, "*.tif*"))
@@ -14,7 +13,17 @@ def retrieve_list_of_files(list_folders):
     return list_files
 
 
-@staticmethod
+def retrieve_list_of_runs(top_folder):
+    list_runs = glob.glob(os.path.join(top_folder, "Run_*"))
+    list_runs.sort()
+    return list_runs
+
+
+def retrieve_list_of_tif(folder):
+    list_tif = glob.glob(os.path.join(folder, "*.tif*"))
+    return list_tif
+
+
 def load_json(json_file_name):
     if not os.path.exists(json_file_name):
         return None
@@ -25,7 +34,6 @@ def load_json(json_file_name):
     return data
 
 
-@staticmethod
 def save_json(json_file_name, json_dictionary=None):
     with open(json_file_name, 'w') as outfile:
         json.dump(json_dictionary, outfile)
