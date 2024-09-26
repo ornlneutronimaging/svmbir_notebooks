@@ -36,11 +36,15 @@ class RecapData(Parent):
         final_list_of_sample_runs = []
         for _run in list_of_runs[DataType.sample].keys():
             _pc = list_of_runs[DataType.sample][_run]
+    
             if RecapData.is_pc_within_range(pc_value=_pc,
                                             pc_requested=pc_sample_requested,
                                             threshold=pc_threshold):
                 final_list_of_sample_runs.append(_run)
-
+                logging.info(f"\t{_run} with pc of {_pc} is within the range !")
+            else:
+                logging.info(f"\t{_run} with pc of {_pc} is not within the range !")
+                
         self.final_list_of_runs[DataType.sample] = final_list_of_sample_runs
 
         final_list_of_ob_runs = []
@@ -68,6 +72,7 @@ class RecapData(Parent):
         ],
         layout=widgets.Layout(width='200px',
                                 height='300px'))
+        self.parent.list_of_sample_runs_to_reject_ui = sample_runs.children[1]
 
         ob_runs = widgets.VBox([
             widgets.Label("OB"),
@@ -77,6 +82,7 @@ class RecapData(Parent):
         ],
         layout=widgets.Layout(width='200px',
                                 height='300px'))
+        self.parent.list_of_ob_runs_to_reject_ui = ob_runs.children[1]
 
         title = widgets.HTML("<b>Select any run(s) you want to exclude!:")
 

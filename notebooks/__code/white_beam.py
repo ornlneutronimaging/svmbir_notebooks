@@ -7,6 +7,7 @@ from __code.utilities.logging import setup_logging
 from __code.workflow.load import Load
 from __code.workflow.checking_data import CheckingData
 from __code.workflow.recap_data import RecapData
+from __code.workflow.combine import Combine
 
 
 class WhiteBeam:
@@ -22,9 +23,14 @@ class WhiteBeam:
                     DataType.ob: {},
                     }
     
+    master_3d_data_array = None  # [angle, y, x]
+
     instrument = "VENUS"
 
     selection_of_pc = None   # plot that allows the user to select the pc for sample and ob and threshold
+
+    list_of_sample_runs_to_reject_ui = None
+    list_of_ob_runs_to_reject_ui = None
 
     def __init__(self, system=None):
 
@@ -56,3 +62,7 @@ class WhiteBeam:
         o_recap = RecapData(parent=self)
         o_recap.run()
 
+    # combine images
+    def combine_images(self):
+        o_combine = Combine(parent=self)
+        o_combine.run()

@@ -61,7 +61,7 @@ class CheckingData(Parent):
         top_nexus_path = self.parent.working_dir[DataType.nexus]
         list_proton_charge_c = {DataType.sample: [],
                                 DataType.ob: []} 
-        for _data_type in self.list_of_runs.keys(): 
+        for _data_type in self.list_of_runs.keys():
             _list_proton_charge = []
             for _run in self.list_of_runs[_data_type]:
                 _, number = os.path.basename(_run).split("_")
@@ -117,4 +117,4 @@ class CheckingData(Parent):
                                                                         )
         display(self.parent.selection_of_pc)
 
-        display(HTML("Select the proton charge requested for <b>sample</b> and <b>ob</b>"))    
+        # display(HTML("Select the proton charge requested for <b>sample</b> and <b>ob</b>"))    
