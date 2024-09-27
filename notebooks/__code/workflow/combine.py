@@ -12,6 +12,7 @@ class Combine(Parent):
 
     def run(self):
         self.removing_rejected_runs()
+        self.combining_runs()
 
     def removing_rejected_runs(self):
         logging.info(f"removing rejected runs:")
@@ -35,4 +36,7 @@ class Combine(Parent):
 
         self.parent.list_of_runs = self.final_list_of_runs
 
-        
+    def combining_runs(self):
+        logging.info(f"combining runs:")
+
+        logging.info(f"\t{self.parent.list_of_runs[DataType.sample]}")

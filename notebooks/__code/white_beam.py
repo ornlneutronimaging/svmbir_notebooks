@@ -31,6 +31,7 @@ class WhiteBeam:
 
     list_of_sample_runs_to_reject_ui = None
     list_of_ob_runs_to_reject_ui = None
+    minimum_requirements_met = False
 
     def __init__(self, system=None):
 
@@ -62,7 +63,16 @@ class WhiteBeam:
         o_recap = RecapData(parent=self)
         o_recap.run()
 
+    def checkin_data_entries(self):
+        o_check = CheckingData(parent=self)
+        o_check.checking_minimum_requirements()
+
     # combine images
     def combine_images(self):
-        o_combine = Combine(parent=self)
-        o_combine.run()
+        o_check = CheckingData(parent=self)
+        o_check.checking_minimum_requirements()
+        if self.minimum_requirements_met:
+            o_combine = Combine(parent=self)
+            o_combine.run()
+        else:
+            o_check.minimum_requirement_not_met()
