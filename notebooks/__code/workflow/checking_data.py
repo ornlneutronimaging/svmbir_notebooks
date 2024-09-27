@@ -8,7 +8,7 @@ from IPython.core.display import HTML, display
 
 from __code.parent import Parent
 from __code.config import PROTON_CHARGE_TOLERANCE_C
-from __code import DataType
+from __code import DataType, Run
 from __code.utilities.files import retrieve_list_of_runs, retrieve_list_of_tif
 from __code.utilities.nexus import get_proton_charge
 from __code.utilities.math import calculate_most_dominant_int_value_from_list
@@ -38,22 +38,32 @@ class CheckingData(Parent):
         for _data_type in self.list_of_runs.keys():
             list_of_runs = retrieve_list_of_runs(top_folder=self.parent.working_dir[_data_type])
             logging.info(f"\tfound {len(list_of_runs)} {_data_type} runs")
-            self.list_of_runs[_data_type] = list_of_runs
-
+            
+            for _run in list_of_runs:
+                self.parent.list_of_runs[_data_type][os.path.basename(_run)] = {Run.full_path: _run,
+                                                                                Run.proton_charge_c: None,
+                                                                                Run.use_it: True}
+          
     def reject_empty_runs(self):
 
         logging.info(f"Rejecting empty runs:")
-        for _data_type in self.list_of_runs.keys():
-            list_of_runs = self.list_of_runs[_data_type]
+        for _data_type in self.parent.list_of_runs.keys():
+            list_of_runs = list(self.parent.list_of_runs[_data_type].keys())
+
             list_of_runs_to_keep = []
             list_of_runs_to_remove = []
+
             for _run in list_of_runs:
-                list_tif = retrieve_list_of_tif(_run)
+
+                _run_full_path = self.parent.list_of_runs[_data_type][_run][Run.full_path]
+                list_tif = retrieve_list_of_tif(_run_full_path)
                 if len(list_tif) > 0:
-                    list_of_runs_to_keep.append(_run)
+                    list_of_runs_to_keep.append(_run_full_path)
+                    self.parent.list_of_runs[_data_type][_run][Run.use_it] = True
                 else:
                     list_of_runs_to_remove.append(_run)
-            self.list_of_runs[_data_type] = list_of_runs_to_keep
+                    self.parent.list_of_runs[_data_type][_run][Run.use_it] = False
+
             logging.info(f"\trejected {len(list_of_runs_to_remove)} {_data_type} runs")
             logging.info(f"\t -> {[os.path.basename(_file) for _file in list_of_runs_to_remove]}")
 
@@ -62,15 +72,15 @@ class CheckingData(Parent):
         top_nexus_path = self.parent.working_dir[DataType.nexus]
         list_proton_charge_c = {DataType.sample: [],
                                 DataType.ob: []} 
-        for _data_type in self.list_of_runs.keys():
+        for _data_type in self.parent.list_of_runs.keys():
             _list_proton_charge = []
-            for _run in self.list_of_runs[_data_type]:
+            for _run in self.parent.list_of_runs[_data_type]:
                 _, number = os.path.basename(_run).split("_")
                 nexus_path = os.path.join(top_nexus_path, f"{self.parent.instrument}_{number}.nxs.h5")
                 proton_charge = get_proton_charge(nexus_path)
                 _list_proton_charge.append(proton_charge)
                 self.list_of_metadata[_run] = proton_charge
-                self.parent.list_of_runs[_data_type][os.path.basename(_run)] = proton_charge/1e12
+                self.parent.list_of_runs[_data_type][_run][Run.proton_charge_c] = proton_charge/1e12
             list_proton_charge_c[_data_type] = [_pc/1e12 for _pc in _list_proton_charge]
             logging.info(f"\t{_data_type}: {list_proton_charge_c[_data_type]}")
 

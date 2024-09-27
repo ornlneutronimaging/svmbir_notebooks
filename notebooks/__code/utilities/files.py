@@ -21,6 +21,7 @@ def retrieve_list_of_runs(top_folder):
 
 def retrieve_list_of_tif(folder):
     list_tif = glob.glob(os.path.join(folder, "*.tif*"))
+    list_tif.sort()
     return list_tif
 
 

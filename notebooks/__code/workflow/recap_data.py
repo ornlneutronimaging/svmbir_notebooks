@@ -24,6 +24,10 @@ class RecapData(Parent):
         else:
             return False
 
+    def run(self):
+        self.prepare_list_of_runs()
+        self.display_list_of_runs()
+
     def prepare_list_of_runs(self):
         logging.info(f"Preparing list of runs to use:")
         pc_sample_requested, pc_ob_requested, pc_threshold = self.parent.selection_of_pc.result
@@ -31,7 +35,7 @@ class RecapData(Parent):
         logging.info(f"\t{pc_ob_requested = }")
         logging.info(f"\t{pc_threshold = }")
 
-        list_of_runs = self.parent.list_of_runs
+        list_of_runs = self.parent.list_proton_charge_c
         
         final_list_of_sample_runs = []
         for _run in list_of_runs[DataType.sample].keys():
@@ -57,9 +61,7 @@ class RecapData(Parent):
 
         self.final_list_of_runs[DataType.ob] = final_list_of_ob_runs
 
-    def run(self):
-        self.prepare_list_of_runs()
-        self.display_list_of_runs()
+        self.parent.final_list_of_runs = self.final_list_of_runs
 
     def display_list_of_runs(self):
 

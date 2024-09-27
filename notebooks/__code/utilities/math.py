@@ -11,7 +11,6 @@ def convert_deg_in_rad(array_of_angles_in_deg):
 
 
 def calculate_most_dominant_int_value_from_list(list_value):
-    print(list_value)
     round_list = [round(_value) for _value in list_value]
     count = Counter(round_list)
     max_value = 0

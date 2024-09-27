@@ -23,7 +23,20 @@ class WhiteBeam:
                     DataType.ob: {},
                     }
     
-    master_3d_data_array = None  # [angle, y, x]
+    list_of_runs_checking_data = {DataType.sample: {},
+                                   DataType.ob: {},
+                                  }
+
+    list_proton_charge_c = {DataType.sample: {},
+                            DataType.ob: {},
+                           }
+
+    final_list_of_runs = {DataType.sample: {},
+                          DataType.ob: {},
+                          }
+
+    master_3d_data_array = {DataType.sample: None,  # [angle, y, x]
+                            DataType.ob: None}
 
     instrument = "VENUS"
 
