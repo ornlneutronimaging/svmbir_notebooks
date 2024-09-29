@@ -1,5 +1,6 @@
 import os
 import logging
+from collections import OrderedDict
 
 from __code import DataType
 from __code.utilities.logging import setup_logging
@@ -19,8 +20,17 @@ class WhiteBeam:
         }
     
     # will record short_run_number and pc
-    list_of_runs = {DataType.sample: {},
-                    DataType.ob: {},
+    # will look like
+    # {DataType.sample: {'Run_1234': {Run.full_path: "/SNS/VENUS/.../Run_1344",
+    #                                 Run.proton_charge: 5.01,
+    #                                 Ru.use_it: True,
+    #                                },
+    #                    ...,
+    #                   },
+    # DataType.ob: {...},
+    # }
+    list_of_runs = {DataType.sample: OrderedDict(),
+                    DataType.ob: OrderedDict(),
                     }
     
     list_of_runs_checking_data = {DataType.sample: {},

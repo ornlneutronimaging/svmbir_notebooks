@@ -72,6 +72,13 @@ class CheckingData(Parent):
         top_nexus_path = self.parent.working_dir[DataType.nexus]
         list_proton_charge_c = {DataType.sample: [],
                                 DataType.ob: []} 
+        
+        min_proton_charge_c = {DataType.sample: None,
+                               DataType.ob: None}
+        
+        max_proton_charge_c = {DataType.sample: None,
+                               DataType.ob: None}
+
         for _data_type in self.parent.list_of_runs.keys():
             _list_proton_charge = []
             for _run in self.parent.list_of_runs[_data_type]:
@@ -84,8 +91,12 @@ class CheckingData(Parent):
             list_proton_charge_c[_data_type] = [_pc/1e12 for _pc in _list_proton_charge]
             logging.info(f"\t{_data_type}: {list_proton_charge_c[_data_type]}")
 
+            min_proton_charge_c[_data_type] = min(list_proton_charge_c[_data_type]) - 1
+            max_proton_charge_c[_data_type] = max(list_proton_charge_c[_data_type]) + 1
+
         default_sample_proton_charge = calculate_most_dominant_int_value_from_list(list_proton_charge_c[DataType.sample])
         default_ob_proton_charge = calculate_most_dominant_int_value_from_list(list_proton_charge_c[DataType.ob])
+
 
         def plot_proton_charges(sample_proton_charge_value, ob_proton_charge_value, proton_charge_threshold):        
             fig, axs = plt.subplots(nrows=1, ncols=1)
@@ -113,13 +124,13 @@ class CheckingData(Parent):
             return sample_proton_charge_value, ob_proton_charge_value, proton_charge_threshold
 
         self.parent.selection_of_pc = interactive(plot_proton_charges,
-                              sample_proton_charge_value = widgets.FloatSlider(min=0.01,
-                                                                       max=50,
+                              sample_proton_charge_value = widgets.FloatSlider(min=min_proton_charge_c[DataType.sample],
+                                                                       max=max_proton_charge_c[DataType.sample],
                                                                        value=default_sample_proton_charge,
                                                                        description='sample pc',
                                                                        continuous_update=True),
-                              ob_proton_charge_value = widgets.FloatSlider(min=0.01,
-                                                                       max=50,
+                              ob_proton_charge_value = widgets.FloatSlider(min=min_proton_charge_c[DataType.ob],
+                                                                       max=max_proton_charge_c[DataType.ob],
                                                                        value=default_ob_proton_charge,
                                                                        description='ob pc',
                                                                        continuous_update=True),
@@ -171,4 +182,4 @@ class CheckingData(Parent):
 
     def minimum_requirement_not_met(self):
         display(HTML(f"<font color=red><b>STOP!</b> Make sure you have at least 3 sample and 1 OB selected!</font>"))
-
+        logging.info(f"Minimum requirement not met!")

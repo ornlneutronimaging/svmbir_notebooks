@@ -8,8 +8,7 @@ import ipywidgets as widgets
 from IPython.core.display import HTML, display
 
 from __code.parent import Parent
-from __code import DataType
-
+from __code import DataType, Run
 
 
 class RecapData(Parent):
@@ -35,33 +34,48 @@ class RecapData(Parent):
         logging.info(f"\t{pc_ob_requested = }")
         logging.info(f"\t{pc_threshold = }")
 
-        list_of_runs = self.parent.list_proton_charge_c
+        list_of_runs = self.parent.list_of_runs
         
         final_list_of_sample_runs = []
         for _run in list_of_runs[DataType.sample].keys():
-            _pc = list_of_runs[DataType.sample][_run]
+            logging.info(f"Working with {DataType.sample}")
+
+            if list_of_runs[DataType.sample][_run][Run.use_it]:
     
-            if RecapData.is_pc_within_range(pc_value=_pc,
-                                            pc_requested=pc_sample_requested,
-                                            threshold=pc_threshold):
-                final_list_of_sample_runs.append(_run)
-                logging.info(f"\t{_run} with pc of {_pc} is within the range !")
-            else:
-                logging.info(f"\t{_run} with pc of {_pc} is not within the range !")
+                if list_of_runs[DataType.sample][_run][Run.use_it]:
+                    _pc = list_of_runs[DataType.sample][_run][Run.proton_charge_c]
+                    if RecapData.is_pc_within_range(pc_value=_pc,
+                                                    pc_requested=pc_sample_requested,
+                                                    threshold=pc_threshold):
+                        final_list_of_sample_runs.append(_run)
+                        logging.info(f"\t{_run} with pc of {_pc} is within the range !")
+                        list_of_runs[DataType.sample][_run][Run.use_it] = True
+                    else:
+                        logging.info(f"\t{_run} with pc of {_pc} is not within the range !")
+                        list_of_runs[DataType.sample][_run][Run.use_it] = False
                 
         self.final_list_of_runs[DataType.sample] = final_list_of_sample_runs
 
         final_list_of_ob_runs = []
         for _run in list_of_runs[DataType.ob].keys():
-            _pc = list_of_runs[DataType.ob][_run]
-            if RecapData.is_pc_within_range(pc_value=_pc,
-                                            pc_requested=pc_ob_requested,
-                                            threshold=pc_threshold):
-                final_list_of_ob_runs.append(_run)
+            logging.info(f"Working with {DataType.ob}")
+
+            if list_of_runs[DataType.ob][_run][Run.use_it]:
+                _pc = list_of_runs[DataType.ob][_run][Run.proton_charge_c]
+                if RecapData.is_pc_within_range(pc_value=_pc,
+                                                pc_requested=pc_ob_requested,
+                                                threshold=pc_threshold):
+                    final_list_of_ob_runs.append(_run)
+                    list_of_runs[DataType.ob][_run][Run.use_it] = True
+                    logging.info(f"\t{_run} with pc of {_pc} is within the range !")
+
+                else:
+                    list_of_runs[DataType.ob][_run][Run.use_it] = False
+                    logging.info(f"\t{_run} with pc of {_pc} is not within the range !")
 
         self.final_list_of_runs[DataType.ob] = final_list_of_ob_runs
-
         self.parent.final_list_of_runs = self.final_list_of_runs
+        self.parent.list_of_runs = list_of_runs
 
     def display_list_of_runs(self):
 
