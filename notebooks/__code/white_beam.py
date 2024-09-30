@@ -9,6 +9,7 @@ from __code.workflow.load import Load
 from __code.workflow.checking_data import CheckingData
 from __code.workflow.recap_data import RecapData
 from __code.workflow.combine import Combine
+from __code.workflow.pixel_cleaner import PixelCleaner
 
 
 class WhiteBeam:
@@ -99,3 +100,8 @@ class WhiteBeam:
             o_combine.run()
         else:
             o_check.minimum_requirement_not_met()
+
+    # cleaning low/high pixels
+    def preview_clean_pixels(self):
+        o_clean = PixelCleaner(parent=self)
+        o_clean.preview_cleaning()

@@ -22,3 +22,18 @@ DEFAULT_TILT_SLICES_SELECTION = [103, 602]
 STEP_SIZE = 50  # for working with bucket of data at a time
 
 PROTON_CHARGE_TOLERANCE_C = 0.1  # C
+
+# parameters used for data cleaning
+"""
+if_clean: switch of cleaning operation (bool)
+if_save_clean: switch of saving cleaned tiff files (bool)
+low_gate: the lower index of the image hist bin edges (int 0-9)
+high_gate: the higher index of the image hist bin edges (int 0-9)
+correct_radius: the neighbors (2r+1 * 2r+1 matrix) radius used for replacing bad pixels (int) 
+"""
+clean_paras = {'if_clean': True, 
+               'if_save_clean': False, 
+               'low_gate': 1, 
+               'high_gate': 9, 
+               'correct_radius': 1,
+               'edge_nbr_pixels': 10}

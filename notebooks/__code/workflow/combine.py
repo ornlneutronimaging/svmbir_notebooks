@@ -56,4 +56,4 @@ class Combine(Parent):
                 list_tif = retrieve_list_of_tif(_full_path_run)
                 _master_data.append(load_data_using_multithreading(list_tif))
                 logging.info(f"\t\t loading done!")
-            self.parent.master_3d_data_array[_data_type] = _master_data
+            self.parent.master_3d_data_array[_data_type] = np.array(_master_data)
