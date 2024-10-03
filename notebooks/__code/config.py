@@ -36,4 +36,5 @@ clean_paras = {'if_clean': True,
                'low_gate': 1, 
                'high_gate': 9, 
                'correct_radius': 1,
-               'edge_nbr_pixels': 10}
+               'edge_nbr_pixels': 10,
+               'nbr_bins': 10}

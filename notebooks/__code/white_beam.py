@@ -9,7 +9,7 @@ from __code.workflow.load import Load
 from __code.workflow.checking_data import CheckingData
 from __code.workflow.recap_data import RecapData
 from __code.workflow.combine import Combine
-from __code.workflow.pixel_cleaner import PixelCleaner
+from __code.workflow.images_cleaner import ImagesCleaner
 
 
 class WhiteBeam:
@@ -18,6 +18,7 @@ class WhiteBeam:
         DataType.sample: "",
         DataType.ob: "",
         DataType.nexus: "",
+        DataType.cleaned_images: "",
         }
     
     # will record short_run_number and pc
@@ -48,6 +49,9 @@ class WhiteBeam:
 
     master_3d_data_array = {DataType.sample: None,  # [angle, y, x]
                             DataType.ob: None}
+
+    master_3d_data_array_cleaned = {DataType.sample: None,  # [angle, y, x]
+                                    DataType.ob: None}
 
     instrument = "VENUS"
 
@@ -102,6 +106,18 @@ class WhiteBeam:
             o_check.minimum_requirement_not_met()
 
     # cleaning low/high pixels
-    def preview_clean_pixels(self):
-        o_clean = PixelCleaner(parent=self)
-        o_clean.preview_cleaning()
+    def clean_images_setup(self):
+        o_clean = ImagesCleaner(parent=self)
+        o_clean.cleaning_setup()
+
+    def clean_images(self):
+        o_clean = ImagesCleaner(parent=self)
+        o_clean.cleaning()
+
+    def select_export_folder(self):
+        o_clean = ImagesCleaner(parent=self)
+        o_clean.select_export_folder()
+
+    def export_cleaned_images(self):
+        o_clean = ImagesCleaner(parent=self)
+        o_clean.export_clean_images()

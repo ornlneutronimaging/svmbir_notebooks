@@ -47,8 +47,8 @@ class Combine(Parent):
     def combining_runs(self):
         logging.info(f"combining runs:")
 
-        _master_data = []
         for _data_type in self.parent.list_of_runs.keys():
+            _master_data = []
             logging.info(f"\tworking with {_data_type}:")
             for _run in tqdm(self.list_of_runs_to_use[_data_type]):
                 _full_path_run = self.parent.list_of_runs[_data_type][_run][Run.full_path]
