@@ -15,6 +15,7 @@ from __code.config import clean_paras
 from __code.parent import Parent
 from __code.workflow.load import Load
 from __code.workflow.export import Export
+from __code.utilities.files import make_or_reset_folder
 
 
 class ImagesCleaner(Parent): 
@@ -174,6 +175,35 @@ class ImagesCleaner(Parent):
         
         logging.info(f"Exporting the cleaned images")
         logging.info(f"\tfolder selected: {self.parent.working_dir[DataType.cleaned_images]}")
+
+        master_3d_data = self.parent.master_3d_data_array_cleaned
+
+        master_base_folder_name = f"{os.path.basename(self.parent.working_dir[DataType.sample])}_cleaned"
+        full_output_folder = os.path.join(self.parent.working_dir[DataType.cleaned_images],
+                                          master_base_folder_name)
+
+        # sample
+        logging.info(f"working with sample:")
+        sample_full_output_folder = os.path.join(full_output_folder, "sample")
+        logging.info(f"\t {sample_full_output_folder =}")
+        make_or_reset_folder(sample_full_output_folder)
+
+        o_export = Export(image_3d=master_3d_data[DataType.sample],
+                          output_folder=sample_full_output_folder)
+        o_export.run()
+
+        # ob
+        logging.info(f"working with ob:")
+        ob_full_output_folder = os.path.join(full_output_folder, 'ob')
+        logging.info(f"\t {ob_full_output_folder =}")
+        make_or_reset_folder(ob_full_output_folder)
+
+        o_export = Export(image_3d=master_3d_data[DataType.ob],
+                          output_folder=ob_full_output_folder)
+        o_export.run()
+        
+
+
 
         # self.export_cleaned_images(dict_of_images=self.parent.master_3d_data_array_cleaned,
         #                 output_folder=self.parent.working_dir[DataType.cleaned_images])

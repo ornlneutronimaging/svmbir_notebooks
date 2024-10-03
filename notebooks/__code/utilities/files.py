@@ -1,6 +1,7 @@
 import glob
 import os
 import json
+import shutil
 
 
 def retrieve_list_of_files_from_folders(list_folders):
@@ -38,3 +39,10 @@ def load_json(json_file_name):
 def save_json(json_file_name, json_dictionary=None):
     with open(json_file_name, 'w') as outfile:
         json.dump(json_dictionary, outfile)
+
+
+def make_or_reset_folder(folder_name):
+    if os.path.exists(folder_name):
+         shutil.rmtree(folder_name)
+    os.makedirs(folder_name)
+    
