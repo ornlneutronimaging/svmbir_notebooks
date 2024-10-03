@@ -54,6 +54,8 @@ class WhiteBeam:
     master_3d_data_array_cleaned = {DataType.sample: None,  # [angle, y, x]
                                     DataType.ob: None}
 
+    normalized_data = None
+
     instrument = "VENUS"
 
     selection_of_pc = None   # plot that allows the user to select the pc for sample and ob and threshold
