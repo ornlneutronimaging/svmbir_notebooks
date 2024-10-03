@@ -44,6 +44,8 @@ class Combine(Parent):
                     self.parent.list_of_runs[DataType.ob][_run][Run.use_it] = True
                     self.list_of_runs_to_use[DataType.ob].append(_run)
 
+        self.parent.list_of_runs_used = self.list_of_runs_to_use
+
     def combining_runs(self):
         logging.info(f"combining runs:")
 

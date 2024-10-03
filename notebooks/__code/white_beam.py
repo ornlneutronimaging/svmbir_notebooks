@@ -10,6 +10,7 @@ from __code.workflow.checking_data import CheckingData
 from __code.workflow.recap_data import RecapData
 from __code.workflow.combine import Combine
 from __code.workflow.images_cleaner import ImagesCleaner
+from __code.workflow.normalization import Normalization
 
 
 class WhiteBeam:
@@ -61,6 +62,10 @@ class WhiteBeam:
     list_of_ob_runs_to_reject_ui = None
     minimum_requirements_met = False
 
+    # created during the combine step to match data index with run number (for normalization)
+    list_of_runs_used = {DataType.sample: [],
+                         DataType.ob:[]}
+
     def __init__(self, system=None):
 
         top_sample_dir = system.System.get_working_dir()
@@ -84,8 +89,11 @@ class WhiteBeam:
 
     # Checking data (proton charge, empty runs ...)
     def checking_data(self):
-        o_checking = CheckingData(parent=self)
-        o_checking.run()
+        try:
+            o_checking = CheckingData(parent=self)
+            o_checking.run()
+        except ValueError:
+            logging.info("Check the input folders provided !")
 
     def recap_data(self):
         o_recap = RecapData(parent=self)
@@ -121,3 +129,8 @@ class WhiteBeam:
     def export_cleaned_images(self):
         o_clean = ImagesCleaner(parent=self)
         o_clean.export_clean_images()
+
+    # normalization
+    def normalization(self):
+        o_norm = Normalization(parent=self)
+        o_norm.run()

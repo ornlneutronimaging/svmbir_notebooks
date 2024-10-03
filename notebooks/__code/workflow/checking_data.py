@@ -37,13 +37,18 @@ class CheckingData(Parent):
         logging.info(f"Retrieving runs:")
         for _data_type in self.list_of_runs.keys():
             list_of_runs = retrieve_list_of_runs(top_folder=self.parent.working_dir[_data_type])
+            if len(list_of_runs) == 0:
+                display(HTML(f"<font color=red>Found 0 {_data_type} runs in {self.parent.working_dir[_data_type]}</font>"))
+                raise ValueError("Missing files !")
+            
             logging.info(f"\tfound {len(list_of_runs)} {_data_type} runs")
             
             for _run in list_of_runs:
                 self.parent.list_of_runs[_data_type][os.path.basename(_run)] = {Run.full_path: _run,
                                                                                 Run.proton_charge_c: None,
                                                                                 Run.use_it: True}
-          
+
+
     def reject_empty_runs(self):
 
         logging.info(f"Rejecting empty runs:")
