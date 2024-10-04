@@ -44,6 +44,7 @@ class Load(Parent):
         self.parent.working_dir[self.data_type] = top_folder
         print(f"Top {self.data_type} folder selected: {top_folder}")
         
+
         # self.parent.input_data_folders[self.parent.current_data_type] = list_folders
 
         # if self.parent.current_data_type == DataType.raw:

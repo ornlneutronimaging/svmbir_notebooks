@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
 from IPython.display import display
@@ -7,6 +8,9 @@ import ipywidgets as widgets
 
 from __code.parent import Parent
 from __code import Run, DataType
+from __code.workflow.load import Load
+from __code.workflow.export import Export
+from __code.utilities.files import make_or_reset_folder
 
 
 class Normalization(Parent):
@@ -23,7 +27,7 @@ class Normalization(Parent):
         logging.info(f"Combine obs:")
         list_obs = self.parent.master_3d_data_array_cleaned[DataType.ob]
         if len(list_obs) == 1:
-            self.obs_combined = list_obs.copy()
+            self.obs_combined = list_obs[0]
             logging.info(f"\tonly 1 ob, nothing to combine!")
         else:
             self.obs_combined = np.mean(list_obs, axis=0)
@@ -95,3 +99,21 @@ class Normalization(Parent):
                                   vmin=widgets.IntSlider(min=0, max=10, value=0),
                                   vmax=widgets.IntSlider(min=0, max=10, value=1))
         display(display_plot)
+    
+    def export_images(self):
+        
+        logging.info(f"Exporting the normalized images")
+        logging.info(f"\tfolder selected: {self.parent.working_dir[DataType.normalized]}")
+
+        normalized_data = self.parent.normalized_data
+
+        master_base_folder_name = f"{os.path.basename(self.parent.working_dir[DataType.sample])}_normalized"
+        full_output_folder = os.path.join(self.parent.working_dir[DataType.normalized],
+                                          master_base_folder_name)
+
+        make_or_reset_folder(full_output_folder)
+
+        o_export = Export(image_3d=normalized_data,
+                          output_folder=full_output_folder)
+        o_export.run()
+        logging.info(f"\texporting normalized images ... Done!")

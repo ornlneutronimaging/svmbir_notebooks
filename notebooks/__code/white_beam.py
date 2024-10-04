@@ -20,6 +20,7 @@ class WhiteBeam:
         DataType.ob: "",
         DataType.nexus: "",
         DataType.cleaned_images: "",
+        DataType.normalized: "",
         }
     
     # will record short_run_number and pc
@@ -140,3 +141,11 @@ class WhiteBeam:
     def visualize_normalization(self):
         o_norm = Normalization(parent=self)
         o_norm.visualize_normalization()
+
+    def select_export_normalized_folder(self):
+        o_select = Load(parent=self)
+        o_select.select_folder(data_type=DataType.normalized)
+
+    def export_normalized_images(self):
+        o_norm = Normalization(parent=self)
+        o_norm.export_images()
