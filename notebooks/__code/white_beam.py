@@ -54,7 +54,7 @@ class WhiteBeam:
     master_3d_data_array_cleaned = {DataType.sample: None,  # [angle, y, x]
                                     DataType.ob: None}
 
-    normalized_data = None
+    normalized_data = None 
 
     instrument = "VENUS"
 
@@ -136,3 +136,7 @@ class WhiteBeam:
     def normalization(self):
         o_norm = Normalization(parent=self)
         o_norm.run()
+
+    def visualize_normalization(self):
+        o_norm = Normalization(parent=self)
+        o_norm.visualize_normalization()
