@@ -11,6 +11,7 @@ from __code.workflow.recap_data import RecapData
 from __code.workflow.combine import Combine
 from __code.workflow.images_cleaner import ImagesCleaner
 from __code.workflow.normalization import Normalization
+from __code.workflow.chips_correction import ChipsCorrection
 
 
 class WhiteBeam:
@@ -55,7 +56,8 @@ class WhiteBeam:
     master_3d_data_array_cleaned = {DataType.sample: None,  # [angle, y, x]
                                     DataType.ob: None}
 
-    normalized_data = None 
+    normalized_data = None   # after normalization
+    corrected_images = None  # after chips correction
 
     instrument = "VENUS"
 
@@ -149,3 +151,12 @@ class WhiteBeam:
     def export_normalized_images(self):
         o_norm = Normalization(parent=self)
         o_norm.export_images()
+
+    # chips correction
+    def chips_correction(self):
+        o_chips = ChipsCorrection(parent=self)
+        o_chips.run()
+
+    def visualize_chips_correction(self):
+        o_chips = ChipsCorrection(parent=self)
+        o_chips.visualize_chips_correction()

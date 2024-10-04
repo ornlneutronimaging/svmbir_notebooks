@@ -38,3 +38,6 @@ clean_paras = {'if_clean': True,
                'correct_radius': 1,
                'edge_nbr_pixels': 10,
                'nbr_bins': 10}
+
+# list of offset values along X and Y axis, respectively (X offset, Y offset)
+chips_offset = [2, 2]
