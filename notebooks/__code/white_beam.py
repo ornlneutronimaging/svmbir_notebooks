@@ -56,7 +56,7 @@ class WhiteBeam:
     master_3d_data_array_cleaned = {DataType.sample: None,  # [angle, y, x]
                                     DataType.ob: None}
 
-    normalized_data = None   # after normalization
+    normalized_images = None   # after normalization
     corrected_images = None  # after chips correction
 
     instrument = "VENUS"

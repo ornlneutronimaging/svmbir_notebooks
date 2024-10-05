@@ -63,11 +63,11 @@ class Normalization(Parent):
             normalized_data.append(normalized_sample) 
             logging.info(f"\tnormalization of {_run} is done!")
 
-        self.parent.normalized_data = normalized_data
+        self.parent.normalized_images = normalized_data
 
     def visualize_normalization(self):
         
-        normalized_data = self.parent.normalized_data
+        normalized_data = self.parent.normalized_images
         list_of_runs_to_use = self.parent.list_of_runs_used[DataType.sample]
         master_3d_sample_data = self.parent.master_3d_data_array_cleaned[DataType.sample]
 
@@ -105,7 +105,7 @@ class Normalization(Parent):
         logging.info(f"Exporting the normalized images")
         logging.info(f"\tfolder selected: {self.parent.working_dir[DataType.normalized]}")
 
-        normalized_data = self.parent.normalized_data
+        normalized_data = self.parent.normalized_images
 
         master_base_folder_name = f"{os.path.basename(self.parent.working_dir[DataType.sample])}_normalized"
         full_output_folder = os.path.join(self.parent.working_dir[DataType.normalized],

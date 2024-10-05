@@ -15,17 +15,19 @@ class ChipsCorrection(Parent):
 
     def run(self):
         
-        offset = chips_offset
+        logging.info(f"Chips correction")
+        offset = list(chips_offset)
 
-        normalized_images = self.parent.normalized_images
-        corrected_images = []
-        for _image in tqdm(normalized_images):
-            _corrected_image = self.correct_alignment(_image,
-                                                      offset=offset)
-            corrected_images.append(_corrected_image)
-        self.parent.corrected_images = corrected_images
+        normalized_images = np.array(self.parent.normalized_images)
+        logging.info(f"\t{np.shape(normalized_images) =}")
+        normalized_images_axis_swap = np.moveaxis(normalized_images, 0, 2)  # y, x, angle
+        logging.info(f"\t{np.shape(normalized_images_axis_swap) =}")
+        corrected_images = self.correct_alignment(normalized_images_axis_swap,
+                                                    offsets=offset)
+        self.parent.corrected_images = np.moveaxis(corrected_images, 2, 0)  # angle, y, x
+        logging.info(f"\tChips correction done!")
 
-    def correct_alignment(unaligned_image, offsets, center=None, fill_gap=True, num_pix_unused=1, num_pix_neighbor=1):
+    def correct_alignment(self, unaligned_image=None, offsets=None, center=None, fill_gap=True, num_pix_unused=1, num_pix_neighbor=1):
         """Function to correct alignment of the 4 segments in each image caused by the mismatch between the 4 chips.
         
         Args:
@@ -143,7 +145,7 @@ class ChipsCorrection(Parent):
 
         corrected_images  = self.parent.corrected_images
         list_of_runs_to_use = self.parent.list_of_runs_used[DataType.sample]
-        master_3d_sample_data = self.parent.master_3d_data_array_cleaned[DataType.sample]
+        normalized_images = self.parent.normalized_images
 
         def plot_norm(image_index=0, vmin=0, vmax=1):
 
@@ -151,10 +153,10 @@ class ChipsCorrection(Parent):
 
             _norm_data = corrected_images[image_index]
             _run_number = list_of_runs_to_use[image_index]
-            _raw_data = master_3d_sample_data[image_index]
+            _raw_data = normalized_images[image_index]
 
-            im0 = axs[0].imshow(_raw_data)
-            axs[0].set_title("Uncorrected")
+            im0 = axs[0].imshow(_raw_data, vmin=vmin, vmax=vmax)
+            axs[0].set_title("Chips uncorrected")
             plt.colorbar(im0, ax=axs[0], shrink=0.5)
 
             im1 = axs[1].imshow(_norm_data, vmin=vmin, vmax=vmax)
