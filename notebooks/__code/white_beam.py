@@ -2,6 +2,7 @@ import os
 import logging
 from collections import OrderedDict
 
+
 from __code import DataType
 from __code.utilities.logging import setup_logging
 
@@ -12,6 +13,7 @@ from __code.workflow.combine import Combine
 from __code.workflow.images_cleaner import ImagesCleaner
 from __code.workflow.normalization import Normalization
 from __code.workflow.chips_correction import ChipsCorrection
+from __code.workflow.center_of_rotation import CenterOfRotation
 
 
 class WhiteBeam:
@@ -160,3 +162,13 @@ class WhiteBeam:
     def visualize_chips_correction(self):
         o_chips = ChipsCorrection(parent=self)
         o_chips.visualize_chips_correction()
+
+    # calculate center of rotation
+    def calculate_center_of_rotation(self):
+        o_center = CenterOfRotation(parent=self)
+        o_center.run()
+
+    # calculate tilt and apply it
+        # o_tilt = Tilt(parent=self)
+        # o_tilt.run()
+        

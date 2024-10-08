@@ -20,3 +20,4 @@ class Run:
     full_path = 'short run number'
     proton_charge_c = 'proton charge c'
     use_it = 'use it'
+    angle = 'angle'

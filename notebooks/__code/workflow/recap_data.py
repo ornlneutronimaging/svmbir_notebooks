@@ -44,14 +44,15 @@ class RecapData(Parent):
     
                 if list_of_runs[DataType.sample][_run][Run.use_it]:
                     _pc = list_of_runs[DataType.sample][_run][Run.proton_charge_c]
+                    _angle = list_of_runs[DataType.sample][_run][Run.angle]
                     if RecapData.is_pc_within_range(pc_value=_pc,
                                                     pc_requested=pc_sample_requested,
                                                     threshold=pc_threshold):
                         final_list_of_sample_runs.append(_run)
-                        logging.info(f"\t{_run} with pc of {_pc} is within the range !")
+                        logging.info(f"\t{_run} with pc of {_pc} ({_angle} degrees) is within the range !")
                         list_of_runs[DataType.sample][_run][Run.use_it] = True
                     else:
-                        logging.info(f"\t{_run} with pc of {_pc} is not within the range !")
+                        logging.info(f"\t{_run} with pc of {_pc} ({_angle} degrees) is not within the range !")
                         list_of_runs[DataType.sample][_run][Run.use_it] = False
                 
         self.final_list_of_runs[DataType.sample] = final_list_of_sample_runs

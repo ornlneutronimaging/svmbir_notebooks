@@ -12,6 +12,7 @@ from __code import DataType, Run
 from __code.utilities.files import retrieve_list_of_runs, retrieve_list_of_tif
 from __code.utilities.nexus import get_proton_charge
 from __code.utilities.math import calculate_most_dominant_int_value_from_list
+from __code.utilities.files import retrieve_list_of_tif
 
 
 class CheckingData(Parent):
@@ -19,6 +20,15 @@ class CheckingData(Parent):
     list_of_runs = {DataType.sample: None,
                     DataType.ob: None}
     list_of_metadata = {}
+
+    def get_angle_value(self, run_full_path=None):
+        """ extract the rotation angle value from a string name looking like 
+        Run_####_20240927_date_..._148_443_######_<file_index>.tif
+        """
+        list_tiff = retrieve_list_of_tif(run_full_path)
+        first_tiff = list_tiff[0]
+        list_part = first_tiff.split("_")
+        return f"{list_part[-4]}.{list_part[-3]}"
 
     def run(self):
 
@@ -31,9 +41,19 @@ class CheckingData(Parent):
         # retrieve proton charge of runs
         self.retrieve_proton_charge()
 
-    def retrieve_runs(self):
-        """retrieve the full list of runs in the top folder of sample and ob"""
+        # retrieve rotation angle
+        self.retrieve_rotation_angle()
 
+    def retrieve_rotation_angle(self):
+        list_of_sample_runs = self.parent.list_of_runs[DataType.sample]
+        for _run in list_of_sample_runs.keys():
+            if list_of_sample_runs[_run][Run.use_it]:
+                angle_value = self.get_angle_value(run_full_path=list_of_sample_runs[_run][Run.full_path])
+                self.parent.list_of_runs[DataType.sample][_run][Run.angle] = angle_value
+
+    def retrieve_runs(self):
+        ''' retrieve the full list of runs in the top folder of sample and ob '''
+        
         logging.info(f"Retrieving runs:")
         for _data_type in self.list_of_runs.keys():
             list_of_runs = retrieve_list_of_runs(top_folder=self.parent.working_dir[_data_type])
@@ -46,7 +66,9 @@ class CheckingData(Parent):
             for _run in list_of_runs:
                 self.parent.list_of_runs[_data_type][os.path.basename(_run)] = {Run.full_path: _run,
                                                                                 Run.proton_charge_c: None,
-                                                                                Run.use_it: True}
+                                                                                Run.use_it: True,
+                                                                                Run.angle: None,
+                                                                                }
 
 
     def reject_empty_runs(self):
