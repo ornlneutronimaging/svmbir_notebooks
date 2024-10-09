@@ -13,7 +13,7 @@ from __code.workflow.combine import Combine
 from __code.workflow.images_cleaner import ImagesCleaner
 from __code.workflow.normalization import Normalization
 from __code.workflow.chips_correction import ChipsCorrection
-from notebooks.__code.workflow.center_of_rotation_and_tilt import CenterOfRotationAndTilt
+from __code.workflow.center_of_rotation_and_tilt import CenterOfRotationAndTilt
 from __code.workflow.remove_strips import RemoveStrips
 
 
@@ -167,9 +167,10 @@ class WhiteBeam:
         o_chips = ChipsCorrection(parent=self)
         o_chips.visualize_chips_correction()
 
-    def remove_strips(self):
+    # strips removal
+    def select_remove_strips_algorithms(self):
         o_remove = RemoveStrips(parent=self)
-        o_remove.run_and_display()
+        o_remove.select_algorithms()
 
     # calculate center of rotation & tilt
     def select_sample_roi(self):

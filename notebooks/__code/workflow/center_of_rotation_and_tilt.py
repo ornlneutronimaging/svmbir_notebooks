@@ -1,6 +1,6 @@
 import numpy as np
 import logging
-from neutompy.preproc.preproc import find_COR
+from neutompy.preproc.preproc import find_COR, correction_COR
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
 from IPython.display import display
@@ -72,21 +72,6 @@ class CenterOfRotationAndTilt(Parent):
 
     def run(self):
         self.calculate_using_neutompy()
-        #self.calculate_using_imars3d()
-
-    # def calculate_using_imars3d(self):
-    #     corrected_images = self.parent.corrected_images
-    #     list_of_runs_used = self.parent.list_of_runs_used[DataType.sample]
-    #     list_of_angles = [self.parent.list_of_runs[DataType.sample][_key][Run.angle] for _key in list_of_runs_used]
-    #     list_of_angles = np.array([float(_value) for _value in list_of_angles])
-    #     mean_delta_angle = np.mean([y - x for (x, y) in zip(list_of_angles[:-1], list_of_angles[1:])])
-
-    #     rotation_center = find_rotation_center(arrays=corrected_images,
-    #                                            angles=list_of_angles,
-    #                                            num_pairs=1,
-    #                                            in_degrees=True,
-    #                                            atol_deg=mean_delta_angle)
-    #     logging.info(f"calculated rotation center: {rotation_center}")
 
     def calculate_using_neutompy(self):
         
@@ -97,10 +82,9 @@ class CenterOfRotationAndTilt(Parent):
         mid_point = int(np.mean([y_top, y_bottom]))
         rois = ((y_top, mid_point+1), (mid_point, y_bottom))
 
-        # run neutompy
-        result = find_COR(self.image_0_degree, 
-                          self.image_180_degree, 
-                          nroi=5, 
-                          ShowResults=False, 
-                          rois=rois)
-        logging.info(f"\t{result = }")
+        corrected_images = correction_COR(self.parent.corrected_images,
+                       self.image_0_degree,
+                       self.image_180_degree,
+                       rois=rois)
+        logging.info(f"{np.shape(corrected_images) =}")
+        self.parent.corrected_images = corrected_images
