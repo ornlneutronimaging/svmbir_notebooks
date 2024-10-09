@@ -13,7 +13,7 @@ from __code.workflow.combine import Combine
 from __code.workflow.images_cleaner import ImagesCleaner
 from __code.workflow.normalization import Normalization
 from __code.workflow.chips_correction import ChipsCorrection
-from __code.workflow.center_of_rotation import CenterOfRotation
+from notebooks.__code.workflow.center_of_rotation_and_tilt import CenterOfRotationAndTilt
 from __code.workflow.remove_strips import RemoveStrips
 
 
@@ -75,7 +75,7 @@ class WhiteBeam:
                          DataType.ob:[]}
 
     # center of rotation
-    o_center = None
+    o_center_and_tilt = None
 
     def __init__(self, system=None):
 
@@ -171,15 +171,10 @@ class WhiteBeam:
         o_remove = RemoveStrips(parent=self)
         o_remove.run_and_display()
 
-    # calculate center of rotation
+    # calculate center of rotation & tilt
     def select_sample_roi(self):
-        self.o_center = CenterOfRotation(parent=self)
-        self.o_center.select_range()
+        self.o_center_and_tilt = CenterOfRotationAndTilt(parent=self)
+        self.o_center_and_tilt.select_range()
 
-    def calculate_center_of_rotation(self):
-        self.o_center.run()
-
-    # calculate tilt and apply it
-        # o_tilt = Tilt(parent=self)
-        # o_tilt.run()
-        
+    def calculate_center_of_rotation_and_tilt(self):
+        self.o_center_and_tilt.run()
