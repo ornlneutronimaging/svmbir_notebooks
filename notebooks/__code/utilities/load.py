@@ -11,7 +11,7 @@ def _worker(fl):
     return (imread(fl).astype(np.float32)).swapaxes(0,1)
 
 def load_data_using_multithreading(list_tif):
-    with mp.Pool(processes=10) as pool:
+    with mp.Pool(processes=40) as pool:
         data = pool.map(_worker, list_tif)
 
     return np.array(data).sum(axis=0)

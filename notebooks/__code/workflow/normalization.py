@@ -53,8 +53,9 @@ class Normalization(Parent):
 
         for _index, _run in enumerate(list_of_runs_used[DataType.sample]):
             sample_proton_charge = self.parent.list_of_runs[DataType.sample][_run][Run.proton_charge_c]
+            angle = self.parent.list_of_runs[DataType.sample][_run][Run.angle]
             list_proton_charge[DataType.sample].append(sample_proton_charge)
-            logging.info(f"\t{_run} has a proton charge of {sample_proton_charge}")
+            logging.info(f"\t{_run} has a proton charge of {sample_proton_charge} and angle of {angle}")
 
             norm_coeff = self.mean_ob_proton_charge / sample_proton_charge
             sample_data = master_3d_data[DataType.sample][_index]

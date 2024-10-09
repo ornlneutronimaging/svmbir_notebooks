@@ -70,7 +70,6 @@ class CheckingData(Parent):
                                                                                 Run.angle: None,
                                                                                 }
 
-
     def reject_empty_runs(self):
 
         logging.info(f"Rejecting empty runs:")
@@ -123,7 +122,6 @@ class CheckingData(Parent):
 
         default_sample_proton_charge = calculate_most_dominant_int_value_from_list(list_proton_charge_c[DataType.sample])
         default_ob_proton_charge = calculate_most_dominant_int_value_from_list(list_proton_charge_c[DataType.ob])
-
 
         def plot_proton_charges(sample_proton_charge_value, ob_proton_charge_value, proton_charge_threshold):        
             fig, axs = plt.subplots(nrows=1, ncols=1)

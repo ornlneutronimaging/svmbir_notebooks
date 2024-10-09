@@ -14,6 +14,7 @@ from __code.workflow.images_cleaner import ImagesCleaner
 from __code.workflow.normalization import Normalization
 from __code.workflow.chips_correction import ChipsCorrection
 from __code.workflow.center_of_rotation import CenterOfRotation
+from __code.workflow.remove_strips import RemoveStrips
 
 
 class WhiteBeam:
@@ -72,6 +73,9 @@ class WhiteBeam:
     # created during the combine step to match data index with run number (for normalization)
     list_of_runs_used = {DataType.sample: [],
                          DataType.ob:[]}
+
+    # center of rotation
+    o_center = None
 
     def __init__(self, system=None):
 
@@ -163,10 +167,17 @@ class WhiteBeam:
         o_chips = ChipsCorrection(parent=self)
         o_chips.visualize_chips_correction()
 
+    def remove_strips(self):
+        o_remove = RemoveStrips(parent=self)
+        o_remove.run_and_display()
+
     # calculate center of rotation
+    def select_sample_roi(self):
+        self.o_center = CenterOfRotation(parent=self)
+        self.o_center.select_range()
+
     def calculate_center_of_rotation(self):
-        o_center = CenterOfRotation(parent=self)
-        o_center.run()
+        self.o_center.run()
 
     # calculate tilt and apply it
         # o_tilt = Tilt(parent=self)

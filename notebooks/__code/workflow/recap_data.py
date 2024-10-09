@@ -55,6 +55,9 @@ class RecapData(Parent):
                         logging.info(f"\t{_run} with pc of {_pc} ({_angle} degrees) is not within the range !")
                         list_of_runs[DataType.sample][_run][Run.use_it] = False
                 
+                else:
+                    logging.info(f"\t{_run} can not be used!")
+                
         self.final_list_of_runs[DataType.sample] = final_list_of_sample_runs
 
         final_list_of_ob_runs = []
@@ -73,6 +76,9 @@ class RecapData(Parent):
                 else:
                     list_of_runs[DataType.ob][_run][Run.use_it] = False
                     logging.info(f"\t{_run} with pc of {_pc} is not within the range !")
+
+            else:
+                logging.info(f"\t{_run} can not be used!")
 
         self.final_list_of_runs[DataType.ob] = final_list_of_ob_runs
         self.parent.final_list_of_runs = self.final_list_of_runs
