@@ -76,6 +76,8 @@ class WhiteBeam:
 
     # center of rotation
     o_center_and_tilt = None
+    # remove strips
+    o_remove = None
 
     def __init__(self, system=None):
 
@@ -169,8 +171,11 @@ class WhiteBeam:
 
     # strips removal
     def select_remove_strips_algorithms(self):
-        o_remove = RemoveStrips(parent=self)
-        o_remove.select_algorithms()
+        self.o_remove = RemoveStrips(parent=self)
+        self.o_remove.select_algorithms()
+
+    def remove_strips(self):
+        self.o_remove.run()
 
     # calculate center of rotation & tilt
     def select_sample_roi(self):

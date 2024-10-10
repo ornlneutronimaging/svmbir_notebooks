@@ -1,6 +1,7 @@
 import numpy as np
 from IPython.display import display
 import ipywidgets as widgets
+from IPython.display import Javascript
 from enum import Enum
 
 
@@ -78,9 +79,14 @@ class RemoveStrips:
                                    second_column,
                                    right_widget])
         display(all_widget)
+        
+        help_button = widgets.Button(description='Algorithms documentation ...',
+                                     layout=widgets.Layout(width='max-content'))
+        display(help_button)
 
         button_add.on_click(self.button_add_clicked)
         button_remove.on_click(self.button_remove_clicked)
+        help_button.on_click(self.help_button_clicked)
 
     def button_add_clicked(self, value):
         list_to_add = self.list_options_widget.value
@@ -117,13 +123,19 @@ class RemoveStrips:
                 new_left_list.append(_option)
         self.list_options_widget.options = new_left_list
 
+    def help_button_clicked(self, value):
+        self.window_open("https://tomopy.readthedocs.io/en/latest/api/tomopy.prep.stripe.html")
+
     def run(self):
         self.perform_cleaning()
         self.display_cleaning()
 
     def perform_cleaning(self):
-        pass
+        list_algo_to_use = self.list_to_use_widget.options
+
 
     def display_cleaning(self):
         pass
     
+    def window_open(self, url):
+        display(Javascript('window.open("{url}");'.format(url=url)))
