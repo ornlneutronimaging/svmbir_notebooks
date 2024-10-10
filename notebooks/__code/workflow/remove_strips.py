@@ -87,18 +87,35 @@ class RemoveStrips:
         list_already_added = self.list_to_use_widget.options
         full_list = list_to_add + list_already_added
         list_to_show_on_the_right = []
-        lsit_to_display_on_the_left = []
+        list_to_display_on_the_left = []
         for _option in self.list_options:
             if _option in full_list:
                 list_to_show_on_the_right.append(_option)
             else:
-                lsit_to_display_on_the_left.append(_option)
+                list_to_display_on_the_left.append(_option)
         self.list_to_use_widget.options = list_to_show_on_the_right
-        self.list_options_widget.options = lsit_to_display_on_the_left
+        self.list_options_widget.options = list_to_display_on_the_left
 
     def button_remove_clicked(self, value):
-        print(f"{value =}")
+        right_list_to_remove = self.list_to_use_widget.value
+        right_list = self.list_to_use_widget.options
 
+        new_list_to_use = []
+        for _option in right_list:
+            if _option in right_list_to_remove:
+                pass
+            else:
+                new_list_to_use.append(_option)
+        self.list_to_use_widget.options = new_list_to_use
+
+        full_list_options = self.list_options
+        new_left_list = []
+        for _option in full_list_options:
+            if _option in new_list_to_use:
+                pass
+            else:
+                new_left_list.append(_option)
+        self.list_options_widget.options = new_left_list
 
     def run(self):
         self.perform_cleaning()
