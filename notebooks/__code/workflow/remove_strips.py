@@ -1,6 +1,7 @@
 import numpy as np
 from IPython.display import display
 import ipywidgets as widgets
+from IPython.core.display import HTML
 from IPython.display import Javascript
 from enum import Enum
 from tomopy.prep import stripe
@@ -26,6 +27,8 @@ class ListAlgo:
 class RemoveStrips:
 
     sinogram = None
+
+    default_list_algo_to_use = [ListAlgo.remove_all_stripe]
 
     list_algo = {ListAlgo.remove_stripe_fw: {'help': 'Remove horizontal stripes from sinogram using the Fourier-Wavelet (FW) based method',
                                              'function': stripe.remove_stripe_fw,
@@ -56,7 +59,7 @@ class RemoveStrips:
                  },
                 }
     
-    list_options = None
+    list_options = list(list_algo.keys())
     list_options_widgets = None
     list_to_use_widgets = None
 
@@ -64,7 +67,22 @@ class RemoveStrips:
     
     def __init__(self, parent=None):
         self.parent = parent
-        # self.calculate_sinogram()
+        self.define_default_lists()
+
+    def define_default_lists(self):
+        full_list_options = self.list_options
+        default_list_algo_to_use = self.default_list_algo_to_use
+
+        left_list_algo = []
+        right_list_algo = default_list_algo_to_use
+        for _algo in full_list_options:
+            if _algo in default_list_algo_to_use:
+                pass
+            else:
+                left_list_algo.append(_algo)
+
+        self.default_left_list_algo = left_list_algo
+        self.default_right_list_algo = right_list_algo
 
     def calculate_sinogram(self, data_3d):
         return np.moveaxis(data_3d, 1, 0)
@@ -75,7 +93,7 @@ class RemoveStrips:
 
         self.list_options = list(self.list_algo.keys())
         self.list_options_widget = widgets.SelectMultiple(
-            options = self.list_options,
+            options = self.default_left_list_algo,
             layout = widgets.Layout(height="200px")
         )
         left_text = widgets.HTML("<b>List of algorithms available</b>")
@@ -86,7 +104,7 @@ class RemoveStrips:
         second_column = widgets.VBox([widgets.Label(""),
                                       button_add, button_remove])
 
-        self.list_to_use_widget = widgets.SelectMultiple(options=[],
+        self.list_to_use_widget = widgets.SelectMultiple(options=self.default_right_list_algo,
                                                     layout = widgets.Layout(height="200px"))      
         right_text = widgets.HTML("<b>List of algorithms to use</b>")
         right_widget = widgets.VBox([right_text, self.list_to_use_widget])
@@ -152,16 +170,31 @@ class RemoveStrips:
         logging.info(f"Strip cleaning:")
         if list_algo_to_use:
             tomography_array = self.parent.corrected_images
-            for _algo in tqdm(list_algo_to_use):
-                logging.info(f"\t{_algo} ... running")
-                tomography_array = RemoveStrips.run_algo(self.list_algo[_algo]['function'], 
-                                                         tomography_array)
-                logging.info(f"\t{_algo} done!")
+            list_algo_that_failed = []
+            list_algo_that_worked = []
+            try:
+                for _algo in tqdm(list_algo_to_use):
+                    logging.info(f"\t{_algo} ... running")
+                    tomography_array = RemoveStrips.run_algo(self.list_algo[_algo]['function'], 
+                                                            tomography_array)
+                    logging.info(f"\t{_algo} done!")
+                    list_algo_that_worked.append(_algo)
+            except np.linalg.LinAlgError:
+                list_algo_that_failed.append(_algo)
 
             self.nothing_to_display = False
             self.parent.strip_corrected_images = tomography_array
         else:
             logging.info(f"\tskipped!")
+
+        if list_algo_that_failed:
+            display(HTML("<font color=red><b>List of algo that failed:</b></font>"))
+            for _algo in list_algo_that_failed:
+                display(HTML(f"<font color=red> * {_algo}</font>"))
+        if list_algo_that_worked:
+            display(HTML("<font color=green><b>List of algos that worked:</b></font>"))
+            for _algo in list_algo_that_worked:
+                display(HTML(f"<font color=green> * {_algo}</font>"))
 
     def run_algo(name_of_algo, array):
         return name_of_algo(array)
@@ -172,11 +205,9 @@ class RemoveStrips:
 
         strip_corrected_images = self.parent.strip_corrected_images
         sinogram_before = self.calculate_sinogram(strip_corrected_images)
-        print(f"{np.shape(sinogram_before) =}")
 
         corrected_images = self.parent.corrected_images
         sinogram_after = self.calculate_sinogram(corrected_images)
-        print(f"{np.shape(sinogram_after) =}")
 
         nbr_projections, height, _ = np.shape(corrected_images)
 
