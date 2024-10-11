@@ -15,6 +15,7 @@ from __code.workflow.normalization import Normalization
 from __code.workflow.chips_correction import ChipsCorrection
 from __code.workflow.center_of_rotation_and_tilt import CenterOfRotationAndTilt
 from __code.workflow.remove_strips import RemoveStrips
+from __code.workflow.svmbir_handler import SvmbirHandler
 
 
 class WhiteBeam:
@@ -187,3 +188,9 @@ class WhiteBeam:
 
     def calculate_center_of_rotation_and_tilt(self):
         self.o_center_and_tilt.run()
+
+    # run svmbir
+    def svmbir_settings(self):
+        o_svmbir = SvmbirHandler(parent=self)
+        o_svmbir.set_settings()
+        
