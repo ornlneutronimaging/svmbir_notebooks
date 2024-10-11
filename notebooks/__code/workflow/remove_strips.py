@@ -21,6 +21,7 @@ class ListAlgo:
     remove_stripe_based_fitting = "remove_stripe_based_fitting"
     remove_large_stripe = "remove_large_stripe"
     remove_all_stripe = "remove_all_stripe"
+    remove_dead_stripe = "remove_dead_stripe"
     remove_stripe_based_interpolation = "remove_stripe_based_interpolation"
 
 
@@ -32,30 +33,121 @@ class RemoveStrips:
 
     list_algo = {ListAlgo.remove_stripe_fw: {'help': 'Remove horizontal stripes from sinogram using the Fourier-Wavelet (FW) based method',
                                              'function': stripe.remove_stripe_fw,
+                                             'settings': widgets.VBox([
+                                                            widgets.Text(value="None",
+                                                                            description="level"),
+                                                            widgets.Dropdown(options=['haar', 'db5', 'sym5'],
+                                                                description="wname"
+                                                            ),
+                                                            widgets.FloatText(value=2,
+                                                                            description="sigma"),
+                                                            widgets.Checkbox(value=True,
+                                                                            description='pad')
+                                                        ]),
                 },
                  ListAlgo.remove_stripe_ti: {'help': "Remove horizontal stripes from sinogram using Titarenko's approach [B13]",
                                              'function': stripe.remove_stripe_ti,
+                                              'settings': widgets.VBox([
+                                                                        widgets.IntText(value=0,
+                                                                            description="nblock"),
+                                                                        widgets.FloatText(value=1.5,
+                                                                            description="alpha"),
+                                                        ]),
                  },
                  ListAlgo.remove_stripe_sf: {'help': "Normalize raw projection data using a smoothing filter approach.",
                                              'function': stripe.remove_stripe_sf,
+                                              'settings': widgets.VBox([
+                                                                        widgets.IntText(value=5,
+                                                                            description="size"),
+                                                        ]),
                  },
                  ListAlgo.remove_stripe_based_sorting: {'help': "Remove full and partial stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 3).",
                                                         'function': stripe.remove_stripe_based_sorting,
+                                                         'settings': widgets.VBox([
+                                                                        widgets.Text(value="None",
+                                                                            description="size"),
+                                                                        widgets.Dropdown(options=['1','2'],
+                                                                            value='1',
+                                                                            description="dim"),
+                                                        ]),
                  },
                  ListAlgo.remove_stripe_based_filtering: {'help': "Remove stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 2).",
                                                           'function': stripe.remove_stripe_based_filtering,
+                                                           'settings': widgets.VBox([
+                                                            widgets.FloatSlider(value=3,
+                                                                                min=3,
+                                                                                max=10,
+                                                                            description="sigma"),
+                                                            widgets.Text(value="None",
+                                                                            description="size"),
+                                                            widgets.Dropdown(options=['1','2'],
+                                                                            value='1',
+                                                                            description="dim")
+                                                        ]),
                  },
                  ListAlgo.remove_stripe_based_fitting: {'help': "Remove stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 1).",
                                                         'function': stripe.remove_stripe_based_fitting,
+                                                         'settings': widgets.VBox([
+                                                            widgets.IntSlider(value=3,
+                                                                                min=1,
+                                                                                max=5,
+                                                                            description="order"),
+                                                            widgets.Text(value="5,20",
+                                                                            description="sigma"),
+                                                        ]),
                  },
                  ListAlgo.remove_large_stripe: {'help': "Remove unresponsive and fluctuating stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 6).",
                                                 'function': stripe.remove_large_stripe,
+                                                'settings': widgets.VBox([
+                                                            widgets.FloatText(value=3,
+                                                                            description="snr"),
+                                                            widgets.IntText(value=51,
+                                                                            description="size"),
+                                                            widgets.FloatSlider(value=0.1,
+                                                                                min=0,
+                                                                                max=1,
+                                                                            description="drop_ratio"),
+                                                            widgets.Checkbox(value=True,
+                                                                             description='norm')
+                                                        ]),
                  },
-                 ListAlgo.remove_all_stripe: {'help': "Remove all types of stripe artifacts from sinogram using Nghia Vo's approach [B24] (combination of algorithm 3,4,5, and 6).",
+                ListAlgo.remove_dead_stripe: {'help': "Remove unresponsive and fluctuating stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 6).",
+                                              'function': stripe.remove_dead_stripe,
+                                              'settings': widgets.VBox([
+                                                            widgets.FloatText(value=3,
+                                                                            description="snr"),
+                                                            widgets.IntText(value=51,
+                                                                            description="size"),
+                                                            widgets.Checkbox(value=True,
+                                                                             description='norm'),
+                                                        ]),
+                },
+                ListAlgo.remove_all_stripe: {'help': "Remove all types of stripe artifacts from sinogram using Nghia Vo's approach [B24] (combination of algorithm 3,4,5, and 6).",
                                               'function': stripe.remove_all_stripe,
+                                              'settings': widgets.VBox([
+                                                            widgets.FloatText(value=3,
+                                                                            description="snr"),
+                                                            widgets.IntText(value=61,
+                                                                            description="la_size"),
+                                                            widgets.IntText(value=21,
+                                                                            description="sm_size"),
+                                                            widgets.Dropdown(options=['1','2'],
+                                                                            value='1',
+                                                                            description='dim')
+                                                        ]),
                  },
                  ListAlgo.remove_stripe_based_interpolation: {'help': "Remove most types of stripe artifacts from sinograms based on interpolation.",
                                                               'function': stripe.remove_stripe_based_interpolation,
+                                                                'settings': widgets.VBox([
+                                                                widgets.FloatText(value=3,
+                                                                                description="snr"),
+                                                                widgets.IntText(value=31,
+                                                                                description="size"),
+                                                                widgets.FloatText(value=.1,
+                                                                                description="drop_ratio"),
+                                                                widgets.Checkbox(value=True,
+                                                                                description='norm')
+                                                            ]),
                  },
                 }
     
@@ -123,6 +215,17 @@ class RemoveStrips:
         button_remove.on_click(self.button_remove_clicked)
         help_button.on_click(self.help_button_clicked)
 
+    def define_settings(self):
+        list_options_to_use = self.list_to_use_widget.options
+
+        _children = []
+        for _option in list_options_to_use:
+            _children.append(self.list_algo[_option]['settings'])
+
+        accordion = widgets.Accordion(children=_children,
+                                      titles=list_options_to_use)
+        display(accordion)
+
     def button_add_clicked(self, value):
         list_to_add = self.list_options_widget.value
         list_already_added = self.list_to_use_widget.options
@@ -165,6 +268,15 @@ class RemoveStrips:
         self.perform_cleaning()
         self.display_cleaning()
 
+    def get_keyword_arguments(self, algorithm_name=None):
+        list_widgets = self.list_algo[algorithm_name]['settings'].children
+        list_arguments = {}
+        for _widget in list_widgets:
+            _arg_name = _widget.description
+            _arg_value = _widget.value
+            list_arguments[_arg_name] = _arg_value
+        return list_arguments
+
     def perform_cleaning(self):
         list_algo_to_use = self.list_to_use_widget.options
         logging.info(f"Strip cleaning:")
@@ -175,8 +287,11 @@ class RemoveStrips:
             try:
                 for _algo in tqdm(list_algo_to_use):
                     logging.info(f"\t{_algo} ... running")
+                    kwargs = self.get_keyword_arguments(algorithm_name=_algo)
+                    logging.info(f"\t\t{kwargs =}")
                     tomography_array = RemoveStrips.run_algo(self.list_algo[_algo]['function'], 
-                                                            tomography_array)
+                                                            tomography_array, 
+                                                            **kwargs)
                     logging.info(f"\t{_algo} done!")
                     list_algo_that_worked.append(_algo)
             except np.linalg.LinAlgError:
@@ -196,8 +311,8 @@ class RemoveStrips:
             for _algo in list_algo_that_worked:
                 display(HTML(f"<font color=green> * {_algo}</font>"))
 
-    def run_algo(name_of_algo, array):
-        return name_of_algo(array)
+    def run_algo(name_of_algo, array, **kwargs):
+        return name_of_algo(array, **kwargs)
 
     def display_cleaning(self):
         if self.nothing_to_display:

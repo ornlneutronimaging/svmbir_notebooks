@@ -174,6 +174,9 @@ class WhiteBeam:
         self.o_remove = RemoveStrips(parent=self)
         self.o_remove.select_algorithms()
 
+    def define_settings(self):
+        self.o_remove.define_settings()
+
     def remove_strips_and_display(self):
         self.o_remove.run()
 
