@@ -144,7 +144,7 @@ class ChipsCorrection(Parent):
     def visualize_chips_correction(self):
 
         corrected_images  = self.parent.corrected_images
-        list_of_runs_to_use = self.parent.list_of_runs_used[DataType.sample]
+        list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
         normalized_images = self.parent.normalized_images
 
         def plot_norm(image_index=0, vmin=0, vmax=1):

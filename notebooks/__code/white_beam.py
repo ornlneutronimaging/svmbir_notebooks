@@ -16,6 +16,7 @@ from __code.workflow.chips_correction import ChipsCorrection
 from __code.workflow.center_of_rotation_and_tilt import CenterOfRotationAndTilt
 from __code.workflow.remove_strips import RemoveStrips
 from __code.workflow.svmbir_handler import SvmbirHandler
+from __code.workflow.final_projections_review import FinalProjectionsReview
 
 
 class WhiteBeam:
@@ -197,6 +198,11 @@ class WhiteBeam:
 
     def calculate_center_of_rotation_and_tilt(self):
         self.o_center_and_tilt.run()
+
+    # last chance to reject runs
+    def final_projections_review(self):
+        o_review = FinalProjectionsReview(parent=self)
+        o_review.run()
 
     # run svmbir
     def svmbir_settings(self):

@@ -9,6 +9,7 @@ import logging
 import svmbir
 
 from __code.parent import Parent
+from __code import DataType
 from __code.config import NUM_THREADS
 
 
@@ -20,11 +21,16 @@ class SvmbirHandler(Parent):
         nbr_images = len(corrected_array)
         height, _ = np.shape(corrected_array[0])        
 
+        list_angles = self.parent.final_list_of_angles
+        list_runs = self.parent.list_of_runs_to_use[DataType.sample]
+
         display(widgets.HTML("<font size=5>Select range of slices to reconstruct</font"))
 
         def plot_range(image_index, top_slice, bottom_slice):
 
             fig, axs = plt.subplots(nrows=1, ncols=1)
+
+            axs.set_title(f"{list_runs[image_index]}, angle: {list_angles[image_index]}")
             axs.imshow(corrected_array[image_index], vmin=0, vmax=1)
             axs.axhspan(top_slice, bottom_slice, color='blue', alpha=0.3)
             axs.axhline(top_slice, color='red', linestyle='--')
@@ -121,6 +127,8 @@ class SvmbirHandler(Parent):
         logging.info(f"\t{list_of_angles = }")
         logging.info(f"\t{width = }")
         logging.info(f"\t{height = }")
+        logging.info(f"\t{type(corrected_array) = }")
+        logging.info(f"\t{np.shape(corrected_array) = }")
 
         logging.info(f"\t launching reconstruction ...")
 
