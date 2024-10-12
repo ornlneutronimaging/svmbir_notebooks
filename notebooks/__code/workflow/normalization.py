@@ -34,16 +34,15 @@ class Normalization(Parent):
             logging.info(f"\tcombining {len(list_obs)} obs.")
 
         list_proton_charge = []
-        for _run in self.parent.list_of_runs_used[DataType.ob]:
+        for _run in self.parent.list_of_runs_to_use[DataType.ob]:
             list_proton_charge.append(self.parent.list_of_runs[DataType.ob][_run][Run.proton_charge_c])
         self.mean_ob_proton_charge = np.mean(list_proton_charge)
         logging.info(f"\tcalculated combined ob proton charge: {self.mean_ob_proton_charge}")
     
     def normalize_runs(self):
         master_3d_data = self.parent.master_3d_data_array_cleaned
-        list_of_runs_used = self.parent.list_of_runs_used
+        list_of_runs_used = self.parent.list_of_runs_to_use
         normalized_data = []
-
 
         list_proton_charge = {DataType.sample: [],
                               DataType.ob: [],
@@ -69,7 +68,7 @@ class Normalization(Parent):
     def visualize_normalization(self):
         
         normalized_data = self.parent.normalized_images
-        list_of_runs_to_use = self.parent.list_of_runs_used[DataType.sample]
+        list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
         master_3d_sample_data = self.parent.master_3d_data_array_cleaned[DataType.sample]
 
         def plot_norm(image_index=0, vmin=0, vmax=1):

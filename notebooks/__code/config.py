@@ -41,3 +41,5 @@ clean_paras = {'if_clean': True,
 
 # list of offset values along X and Y axis, respectively (X offset, Y offset)
 chips_offset = [2, 2]
+
+NUM_THREADS = 30

@@ -21,9 +21,10 @@ class CenterOfRotationAndTilt(Parent):
     display_plot = None
 
     def _isolate_0_and_180_degrees_images(self):
-        list_of_runs_used = self.parent.list_of_runs_used[DataType.sample]
-        logging.info(f"\t{list_of_runs_used = }")
-        list_of_angles = np.array([self.parent.list_of_runs[DataType.sample][_key][Run.angle] for _key in list_of_runs_used])
+        list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
+        logging.info(f"\t{list_of_runs_to_use = }")
+        list_of_angles = np.array([self.parent.list_of_runs[DataType.sample][_key][Run.angle] for _key in list_of_runs_to_use])
+        self.parent.final_list_of_angles = list_of_angles
 
         angles_minus_180 = [float(_value) - 180 for _value in list_of_angles]
         abs_angles_minus_180 = np.abs(angles_minus_180)

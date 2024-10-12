@@ -10,6 +10,8 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
 
+from __code import DataType
+
 
 class ListAlgo:
 
@@ -326,9 +328,14 @@ class RemoveStrips:
 
         nbr_projections, height, _ = np.shape(corrected_images)
 
+        final_list_of_angles = self.parent.list_of_angles_to_use_sorted
+        final_list_of_runs = self.parent.list_of_runs_to_use[DataType.sample]
+
         def plot_result(image_index, slice_index):
 
             fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(10, 10))
+
+            fig.suptitle(f"Run: {final_list_of_runs[image_index]}, Angle: {final_list_of_angles[image_index]}")
 
             axs[0][0].imshow(corrected_images[image_index], vmin=0, vmax=1)
             axs[0][0].set_title("Before correction")

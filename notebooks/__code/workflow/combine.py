@@ -44,15 +44,31 @@ class Combine(Parent):
                     self.parent.list_of_runs[DataType.ob][_run][Run.use_it] = True
                     self.list_of_runs_to_use[DataType.ob].append(_run)
 
-        self.parent.list_of_runs_used = self.list_of_runs_to_use
+        self.parent.list_of_runs_to_use = self.list_of_runs_to_use
 
     def combining_runs(self):
         logging.info(f"combining runs:")
 
+        list_of_angles = []
+        list_of_runs = self.list_of_runs_to_use[DataType.sample]
+        for _run in list_of_runs:
+            list_of_angles.append(self.parent.list_of_runs[DataType.sample][_run][Run.angle])
+
+        # sort the angles and sort the runs the same way
+        index_sorted = sorted(range(len(list_of_angles)), key=lambda k: list_of_angles[k])
+        list_of_runs_sorted = [list_of_runs[_index] for _index in index_sorted]
+        list_of_angles_sorted = [list_of_angles[_index] for _index in index_sorted]
+
+        logging.info(f"\t{list_of_runs_sorted = }")
+        logging.info(f"\t{list_of_angles_sorted = }")
+
+        self.parent.list_of_runs_to_use[DataType.sample] = list_of_runs_sorted
+        self.parent.list_of_angles_to_use_sorted = list_of_angles_sorted
+
         for _data_type in self.parent.list_of_runs.keys():
             _master_data = []
             logging.info(f"\tworking with {_data_type}:")
-            for _run in tqdm(self.list_of_runs_to_use[_data_type]):
+            for _run in tqdm(self.parent.list_of_runs_to_use[_data_type]):
                 _full_path_run = self.parent.list_of_runs[_data_type][_run][Run.full_path]
                 logging.info(f"\t\tloading {os.path.basename(_full_path_run)} ...")
                 list_tif = retrieve_list_of_tif(_full_path_run)

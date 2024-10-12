@@ -54,6 +54,9 @@ class WhiteBeam:
                           DataType.ob: {},
                           }
 
+    final_list_of_angles = None
+    list_of_runs_to_use = None
+
     master_3d_data_array = {DataType.sample: None,  # [angle, y, x]
                             DataType.ob: None}
 
@@ -72,13 +75,19 @@ class WhiteBeam:
     minimum_requirements_met = False
 
     # created during the combine step to match data index with run number (for normalization)
-    list_of_runs_used = {DataType.sample: [],
-                         DataType.ob:[]}
+    list_of_runs_to_use = {DataType.sample: [],
+                           DataType.ob:[]}
+    list_of_angles_to_use_sorted = None
 
     # center of rotation
     o_center_and_tilt = None
     # remove strips
     o_remove = None
+    # svmbir 
+    o_svmbir = None
+
+    # reconstructed 3D array with svmbir
+    reconstruction_array = None
 
     def __init__(self, system=None):
 
@@ -191,6 +200,11 @@ class WhiteBeam:
 
     # run svmbir
     def svmbir_settings(self):
-        o_svmbir = SvmbirHandler(parent=self)
-        o_svmbir.set_settings()
-        
+        self.o_svmbir = SvmbirHandler(parent=self)
+        self.o_svmbir.set_settings()
+
+    def svmbir_display_projections(self):
+        self.o_svmbir.display_projections()
+
+    def svmbir_run(self):
+        self.o_svmbir.run_reconstruction()
