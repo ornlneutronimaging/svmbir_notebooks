@@ -10,6 +10,7 @@ import ipywidgets as widgets
 
 from __code.parent import Parent
 from __code import DataType, Run
+from __code.utilities.logging import logging_3d_array_infos
 
 
 class CenterOfRotationAndTilt(Parent):
@@ -79,6 +80,8 @@ class CenterOfRotationAndTilt(Parent):
         # retrieve index of 0 and 180degrees runs
         logging.info(f"calculate center of rotation:")
 
+        logging_3d_array_infos(message="before", array=self.parent.corrected_images)
+
         y_top, y_bottom = self.display_plot.result
         mid_point = int(np.mean([y_top, y_bottom]))
         rois = ((y_top, mid_point+1), (mid_point, y_bottom))
@@ -89,3 +92,5 @@ class CenterOfRotationAndTilt(Parent):
                        rois=rois)
         logging.info(f"{np.shape(corrected_images) =}")
         self.parent.corrected_images = corrected_images
+
+        logging_3d_array_infos(message="after", array=self.parent.corrected_images)

@@ -1,13 +1,17 @@
 import numpy as np
+import os
 from IPython.display import display
 import ipywidgets as widgets
 from IPython.core.display import HTML
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
 import logging
+import tomopy
 
 import svmbir
 
+from __code.workflow.export import Export
+from __code.utilities.files import make_or_reset_folder
 from __code.parent import Parent
 from __code import DataType
 from __code.config import NUM_THREADS
@@ -102,7 +106,6 @@ class SvmbirHandler(Parent):
                                         )
         display(display_sinogram)
 
-
     def run_reconstruction(self):
 
         logging.info(f"Running reconstruction:")
@@ -116,6 +119,7 @@ class SvmbirHandler(Parent):
         corrected_array = self.parent.corrected_images
         height, width = np.shape(corrected_array[0])      
         list_of_angles = np.array(self.parent.list_of_angles_to_use_sorted)
+        list_of_angles_rad = np.array([np.deg2rad(float(_angle)) for _angle in list_of_angles])
 
         logging.info(f"\t{top_slice = }")
         logging.info(f"\t{bottom_slice = }")
@@ -124,16 +128,24 @@ class SvmbirHandler(Parent):
         logging.info(f"\t{positivity = }")
         logging.info(f"\t{max_iterations = }")
         logging.info(f"\t{verbose = }")
-        logging.info(f"\t{list_of_angles = }")
+        logging.info(f"\t{list_of_angles_rad = }")
         logging.info(f"\t{width = }")
         logging.info(f"\t{height = }")
         logging.info(f"\t{type(corrected_array) = }")
         logging.info(f"\t{np.shape(corrected_array) = }")
-
         logging.info(f"\t launching reconstruction ...")
 
-        self.parent.reconstruction_array = svmbir.recon(sino=corrected_array[:, top_slice: bottom_slice+1, :],
-                                                        angles=list_of_angles,
+        corrected_array_log = tomopy.minus_log(corrected_array)
+
+        where_nan = np.where(np.isnan(corrected_array_log))
+        corrected_array_log[where_nan] = 0
+
+        logging.info(f"\t{np.min(corrected_array_log) =}")
+        logging.info(f"\t{np.max(corrected_array_log) =}")
+        logging.info(f"\t{np.mean(corrected_array_log) =}")
+
+        self.parent.reconstruction_array = svmbir.recon(sino=corrected_array_log[:, top_slice: bottom_slice+1, :],
+                                                        angles=list_of_angles_rad,
                                                         num_rows = height,
                                                         num_cols = width,
                                                         center_offset = 0,
@@ -146,3 +158,41 @@ class SvmbirHandler(Parent):
                                                         svmbir_lib_path = "/tmp/"
                                                         )
         logging.info(f"\t Done !")
+
+    def display_slices(self):
+
+        reconstruction_array = self.parent.reconstruction_array
+        height, _ = np.shape(reconstruction_array[0])        
+
+        def display_slices(slice_index):
+
+            fig, axs = plt.subplots(nrows=1, ncols=1)
+            im1 = axs.imshow(reconstruction_array[:, slice_index, :])
+            plt.colorbar(im1, ax=axs, shrink=0.5)
+            plt.tight_layout()
+            plt.show()
+
+        display_svmbir_slices = interactive(display_slices,
+                                            slice_index = widgets.IntSlider(min=0,
+                                                                            max=height-1,
+                                                                            value=0),
+                                                )
+        display(display_svmbir_slices)
+
+    def export_images(self):
+        
+        logging.info(f"Exporting the reconstructed slices")
+        logging.info(f"\tfolder selected: {self.parent.working_dir[DataType.reconstructed]}")
+
+        reconstructed_array = self.parent.reconstruction_array
+
+        master_base_folder_name = f"{os.path.basename(self.parent.working_dir[DataType.sample])}_reconstructed"
+        full_output_folder = os.path.join(self.parent.working_dir[DataType.reconstructed],
+                                          master_base_folder_name)
+
+        make_or_reset_folder(full_output_folder)
+
+        o_export = Export(image_3d=reconstructed_array,
+                          output_folder=full_output_folder)
+        o_export.run()
+        logging.info(f"\texporting reconstructed images ... Done!")

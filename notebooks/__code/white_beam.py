@@ -17,6 +17,9 @@ from __code.workflow.center_of_rotation_and_tilt import CenterOfRotationAndTilt
 from __code.workflow.remove_strips import RemoveStrips
 from __code.workflow.svmbir_handler import SvmbirHandler
 from __code.workflow.final_projections_review import FinalProjectionsReview
+from __code.workflow.export import ExportExtra
+
+LOG_BASENAME_FILENAME = "svmbir_white_beam"
 
 
 class WhiteBeam:
@@ -80,6 +83,8 @@ class WhiteBeam:
                            DataType.ob:[]}
     list_of_angles_to_use_sorted = None
 
+    strip_corrected_images = None # Array 3D after strip correction
+
     # center of rotation
     o_center_and_tilt = None
     # remove strips
@@ -95,7 +100,7 @@ class WhiteBeam:
         top_sample_dir = system.System.get_working_dir()
         self.instrument = system.System.get_instrument_selected()
 
-        setup_logging(basename_of_log_file="svmbir_white_beam")        
+        setup_logging(basename_of_log_file=LOG_BASENAME_FILENAME)        
         self.working_dir[DataType.ipts] = os.path.basename(top_sample_dir)
         self.working_dir[DataType.top] = os.path.join(top_sample_dir, "shared", "autoreduce", "mcp")
         self.working_dir[DataType.nexus] = os.path.join(top_sample_dir, "nexus")
@@ -193,6 +198,10 @@ class WhiteBeam:
 
     # calculate center of rotation & tilt
     def select_sample_roi(self):
+        if self.strip_corrected_images is None:
+            # if the remove filter hasn't been ran
+            self.strip_corrected_images = self.corrected_images
+
         self.o_center_and_tilt = CenterOfRotationAndTilt(parent=self)
         self.o_center_and_tilt.select_range()
 
@@ -214,3 +223,23 @@ class WhiteBeam:
 
     def svmbir_run(self):
         self.o_svmbir.run_reconstruction()
+
+    def display_slices(self):
+        self.o_svmbir.display_slices()
+
+    # export slices
+    def select_export_slices_folder(self):
+        o_select = Load(parent=self)
+        o_select.select_folder(data_type=DataType.reconstructed)
+
+    def export_slices(self):
+        self.o_svmbir.export_images()
+
+    # export extra files
+    def select_export_extra_files(self):
+        o_select = Load(parent=self)
+        o_select.select_folder(data_type=DataType.extra)
+
+    def export_extra_files(self):
+        o_export = ExportExtra(parent=self)
+        o_export.run(base_log_file_name=LOG_BASENAME_FILENAME)

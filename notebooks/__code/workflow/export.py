@@ -1,8 +1,11 @@
 from tqdm import tqdm
 import os
 import logging
+import shutil
 
 from __code.utilities.save import make_tiff
+from __code.parent import Parent
+from __code import DataType
 
 
 class Export:
@@ -20,3 +23,13 @@ class Export:
             full_file_name = os.path.join(self.output_folder, short_file_name)
             logging.info(f"\texporting {full_file_name}")
             make_tiff(data=_data, filename=full_file_name)
+
+
+class ExportExtra(Parent):
+
+    def run(self, base_log_file_name=None):
+        print(f"Files exported:")
+        log_file_name = f"/SNS/VENUS/shared/log/{base_log_file_name}.log"
+        output_folder = self.parent.working_dir[DataType.extra]
+        shutil.copy(log_file_name, output_folder)
+        print(f"\tlog file from {log_file_name} to {output_folder}!")

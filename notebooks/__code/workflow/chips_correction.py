@@ -9,6 +9,7 @@ import ipywidgets as widgets
 from __code.parent import Parent
 from __code.config import chips_offset
 from __code import DataType
+from __code.utilities.logging import logging_3d_array_infos
 
 
 class ChipsCorrection(Parent):
@@ -18,6 +19,9 @@ class ChipsCorrection(Parent):
         logging.info(f"Chips correction")
         offset = list(chips_offset)
 
+        logging_3d_array_infos(message="before chips correction",
+                               array=self.parent.normalized_images)
+
         normalized_images = np.array(self.parent.normalized_images)
         logging.info(f"\t{np.shape(normalized_images) =}")
         normalized_images_axis_swap = np.moveaxis(normalized_images, 0, 2)  # y, x, angle
@@ -26,6 +30,9 @@ class ChipsCorrection(Parent):
                                                     offsets=offset)
         self.parent.corrected_images = np.moveaxis(corrected_images, 2, 0)  # angle, y, x
         logging.info(f"\tChips correction done!")
+
+        logging_3d_array_infos(message="aftert chips correction",
+                               array=self.parent.corrected_images)
 
     def correct_alignment(self, unaligned_image=None, offsets=None, center=None, fill_gap=True, num_pix_unused=1, num_pix_neighbor=1):
         """Function to correct alignment of the 4 segments in each image caused by the mismatch between the 4 chips.

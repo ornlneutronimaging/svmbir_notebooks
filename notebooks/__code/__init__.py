@@ -6,6 +6,8 @@ class DataType:
     nexus = 'nexus'
     cleaned_images = 'cleaned images'
     normalized = 'normalized'
+    reconstructed = 'reconstructed'
+    extra = 'extra'
 
 
 DEBUG = True
@@ -13,6 +15,8 @@ debug_folder = {DataType.sample: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/Se
                 DataType.ob: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/September26_2024_PurpleCar_OpenBean_5_0_C_Cd_inBeam_Resonance",
                 DataType.cleaned_images: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
                 DataType.normalized: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
+                DataType.reconstructed: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
+                DataType.extra: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
 }
 
 

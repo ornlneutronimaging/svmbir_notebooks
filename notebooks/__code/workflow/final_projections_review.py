@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from IPython.display import display
+import ipywidgets as widgets
 
 from __code.parent import Parent
 from __code import DataType
@@ -17,6 +19,8 @@ class FinalProjectionsReview(Parent):
 
         nbr_cols = 5
         nbr_rows = int(np.ceil(nbr_images / nbr_cols))
+
+        display(widgets.HTML("Scales kept between 0 and 1!"))
 
         fig, axs =  plt.subplots(nrows=nbr_rows, ncols=nbr_cols,
                                 figsize=(nbr_cols*2,nbr_rows*2))

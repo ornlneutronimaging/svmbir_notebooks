@@ -5,12 +5,14 @@ import matplotlib.pyplot as plt
 from ipywidgets import interactive
 from IPython.display import display
 import ipywidgets as widgets
+from scipy.ndimage import median_filter
 
 from __code.parent import Parent
 from __code import Run, DataType
 from __code.workflow.load import Load
 from __code.workflow.export import Export
 from __code.utilities.files import make_or_reset_folder
+from __code.utilities.logging import logging_3d_array_infos
 
 
 class Normalization(Parent):
@@ -27,15 +29,22 @@ class Normalization(Parent):
         logging.info(f"Combine obs:")
         list_obs = self.parent.master_3d_data_array_cleaned[DataType.ob]
         if len(list_obs) == 1:
-            self.obs_combined = list_obs[0]
+            self.obs_combined = np.array(list_obs[0])
             logging.info(f"\tonly 1 ob, nothing to combine!")
         else:
             self.obs_combined = np.mean(list_obs, axis=0)
             logging.info(f"\tcombining {len(list_obs)} obs.")
+        
+        temp_obs_combined = median_filter(self.obs_combined, size=2)
+        index_of_zero = np.where(self.obs_combined == 0)
+        self.obs_combined[index_of_zero] = temp_obs_combined[index_of_zero]
+
+        logging_3d_array_infos(message="obs", array=self.obs_combined)
 
         list_proton_charge = []
         for _run in self.parent.list_of_runs_to_use[DataType.ob]:
             list_proton_charge.append(self.parent.list_of_runs[DataType.ob][_run][Run.proton_charge_c])
+
         self.mean_ob_proton_charge = np.mean(list_proton_charge)
         logging.info(f"\tcalculated combined ob proton charge: {self.mean_ob_proton_charge}")
     
@@ -49,17 +58,20 @@ class Normalization(Parent):
                              }
 
         logging.info(f"Normalization:")
+        logging_3d_array_infos(array=self.mean_ob_proton_charge, message="mean_ob_proton_charge")
 
         for _index, _run in enumerate(list_of_runs_used[DataType.sample]):
             sample_proton_charge = self.parent.list_of_runs[DataType.sample][_run][Run.proton_charge_c]
             angle = self.parent.list_of_runs[DataType.sample][_run][Run.angle]
             list_proton_charge[DataType.sample].append(sample_proton_charge)
             logging.info(f"\t{_run} has a proton charge of {sample_proton_charge} and angle of {angle}")
-
+            
             norm_coeff = self.mean_ob_proton_charge / sample_proton_charge
-            sample_data = master_3d_data[DataType.sample][_index]
+            sample_data = np.array(master_3d_data[DataType.sample][_index])
+            logging_3d_array_infos(message="sample_data", array=sample_data)
 
             normalized_sample = np.divide(sample_data, self.obs_combined) * norm_coeff
+            logging_3d_array_infos(message="after normalization", array=normalized_sample)
             normalized_data.append(normalized_sample) 
             logging.info(f"\tnormalization of {_run} is done!")
 

@@ -303,6 +303,7 @@ class RemoveStrips:
             self.parent.strip_corrected_images = tomography_array
         else:
             logging.info(f"\tskipped!")
+            self.parent.strip_corrected_images = tomography_array
 
         if list_algo_that_failed:
             display(HTML("<font color=red><b>List of algo that failed:</b></font>"))
