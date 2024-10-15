@@ -25,3 +25,5 @@ class Run:
     proton_charge_c = 'proton charge c'
     use_it = 'use it'
     angle = 'angle'
+    frame_number = 'number of frames'
+    nexus = ''

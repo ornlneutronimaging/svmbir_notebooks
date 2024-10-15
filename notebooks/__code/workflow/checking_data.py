@@ -10,7 +10,7 @@ from __code.parent import Parent
 from __code.config import PROTON_CHARGE_TOLERANCE_C
 from __code import DataType, Run
 from __code.utilities.files import retrieve_list_of_runs, retrieve_list_of_tif
-from __code.utilities.nexus import get_proton_charge
+from __code.utilities.nexus import get_proton_charge, get_frame_number
 from __code.utilities.math import calculate_most_dominant_int_value_from_list
 from __code.utilities.files import retrieve_list_of_tif
 
@@ -44,6 +44,25 @@ class CheckingData(Parent):
         # retrieve rotation angle
         self.retrieve_rotation_angle()
 
+        # retrieve frame number
+        self.retrieve_frame_number()
+
+    def retrieve_frame_number(self):
+        logging.info(f"Retrieving frame numbers:")
+        self.parent.at_least_one_frame_number_not_found = False
+        for _data_type in self.parent.list_of_runs.keys():
+            list_of_frame_number = []
+            for _run in self.parent.list_of_runs[_data_type]:
+                # _, number = os.path.basename(_run).split("_")
+                # nexus_path = os.path.join(top_nexus_path, f"{self.parent.instrument}_{number}.nxs.h5")
+                nexus_path = self.parent.list_of_runs[_data_type][_run][Run.nexus]
+                frame_number = get_frame_number(nexus_path)
+                list_of_frame_number.append(frame_number)
+                self.parent.list_of_runs[_data_type][_run][Run.frame_number] = frame_number
+                if frame_number is None:
+                    self.parent.at_least_one_frame_number_not_found = True
+            logging.info(f"\t{_data_type}: {list_of_frame_number}")
+
     def retrieve_rotation_angle(self):
         list_of_sample_runs = self.parent.list_of_runs[DataType.sample]
         for _run in list_of_sample_runs.keys():
@@ -63,11 +82,16 @@ class CheckingData(Parent):
             
             logging.info(f"\tfound {len(list_of_runs)} {_data_type} runs")
             
+            top_nexus_path = self.parent.working_dir[DataType.nexus]
             for _run in list_of_runs:
+                _, number = os.path.basename(_run).split("_")
+                nexus_path = os.path.join(top_nexus_path, f"{self.parent.instrument}_{number}.nxs.h5")
                 self.parent.list_of_runs[_data_type][os.path.basename(_run)] = {Run.full_path: _run,
                                                                                 Run.proton_charge_c: None,
                                                                                 Run.use_it: True,
                                                                                 Run.angle: None,
+                                                                                Run.nexus: nexus_path,
+                                                                                Run.frame_number: None,
                                                                                 }
 
     def reject_empty_runs(self):
@@ -108,8 +132,7 @@ class CheckingData(Parent):
         for _data_type in self.parent.list_of_runs.keys():
             _list_proton_charge = []
             for _run in self.parent.list_of_runs[_data_type]:
-                _, number = os.path.basename(_run).split("_")
-                nexus_path = os.path.join(top_nexus_path, f"{self.parent.instrument}_{number}.nxs.h5")
+                nexus_path = self.parent.list_of_runs[_data_type][_run][Run.nexus]
                 proton_charge = get_proton_charge(nexus_path)
                 _list_proton_charge.append(proton_charge)
                 self.list_of_metadata[_run] = proton_charge

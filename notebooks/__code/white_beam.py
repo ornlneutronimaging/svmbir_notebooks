@@ -60,6 +60,9 @@ class WhiteBeam:
 
     final_list_of_angles = None
     list_of_runs_to_use = None
+    
+    # set up in the checking_data. True if at least one of the run doesn't have this metadata in the NeXus
+    at_least_one_frame_number_not_found = False
 
     master_3d_data_array = {DataType.sample: None,  # [angle, y, x]
                             DataType.ob: None}

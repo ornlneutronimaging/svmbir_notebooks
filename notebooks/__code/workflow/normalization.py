@@ -21,16 +21,21 @@ class Normalization(Parent):
     obs_combined = None
     mean_ob_proton_charge = None
 
+    enable_frame_number = False
+
     def normalization_settings(self):
-        use_proton_charge_ui = widgets.Checkbox(value=False,
+
+        self.use_proton_charge_ui = widgets.Checkbox(value=False,
                                                 description='Use proton charge')
-        use_frames_ui = widgets.Checkbox(value=False,
-                                         description='Use frames')
-        use_roi_ui = widgets.Checkbox(value=False,
+        self.use_frames_ui = widgets.Checkbox(value=False,
+                                         description='Use frames',
+                                         disabled=self.parent.at_least_one_frame_number_not_found,
+                                         )
+        self.use_roi_ui = widgets.Checkbox(value=False,
                                       description='Use ROI')
-        vertical_layout = widgets.VBox([use_proton_charge_ui,
-                                        use_frames_ui,
-                                        use_roi_ui])
+        vertical_layout = widgets.VBox([self.use_proton_charge_ui,
+                                        self.use_frames_ui,
+                                        self.use_roi_ui])
         display(vertical_layout)
 
     def select_roi(self):
