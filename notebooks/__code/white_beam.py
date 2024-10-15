@@ -160,6 +160,10 @@ class WhiteBeam:
         o_clean.export_clean_images()
 
     # normalization
+    def normalization_settings(self):
+        o_norm = Normalization(parent=self)
+        o_norm.normalization_settings()
+
     def normalization(self):
         o_norm = Normalization(parent=self)
         o_norm.run()

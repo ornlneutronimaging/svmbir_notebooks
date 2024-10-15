@@ -2,6 +2,7 @@ import logging
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 from ipywidgets import interactive
 from IPython.display import display
 import ipywidgets as widgets
@@ -19,6 +20,46 @@ class Normalization(Parent):
 
     obs_combined = None
     mean_ob_proton_charge = None
+
+    def normalization_settings(self):
+        use_proton_charge_ui = widgets.Checkbox(value=False,
+                                                description='Use proton charge')
+        use_frames_ui = widgets.Checkbox(value=False,
+                                         description='Use frames')
+        use_roi_ui = widgets.Checkbox(value=False,
+                                      description='Use ROI')
+        vertical_layout = widgets.VBox([use_proton_charge_ui,
+                                        use_frames_ui,
+                                        use_roi_ui])
+        display(vertical_layout)
+
+    def select_roi(self):
+        logging.info(f"User select ROI for normalization:")
+        master_3d_data = self.parent.master_3d_data_array_cleaned
+        logging.info(f"\t{np.shaape(master_3d_data) = }")
+        integrated_images = np.sum(master_3d_data, axis=0)
+        logging.info(f"\t{np.shape(integrated_images) = }")
+
+        def plot_roi(left, right, top, bottom):
+
+            height = np.abs(bottom - top) + 1
+            width = np.abs(right - left) + 1
+
+            fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(10,10))
+            im1 = axs.imshow(integrated_images)
+            plt.colorbar(im1, ax=axs, shrink=0.8)
+
+            axs.add_patch(Rectangle((top, left), height, width,
+                                        edgecolor='red',
+                                        facecolor='blue',
+                                        fill=True,
+                                        lw=2,
+                                        alpha=0.5,
+                                        ),
+            )
+                                
+
+
 
     def run(self):
         self.combine_obs()
