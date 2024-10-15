@@ -9,12 +9,47 @@ import ipywidgets as widgets
 from scipy.ndimage import median_filter
 
 from __code.parent import Parent
+from __code import DEBUG, roi
 from __code import Run, DataType
 from __code.workflow.load import Load
 from __code.workflow.export import Export
 from __code.utilities.files import make_or_reset_folder
 from __code.utilities.logging import logging_3d_array_infos
 
+
+class RectangleSelector:
+   def __init__(self, ax):
+      self.ax = ax
+      self.start_point = None
+      self.rect = None
+      self.cid_press = ax.figure.canvas.mpl_connect('button_press_event', self.on_press)
+      self.cid_release = ax.figure.canvas.mpl_connect('button_release_event', self.on_release)
+      self.cid_motion = ax.figure.canvas.mpl_connect('motion_notify_event', self.on_motion)
+   def on_press(self, event):
+      if event.inaxes == self.ax:
+         self.start_point = (event.xdata, event.ydata)
+         self.rect = Rectangle(self.start_point, 0, 0, edgecolor='red', alpha=0.2)
+         self.ax.add_patch(self.rect)
+   def on_motion(self, event):
+      if self.start_point is not None and event.inaxes == self.ax:
+         width = event.xdata - self.start_point[0]
+         height = event.ydata - self.start_point[1]
+         self.rect.set_width(width)
+         self.rect.set_height(height)
+         self.ax.figure.canvas.draw()
+   def on_release(self, event):
+      if self.start_point is not None:
+         # Determine the data points within the rectangle and perform actions as needed
+         selected_data = self.get_data_within_rectangle()
+         print("Selected Data:", selected_data)
+         self.start_point = None
+         self.rect.remove()
+         self.ax.figure.canvas.draw()
+   def get_data_within_rectangle(self):
+      # Placeholder function to determine data points within the rectangle
+      # Implement logic to identify data points based on the rectangle's coordinates
+      return [(1, 2), (3, 4)]  # Example data points
+   
 
 class Normalization(Parent):
 
@@ -39,11 +74,14 @@ class Normalization(Parent):
         display(vertical_layout)
 
     def select_roi(self):
-        logging.info(f"User select ROI for normalization:")
-        master_3d_data = self.parent.master_3d_data_array_cleaned
-        logging.info(f"\t{np.shaape(master_3d_data) = }")
-        integrated_images = np.sum(master_3d_data, axis=0)
-        logging.info(f"\t{np.shape(integrated_images) = }")
+
+        if not self.use_roi_ui.value:
+            logging.info(f"User skipped normalization ROI selection.")
+            return
+
+        integrated_images = np.log(np.min(self.parent.master_3d_data_array_cleaned[DataType.sample], axis=0))
+        height = self.parent.image_size['height']
+        width = self.parent.image_size['width']
 
         def plot_roi(left, right, top, bottom):
 
@@ -54,17 +92,41 @@ class Normalization(Parent):
             im1 = axs.imshow(integrated_images)
             plt.colorbar(im1, ax=axs, shrink=0.8)
 
-            axs.add_patch(Rectangle((top, left), height, width,
-                                        edgecolor='red',
-                                        facecolor='blue',
+            axs.add_patch(Rectangle((left, top), width, height,
+                                        edgecolor='yellow',
+                                        facecolor='green',
                                         fill=True,
                                         lw=2,
-                                        alpha=0.5,
+                                        alpha=0.3,
                                         ),
-            )
-                                
+            )     
 
+            return left, right, top, bottom                       
+    
+        if DEBUG:
+            default_left = roi['left']
+            default_right = roi['right']
+            default_top = roi['top']
+            defualt_bottom = roi['bottom']
+        else:
+            default_left = default_top = 0
+            default_right = defualt_bottom = 20
 
+        self.display_roi = interactive(plot_roi,
+                                       left=widgets.IntSlider(min=0,
+                                                              max=width-1,
+                                                              value=default_left),
+                                        right=widgets.IntSlider(min=0,
+                                                                max=width-1,
+                                                                value=default_right),                      
+                                        top=widgets.IntSlider(min=0,
+                                                              max=height-1,
+                                                              value=default_top),
+                                        bottom=widgets.IntSlider(min=0,
+                                                                 max=height-1,
+                                                                 value=defualt_bottom),
+                                        )
+        display(self.display_roi)
 
     def run(self):
         self.combine_obs()
@@ -106,22 +168,51 @@ class Normalization(Parent):
         logging.info(f"Normalization:")
         logging_3d_array_infos(array=self.mean_ob_proton_charge, message="mean_ob_proton_charge")
 
+        use_proton_charge = self.use_proton_charge_ui.value
+        use_frame = self.use_frames_ui.value
+        use_roi = self.use_roi_ui.value
+
+        logging.info(f"\tnormalization settings:")
+        logging.info(f"\t\t- use proton charge: {use_proton_charge}")
+        logging.info(f"\t\t- use_frame: {use_frame}")
+        logging.info(f"\t\t- use_roi: {use_roi}")
+
+        if use_roi:
+            left, right, top, bottom = self.display_roi.result
+
+        obs_combined = self.obs_combined
+        final_list_of_angles = []
+
         for _index, _run in enumerate(list_of_runs_used[DataType.sample]):
+
             sample_proton_charge = self.parent.list_of_runs[DataType.sample][_run][Run.proton_charge_c]
             angle = self.parent.list_of_runs[DataType.sample][_run][Run.angle]
+            final_list_of_angles.append(angle)
             list_proton_charge[DataType.sample].append(sample_proton_charge)
             logging.info(f"\t{_run} has a proton charge of {sample_proton_charge} and angle of {angle}")
             
-            norm_coeff = self.mean_ob_proton_charge / sample_proton_charge
             sample_data = np.array(master_3d_data[DataType.sample][_index])
-            logging_3d_array_infos(message="sample_data", array=sample_data)
 
-            normalized_sample = np.divide(sample_data, self.obs_combined) * norm_coeff
+            coeff = 1
+            if use_proton_charge:
+                coeff *= self.mean_ob_proton_charge / sample_proton_charge
+
+            if use_frame:
+                raise NotImplementedError("using frame is not working yet!")
+
+            if use_roi:
+                sample_roi_counts = np.sum(sample_data[top: bottom+1, left: right+1])
+                ob_roi_counts = np.sum(obs_combined[top: bottom+1, left: right+1])
+                coeff *= ob_roi_counts / sample_roi_counts
+
+            logging_3d_array_infos(message="sample_data", array=sample_data)
+            normalized_sample = np.divide(sample_data, self.obs_combined) * coeff
             logging_3d_array_infos(message="after normalization", array=normalized_sample)
             normalized_data.append(normalized_sample) 
             logging.info(f"\tnormalization of {_run} is done!")
 
         self.parent.normalized_images = normalized_data
+        self.parent.final_list_of_angles = final_list_of_angles
 
     def visualize_normalization(self):
         
@@ -157,7 +248,7 @@ class Normalization(Parent):
                                   vmin=widgets.IntSlider(min=0, max=10, value=0),
                                   vmax=widgets.IntSlider(min=0, max=10, value=1))
         display(display_plot)
-    
+
     def export_images(self):
         
         logging.info(f"Exporting the normalized images")

@@ -32,6 +32,9 @@ class WhiteBeam:
         DataType.normalized: "",
         }
     
+    image_size = {'height': None,
+                  'width': None}
+
     # will record short_run_number and pc
     # will look like
     # {DataType.sample: {'Run_1234': {Run.full_path: "/SNS/VENUS/.../Run_1344",
@@ -92,6 +95,8 @@ class WhiteBeam:
     o_center_and_tilt = None
     # remove strips
     o_remove = None
+    # normalization
+    o_norm = None
     # svmbir 
     o_svmbir = None
 
@@ -164,24 +169,28 @@ class WhiteBeam:
 
     # normalization
     def normalization_settings(self):
-        o_norm = Normalization(parent=self)
-        o_norm.normalization_settings()
+        self.o_norm = Normalization(parent=self)
+        self.o_norm.normalization_settings()
+
+    def normalization_select_roi(self):
+        self.o_norm.select_roi()
 
     def normalization(self):
-        o_norm = Normalization(parent=self)
-        o_norm.run()
+        self.o_norm.run()
 
-    def visualize_normalization(self):
-        o_norm = Normalization(parent=self)
-        o_norm.visualize_normalization()
+    def visualize_normalization(self, individual=True):
+        if individual:
+            self.o_norm.visualize_normalization()
+        else:
+            o_review = FinalProjectionsReview(parent=self)
+            o_review.run(array=self.normalized_images)
 
     def select_export_normalized_folder(self):
         o_select = Load(parent=self)
         o_select.select_folder(data_type=DataType.normalized)
 
     def export_normalized_images(self):
-        o_norm = Normalization(parent=self)
-        o_norm.export_images()
+        self.o_norm.export_images()
 
     # chips correction
     def chips_correction(self):
@@ -218,7 +227,7 @@ class WhiteBeam:
     # last chance to reject runs
     def final_projections_review(self):
         o_review = FinalProjectionsReview(parent=self)
-        o_review.run()
+        o_review.run(array=self.corrected_images)
 
     # run svmbir
     def svmbir_settings(self):

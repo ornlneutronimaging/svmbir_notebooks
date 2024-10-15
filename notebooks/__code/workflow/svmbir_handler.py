@@ -23,7 +23,7 @@ class SvmbirHandler(Parent):
 
         corrected_array = self.parent.corrected_images
         nbr_images = len(corrected_array)
-        height, _ = np.shape(corrected_array[0])        
+        height = self.parent.image_size['height']
 
         list_angles = self.parent.final_list_of_angles
         list_runs = self.parent.list_of_runs_to_use[DataType.sample]
@@ -89,9 +89,8 @@ class SvmbirHandler(Parent):
     def display_projections(self):
 
         corrected_array = self.parent.corrected_images
-        nbr_images = len(corrected_array)
-        height, _ = np.shape(corrected_array[0])        
-
+        height = self.parent.image_size['height']
+        
         def display_sinograms(slice_index):
 
             fig, axs = plt.subplots(nrows=1, ncols=1)
@@ -117,7 +116,8 @@ class SvmbirHandler(Parent):
         verbose = 1 if self.verbose_ui.value else 0
 
         corrected_array = self.parent.corrected_images
-        height, width = np.shape(corrected_array[0])      
+        height = self.parent.image_size['height']
+        width = self.parent.image_size['width']
         list_of_angles = np.array(self.parent.list_of_angles_to_use_sorted)
         list_of_angles_rad = np.array([np.deg2rad(float(_angle)) for _angle in list_of_angles])
 
@@ -162,8 +162,9 @@ class SvmbirHandler(Parent):
     def display_slices(self):
 
         reconstruction_array = self.parent.reconstruction_array
-        height, _ = np.shape(reconstruction_array[0])        
 
+        height = self.parent.image_size['height']
+        
         def display_slices(slice_index):
 
             fig, axs = plt.subplots(nrows=1, ncols=1)

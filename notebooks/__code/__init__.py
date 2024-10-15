@@ -18,6 +18,10 @@ debug_folder = {DataType.sample: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/Se
                 DataType.reconstructed: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
                 DataType.extra: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
 }
+roi = {'left': 0,
+       'right': 74,
+       'top': 0,
+       'bottom': 49}
 
 
 class Run:

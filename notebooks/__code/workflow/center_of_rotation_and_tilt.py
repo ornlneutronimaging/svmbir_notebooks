@@ -40,10 +40,9 @@ class CenterOfRotationAndTilt(Parent):
         self.image_0_degree = self.parent.corrected_images[index_0_degree]
         self.image_180_degree = self.parent.corrected_images[index_180_degree]
 
-        self.height, _ = np.shape(self.image_0_degree)
-
     def select_range(self):
         self._isolate_0_and_180_degrees_images()
+        height = self.parent.image_size['height']
 
         def plot_range(y_top, y_bottom):
             _, axs = plt.subplots(nrows=1, ncols=2, figsize=(10,5))
@@ -63,11 +62,11 @@ class CenterOfRotationAndTilt(Parent):
 
         self.display_plot = interactive(plot_range,
                                    y_top = widgets.IntSlider(min=0, 
-                                                            max=self.height-1, 
+                                                            max=height-1, 
                                                             value=0),
                                    y_bottom = widgets.IntSlider(min=0,
-                                                            max=self.height-1, 
-                                                            value=self.height-1)
+                                                            max=height-1, 
+                                                            value=height-1)
         )
 
         display(self.display_plot)

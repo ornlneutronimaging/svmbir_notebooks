@@ -75,3 +75,8 @@ class Combine(Parent):
                 _master_data.append(load_data_using_multithreading(list_tif))
                 logging.info(f"\t\t loading done!")
             self.parent.master_3d_data_array[_data_type] = np.array(_master_data)
+
+        height, width = np.shape(self.parent.master_3d_data_array[DataType.sample][0])
+        self.parent.image_size = {'height': height,
+                                  'width': width}
+        
