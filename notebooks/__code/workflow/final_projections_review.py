@@ -16,9 +16,6 @@ class FinalProjectionsReview(Parent):
         list_angles = self.parent.final_list_of_angles
         list_runs = self.parent.list_of_runs_to_use[DataType.sample]
 
-        print(f"{list_runs = }")
-        print(f"{list_angles =}")
-
         nbr_cols = 5
         nbr_rows = int(np.ceil(nbr_images / nbr_cols))
 

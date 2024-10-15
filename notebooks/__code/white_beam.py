@@ -178,12 +178,11 @@ class WhiteBeam:
     def normalization(self):
         self.o_norm.run()
 
-    def visualize_normalization(self, individual=True):
-        if individual:
-            self.o_norm.visualize_normalization()
-        else:
-            o_review = FinalProjectionsReview(parent=self)
-            o_review.run(array=self.normalized_images)
+    def visualization_normalization_settings(self):
+        self.o_norm.visualization_normalization_settings()
+
+    def visualize_normalization(self):
+        self.o_norm.visualize_normalization()
 
     def select_export_normalized_folder(self):
         o_select = Load(parent=self)
