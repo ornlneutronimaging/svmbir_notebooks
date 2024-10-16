@@ -47,6 +47,9 @@ class CheckingData(Parent):
         # retrieve frame number
         self.retrieve_frame_number()
 
+        # display graph
+        self.display_graph()
+
     def retrieve_frame_number(self):
         logging.info(f"Retrieving frame numbers:")
         self.parent.at_least_one_frame_number_not_found = False
@@ -143,27 +146,33 @@ class CheckingData(Parent):
             min_proton_charge_c[_data_type] = min(list_proton_charge_c[_data_type]) - 1
             max_proton_charge_c[_data_type] = max(list_proton_charge_c[_data_type]) + 1
 
-        default_sample_proton_charge = calculate_most_dominant_int_value_from_list(list_proton_charge_c[DataType.sample])
-        default_ob_proton_charge = calculate_most_dominant_int_value_from_list(list_proton_charge_c[DataType.ob])
+        self.list_proton_charge_c = list_proton_charge_c
+        self.min_proton_charge_c = min_proton_charge_c
+        self.max_proton_charge_c = max_proton_charge_c
+  
+    def display_graph(self):
+        
+        default_sample_proton_charge = calculate_most_dominant_int_value_from_list(self.list_proton_charge_c[DataType.sample])
+        default_ob_proton_charge = calculate_most_dominant_int_value_from_list(self.list_proton_charge_c[DataType.ob])
 
         def plot_proton_charges(sample_proton_charge_value, ob_proton_charge_value, proton_charge_threshold):        
             fig, axs = plt.subplots(nrows=1, ncols=1)
             axs.set_title("Proton charge (C) of selected runs")
-            axs.plot(list_proton_charge_c[DataType.sample], 'g+', label=DataType.sample)
-            axs.plot(list_proton_charge_c[DataType.ob], 'bo', label=DataType.ob)
+            axs.plot(self.list_proton_charge_c[DataType.sample], 'g+', label=DataType.sample)
+            axs.plot(self.list_proton_charge_c[DataType.ob], 'bo', label=DataType.ob)
             axs.set_xlabel("file index")
             axs.set_ylabel("proton charge (C)")
             axs.legend()
     
             axs.axhline(sample_proton_charge_value, linestyle='--', color='green')
             sample_proton_charge_range = [sample_proton_charge_value + proton_charge_threshold,
-                                   sample_proton_charge_value - proton_charge_threshold]
+                                sample_proton_charge_value - proton_charge_threshold]
             axs.axhspan(sample_proton_charge_range[0], 
                         sample_proton_charge_range[1], facecolor='green', alpha=0.2)
 
             axs.axhline(ob_proton_charge_value, linestyle='--', color='blue')
             ob_proton_charge_range = [ob_proton_charge_value + proton_charge_threshold,
-                                      ob_proton_charge_value - proton_charge_threshold]
+                                    ob_proton_charge_value - proton_charge_threshold]
             axs.axhspan(ob_proton_charge_range[0], 
                         ob_proton_charge_range[1], facecolor='blue', alpha=0.2)
 
@@ -172,25 +181,23 @@ class CheckingData(Parent):
             return sample_proton_charge_value, ob_proton_charge_value, proton_charge_threshold
 
         self.parent.selection_of_pc = interactive(plot_proton_charges,
-                              sample_proton_charge_value = widgets.FloatSlider(min=min_proton_charge_c[DataType.sample],
-                                                                       max=max_proton_charge_c[DataType.sample],
-                                                                       value=default_sample_proton_charge,
-                                                                       description='sample pc',
-                                                                       continuous_update=True),
-                              ob_proton_charge_value = widgets.FloatSlider(min=min_proton_charge_c[DataType.ob],
-                                                                       max=max_proton_charge_c[DataType.ob],
-                                                                       value=default_ob_proton_charge,
-                                                                       description='ob pc',
-                                                                       continuous_update=True),
-                              proton_charge_threshold = widgets.FloatSlider(min=0.0001,
+                            sample_proton_charge_value = widgets.FloatSlider(min=self.min_proton_charge_c[DataType.sample],
+                                                                    max=self.max_proton_charge_c[DataType.sample],
+                                                                    value=default_sample_proton_charge,
+                                                                    description='sample pc',
+                                                                    continuous_update=True),
+                            ob_proton_charge_value = widgets.FloatSlider(min=self.min_proton_charge_c[DataType.ob],
+                                                                    max=self.max_proton_charge_c[DataType.ob],
+                                                                    value=default_ob_proton_charge,
+                                                                    description='ob pc',
+                                                                    continuous_update=True),
+                            proton_charge_threshold = widgets.FloatSlider(min=0.0001,
                                                                         max=1,
                                                                         description='threshold',
                                                                         value=PROTON_CHARGE_TOLERANCE_C,
                                                                         continuous_update=True),
                                                                         )
         display(self.parent.selection_of_pc)
-
-        # display(HTML("Select the proton charge requested for <b>sample</b> and <b>ob</b>"))    
 
     def checking_minimum_requirements(self):
         """at least 1 OB and 3 samples selected"""

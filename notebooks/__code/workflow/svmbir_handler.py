@@ -86,7 +86,7 @@ class SvmbirHandler(Parent):
                                          self.verbose_ui])
         display(vertical_widgets)
 
-    def display_projections(self):
+    def display_sinograms(self):
 
         corrected_array = self.parent.corrected_images
         height = self.parent.image_size['height']
@@ -105,21 +105,41 @@ class SvmbirHandler(Parent):
                                         )
         display(display_sinogram)
 
+    def _get_list_of_index_of_runs_to_exclude(self):
+        """this return the index of the runs selected and that need to be rejected from final reconstruction"""
+        list_options = self.parent.runs_to_exclude_ui.options
+        list_value = self.parent.runs_to_exclude_ui.value
+        list_index = []
+        for _index, _option in enumerate(list_options):
+            if _option in list_value:
+                list_index.append(_index)
+        return list_index, list_value
+
     def run_reconstruction(self):
 
         logging.info(f"Running reconstruction:")
-        top_slice, bottom_slice = self.display_corrected_range.result
-        sharpness = self.sharpness_ui.value
-        snr_db = self.snr_db_ui.value
-        positivity = self.positivity_ui.value
-        max_iterations = self.max_iterations_ui.value
-        verbose = 1 if self.verbose_ui.value else 0
 
         corrected_array = self.parent.corrected_images
         height = self.parent.image_size['height']
         width = self.parent.image_size['width']
         list_of_angles = np.array(self.parent.list_of_angles_to_use_sorted)
         list_of_angles_rad = np.array([np.deg2rad(float(_angle)) for _angle in list_of_angles])
+
+        # looking at list of runs to reject
+        list_of_index_of_runs_to_exlude, list_runs_to_exclude = self._get_list_of_index_of_runs_to_exclude()
+        if list_of_index_of_runs_to_exlude:
+            logging.info(f"\tUser wants to reject the following runs: {list_runs_to_exclude}!")
+            corrected_array = np.delete(corrected_array, list_of_index_of_runs_to_exlude, axis=0)
+            list_of_angles_rad = np.delete(list_of_angles_rad, list_of_index_of_runs_to_exlude, axis=0)
+        else:
+            logging.info(f"\tNo runs rejected before final reconstruction!")
+
+        top_slice, bottom_slice = self.display_corrected_range.result
+        sharpness = self.sharpness_ui.value
+        snr_db = self.snr_db_ui.value
+        positivity = self.positivity_ui.value
+        max_iterations = self.max_iterations_ui.value
+        verbose = 1 if self.verbose_ui.value else 0
 
         logging.info(f"\t{top_slice = }")
         logging.info(f"\t{bottom_slice = }")

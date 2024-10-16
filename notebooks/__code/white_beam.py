@@ -30,6 +30,7 @@ class WhiteBeam:
         DataType.nexus: "",
         DataType.cleaned_images: "",
         DataType.normalized: "",
+        DataType.processed: "",
         }
     
     image_size = {'height': None,
@@ -100,6 +101,9 @@ class WhiteBeam:
     # svmbir 
     o_svmbir = None
 
+    # widget multi selection - list of runs to exclude before running svmbir
+    runs_to_exclude_ui = None
+
     # reconstructed 3D array with svmbir
     reconstruction_array = None
 
@@ -112,6 +116,7 @@ class WhiteBeam:
         self.working_dir[DataType.ipts] = os.path.basename(top_sample_dir)
         self.working_dir[DataType.top] = os.path.join(top_sample_dir, "shared", "autoreduce", "mcp")
         self.working_dir[DataType.nexus] = os.path.join(top_sample_dir, "nexus")
+        self.working_dir[DataType.processed] = os.path.join(top_sample_dir, "shared", "processed_data")
         logging.info(f"working_dir: {self.working_dir}")
         logging.info(f"instrument: {self.instrument}")
 
@@ -227,20 +232,22 @@ class WhiteBeam:
     def final_projections_review(self):
         o_review = FinalProjectionsReview(parent=self)
         o_review.run(array=self.corrected_images)
+        o_review.list_runs_to_reject()
 
     # run svmbir
     def svmbir_settings(self):
         self.o_svmbir = SvmbirHandler(parent=self)
         self.o_svmbir.set_settings()
 
-    def svmbir_display_projections(self):
-        self.o_svmbir.display_projections()
+    def svmbir_display_sinograms(self):
+        self.o_svmbir.display_sinograms()
 
     def svmbir_run(self):
         self.o_svmbir.run_reconstruction()
-
-    def display_slices(self):
         self.o_svmbir.display_slices()
+
+    # def display_slices(self):
+    #     self.o_svmbir.display_slices()
 
     # export slices
     def select_export_slices_folder(self):
