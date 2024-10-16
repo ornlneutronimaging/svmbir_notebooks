@@ -8,7 +8,7 @@
 /* main background */
 #site { 
     background: #888;
-    color: #red; 
+    color: red; 
 }
 
 div.container {
@@ -37,8 +37,8 @@ div #notebook { /* centre the content */
 div.cell.code_cell.running {
 /*    background-color: rgba(164,188,194,.75); */
     background-color: green;
-    border-width: 8px
-    border-style: solid
+    border-width: 8px;
+    border-style: solid;
     border-color: #111;
 }
 
@@ -120,8 +120,4 @@ div.text_cell_render{
 #notebook_panel { /* main background */
     background-image: url("tile_background.jpg");
 }
-
-
-
-
 </style>
