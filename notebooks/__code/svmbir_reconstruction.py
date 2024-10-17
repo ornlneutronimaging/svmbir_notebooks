@@ -3,7 +3,7 @@ import logging
 from collections import OrderedDict
 
 
-from __code import DataType
+from __code import DataType, OperatingMode
 from __code.utilities.logging import setup_logging
 
 from __code.workflow.load import Load
@@ -33,8 +33,16 @@ class SvmbirReconstruction:
         DataType.processed: "",
         }
     
+    operating_mode = OperatingMode.tof   # or OperatingMode.white_beam
+
     image_size = {'height': None,
                   'width': None}
+
+    spectra_file_full_path = None
+
+    # used to displya profile vs lambda in TOF mode
+    # np.shape of y, x, tof
+    data_3d_of_all_projections_merged = None
 
     # will record short_run_number and pc
     # will look like
@@ -155,6 +163,19 @@ class SvmbirReconstruction:
     def load_data(self):
         self.o_mode.load()
         
+    def select_tof_range(self):
+        if self.operating_mode == OperatingMode.white_beam:
+            return
+        
+        self.o_tof_range_mode.select_tof_range()
+
+    def combine_tof_mode_data(self):
+        self.o_tof_range_mode.combine_tof_mode_data()
+
+    
+
+
+
 
 
     # # combine images

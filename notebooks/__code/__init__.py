@@ -31,9 +31,13 @@ roi = {'left': 0,
 
 
 class Run:
-    full_path = 'short run number'
+    full_path = 'full path'
     proton_charge_c = 'proton charge c'
     use_it = 'use it'
     angle = 'angle'
     frame_number = 'number of frames'
-    nexus = ''
+    nexus = 'nexus'
+
+
+ANGSTROMS = u"\u212b"
+LAMBDA = u"\u03bb"

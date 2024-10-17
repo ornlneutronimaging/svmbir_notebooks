@@ -23,6 +23,9 @@ STEP_SIZE = 50  # for working with bucket of data at a time
 
 PROTON_CHARGE_TOLERANCE_C = 0.1  # C
 
+# at VENUS
+DISTANCE_SOURCE_DETECTOR = 25  # m
+
 # parameters used for data cleaning
 """
 if_clean: switch of cleaning operation (bool)

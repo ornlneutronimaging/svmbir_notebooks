@@ -1,14 +1,8 @@
-import copy
+import glob
 import os
 import numpy as np
-import matplotlib.pyplot as plt
-from ipywidgets import interactive
-import ipywidgets as widgets
-from IPython.display import display
-import random
 import logging
 from tqdm import tqdm
-import numpy as np
 
 from __code import DataType, Run
 from __code import DEBUG, debug_folder
@@ -82,4 +76,15 @@ class Load(Parent):
                                   'nbr_tof': nbr_tof}
         
         logging.info(f"{self.parent.image_size} = ")
+
+    def load_spectra_file(self):
+        list_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
+        first_run = list_runs_to_use[0]
+        full_path_to_run = self.parent.list_of_runs[DataType.sample][first_run][Run.full_path]
+        list_files = glob.glob(os.path.join(full_path_to_run, "*_Spectra.txt"))
+        if list_files and os.path.exists(list_files[0]):
+            time_spectra_file = list_files[0]
+        else:
+            time_spectra_file = ""
+        self.parent.spectra_file_full_path = time_spectra_file
         

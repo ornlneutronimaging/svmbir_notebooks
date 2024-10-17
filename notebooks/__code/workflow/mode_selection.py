@@ -3,14 +3,16 @@ from IPython.display import display
 from IPython.core.display import HTML
 from ipywidgets import interactive
 import logging
+import numpy as np
 
 from __code.parent import Parent
-from __code import OperatingMode
+from __code import OperatingMode, DataType
 
 from __code.workflow.checking_data import CheckingData
 from __code.workflow.remove_rejected_runs import RemoveRejectedRuns
 from __code.workflow.sort_runs import SortRuns
 from __code.workflow.load import Load
+from __code.workflow.tof_range_mode import TofRangeMode
 
 
 class ModeSelection(Parent):
@@ -35,20 +37,24 @@ class ModeSelection(Parent):
             o_sort.run()
 
             combine_mode = (self.mode_selection_ui.value == OperatingMode.white_beam)
-            o_combine = Load(parent=self.parent)
-            o_combine.load_data(combine=combine_mode)
+            self.parent.operating_mode = combine_mode
+            o_load = Load(parent=self.parent)
+            o_load.load_data(combine=combine_mode)
 
             if not combine_mode:
-                pass
-                # load the data keep full 3D array
 
-                # retrieve time spectra of first file
+                master_3d_data_array = self.parent.master_3d_data_array[DataType.sample]
+                logging.info(f"combining all the slices:")
+                logging.info(f"\t{np.shape(master_3d_data_array) =}")
+                merged_all_slices = np.sum(master_3d_data_array, axis=0)
+                self.parent.data_3d_of_all_projections_merged = merged_all_slices
+                logging.info(f"\t{np.shape(merged_all_slices) = }")
+        
+                o_load.load_spectra_file()
 
-                # retrieve detector offset and distance source_detector (json created by autoreduction?)
-
-                # display profile and sample (integrated) with region moving
-
-                # 
+                # will display the profile of the region with lambda as x-axis
+                self.parent.o_tof_range_mode = TofRangeMode(parent=self.parent)
+                self.parent.o_tof_range_mode.run()
 
         else:
             o_check.minimum_requirement_not_met()
