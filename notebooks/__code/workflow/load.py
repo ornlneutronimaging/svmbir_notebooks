@@ -72,7 +72,14 @@ class Load(Parent):
                 logging.info(f"\t\t loading done!")
             self.parent.master_3d_data_array[_data_type] = np.array(_master_data)
 
-        height, width = np.shape(self.parent.master_3d_data_array[DataType.sample][0])
+        if combine:
+            height, width = np.shape(self.parent.master_3d_data_array[DataType.sample][0])
+            nbr_tof = 1
+        else:
+            nbr_tof, height, width = np.shape(self.parent.master_3d_data_array[DataType.sample][0])
         self.parent.image_size = {'height': height,
-                                  'width': width}
+                                  'width': width,
+                                  'nbr_tof': nbr_tof}
+        
+        logging.info(f"{self.parent.image_size} = ")
         
