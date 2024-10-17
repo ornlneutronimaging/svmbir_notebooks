@@ -88,6 +88,7 @@ class SvmbirReconstruction:
     # created during the combine step to match data index with run number (for normalization)
     list_of_runs_to_use = {DataType.sample: [],
                            DataType.ob:[]}
+    
     list_of_angles_to_use_sorted = None
 
     strip_corrected_images = None # Array 3D after strip correction

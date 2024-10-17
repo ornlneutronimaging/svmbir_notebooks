@@ -8,7 +8,9 @@ from __code.parent import Parent
 from __code import OperatingMode
 
 from __code.workflow.checking_data import CheckingData
-from __code.workflow.combine import Combine
+from __code.workflow.remove_rejected_runs import RemoveRejectedRuns
+from __code.workflow.sort_runs import SortRuns
+from __code.workflow.load import Load
 
 
 class ModeSelection(Parent):
@@ -22,23 +24,31 @@ class ModeSelection(Parent):
     def load(self):
         
         logging.info(f"Working in {self.mode_selection_ui.value} mode")
-        if self.mode_selection_ui.value == OperatingMode.white_beam:
-            o_check = CheckingData(parent=self.parent)
-            o_check.checking_minimum_requirements()
-            if self.minimum_requirements_met:
-                o_combine = Combine(parent=self.parent)
-                o_combine.run()
-            else:
-                o_check.minimum_requirement_not_met()
-        
+        o_check = CheckingData(parent=self.parent)
+        o_check.checking_minimum_requirements()
+        if self.parent.minimum_requirements_met:
+
+            o_rejected = RemoveRejectedRuns(parent=self.parent)
+            o_rejected.run()
+
+            o_sort = SortRuns(parent=self.parent)
+            o_sort.run()
+
+            combine_mode = (self.mode_selection_ui.value == OperatingMode.white_beam)
+            o_combine = Load(parent=self.parent)
+            o_combine.load_data(combine=combine_mode)
+
+            if not combine_mode:
+                pass
+                # load the data keep full 3D array
+
+                # retrieve time spectra of first file
+
+                # retrieve detector offset and distance source_detector (json created by autoreduction?)
+
+                # display profile and sample (integrated) with region moving
+
+                # 
+
         else:
-            pass
-            # load the data keep full 3D array
-
-            # retrieve time spectra of first file
-
-            # retrieve detector offset and distance source_detector (json created by autoreduction?)
-
-            # display profile and sample (integrated) with region moving
-
-            # 
+            o_check.minimum_requirement_not_met()

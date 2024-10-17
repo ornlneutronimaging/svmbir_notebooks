@@ -10,11 +10,14 @@ from __code.utilities.files import retrieve_list_of_tif
 def _worker(fl):
     return (imread(fl).astype(np.float32)).swapaxes(0,1)
 
-def load_data_using_multithreading(list_tif):
+def load_data_using_multithreading(list_tif, combine_tof=False):
     with mp.Pool(processes=40) as pool:
         data = pool.map(_worker, list_tif)
 
-    return np.array(data).sum(axis=0)
+    if combine_tof:
+        return np.array(data).sum(axis=0)
+    else:
+        return np.array(data)
 
 def load_data(folder):
     list_tif = retrieve_list_of_tif(folder)
