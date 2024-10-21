@@ -3,7 +3,7 @@ import logging
 from collections import OrderedDict
 
 
-from __code import DataType, OperatingMode
+from __code import DataType, OperatingMode, DEFAULT_OPERATING_MODE
 from __code.utilities.logging import setup_logging
 
 from __code.workflow.load import Load
@@ -33,7 +33,7 @@ class SvmbirReconstruction:
         DataType.processed: "",
         }
     
-    operating_mode = OperatingMode.tof   # or OperatingMode.white_beam
+    operating_mode = DEFAULT_OPERATING_MODE
 
     image_size = {'height': None,
                   'width': None}
@@ -109,6 +109,8 @@ class SvmbirReconstruction:
     o_norm = None
     # svmbir 
     o_svmbir = None
+    # tof mode
+    o_tof_range_mode = None
 
     # widget multi selection - list of runs to exclude before running svmbir
     runs_to_exclude_ui = None
@@ -166,27 +168,12 @@ class SvmbirReconstruction:
     def select_tof_range(self):
         if self.operating_mode == OperatingMode.white_beam:
             return
-        
+
         self.o_tof_range_mode.select_tof_range()
 
     def combine_tof_mode_data(self):
-        self.o_tof_range_mode.combine_tof_mode_data()
-
-    
-
-
-
-
-
-    # # combine images
-    # def combine_images(self):
-    #     o_check = CheckingData(parent=self)
-    #     o_check.checking_minimum_requirements()
-    #     if self.minimum_requirements_met:
-    #         o_combine = Combine(parent=self)
-    #         o_combine.run()
-    #     else:
-    #         o_check.minimum_requirement_not_met()
+        if self.o_tof_range_mode:
+            self.o_tof_range_mode.combine_tof_mode_data()
 
     # cleaning low/high pixels
     def clean_images_setup(self):

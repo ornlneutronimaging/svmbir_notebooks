@@ -7,6 +7,7 @@ import numpy as np
 
 from __code.parent import Parent
 from __code import OperatingMode, DataType
+from __code import DEFAULT_OPERATING_MODE
 
 from __code.workflow.checking_data import CheckingData
 from __code.workflow.remove_rejected_runs import RemoveRejectedRuns
@@ -20,11 +21,18 @@ class ModeSelection(Parent):
     def select(self):   
         self.mode_selection_ui = widgets.ToggleButtons(options=[OperatingMode.white_beam, 
                                                                 OperatingMode.tof],
-                                           value=OperatingMode.tof)
+                                           value=DEFAULT_OPERATING_MODE)
         display(self.mode_selection_ui)
     
     def load(self):
         
+        if self.mode_selection_ui.value == OperatingMode.white_beam:
+            self.parent.operating_mode = OperatingMode.white_beam
+        else:
+            self.parent.operating_mode = OperatingMode.tof
+        
+        self.mode_selection_ui.value
+
         logging.info(f"Working in {self.mode_selection_ui.value} mode")
         o_check = CheckingData(parent=self.parent)
         o_check.checking_minimum_requirements()
@@ -37,7 +45,6 @@ class ModeSelection(Parent):
             o_sort.run()
 
             combine_mode = (self.mode_selection_ui.value == OperatingMode.white_beam)
-            self.parent.operating_mode = combine_mode
             o_load = Load(parent=self.parent)
             o_load.load_data(combine=combine_mode)
 
