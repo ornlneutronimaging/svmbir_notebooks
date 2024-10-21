@@ -182,7 +182,7 @@ class TofRangeMode(Parent):
             logging.info(f"\tbefore: {np.shape(master_3d_data_array[_data_type]) = }")
             new_master_3d_data_array = []
             for _data in master_3d_data_array[_data_type]:
-                new_master_3d_data_array.append(np.mean(_data[left_tof_index:right_tof_index+1]))
+                new_master_3d_data_array.append(np.mean(_data[left_tof_index:right_tof_index+1, :, :], axis=0))
             master_3d_data_array[_data_type] = np.array(new_master_3d_data_array)
             logging.info(f"\tafter: {np.shape(master_3d_data_array[_data_type]) = }")
         self.parent.master_3d_data_array = master_3d_data_array
