@@ -24,7 +24,8 @@ class System:
     def select_working_dir(cls, debugger_folder='', system_folder='',
                            facility='SNS',
                            instrument='VENUS',
-                           notebook="N/A"):
+                           notebook="N/A",
+                           hfir_only=True):
 
         # try:
 
@@ -42,21 +43,27 @@ class System:
                    </style>
                    """))
 
-        full_list_instruments = cls.get_full_list_instrument()
-        # full_list_instruments.sort()
+        if not hfir_only:
+            full_list_instruments = cls.get_full_list_instrument()
+        else:
+            full_list_instruments = ['CG1D']
+
         start_path = cls.get_start_path(debugger_folder=debugger_folder,
                                         system_folder=system_folder,
                                         instrument=full_list_instruments[0])
 
         cls.start_path = start_path
 
-        select_instrument_ui = widgets.HBox([widgets.Label("Select Instrument",
-                                                           layout=widgets.Layout(width='20%')),
-                                             widgets.Select(options=full_list_instruments,
-                                                            value=full_list_instruments[0],
-                                                            layout=widgets.Layout(width='20%'))])
-        cls.instrument_ui = select_instrument_ui.children[1]
-        cls.instrument_ui.observe(cls.check_instrument_input, names='value')
+        if not hfir_only:
+            select_instrument_ui = widgets.HBox([widgets.Label("Select Instrument",
+                                                            layout=widgets.Layout(width='20%')),
+                                                widgets.Select(options=full_list_instruments,
+                                                                value=full_list_instruments[0],
+                                                                layout=widgets.Layout(width='20%'))])
+            cls.instrument_ui = select_instrument_ui.children[1]
+            cls.instrument_ui.observe(cls.check_instrument_input, names='value')
+        else:
+            select_instrument_ui = widgets.HTML("<b>Instrument</b>: MARS (CG1D)<br><hr>")
 
         help_ui = widgets.Button(description="HELP",
                                  button_style='info')
@@ -82,7 +89,7 @@ class System:
                                                    value=default_value,
                                                    layout=widgets.Layout(height='300px')),
                                     ])
-        cls.user_list_folders = user_list_folders
+        cls.user_list_folders = user_list_folders      
         box = widgets.VBox([select_instrument_ui, top_hbox, or_label, bottom_hbox, help_ui])
         display(box)
 
