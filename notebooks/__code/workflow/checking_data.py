@@ -1,6 +1,7 @@
 import logging
 import os
 import matplotlib.pyplot as plt
+import numpy as np
 from ipywidgets import interactive
 from IPython.display import display
 import ipywidgets as widgets
@@ -54,6 +55,7 @@ class CheckingData(Parent):
         logging.info(f"Retrieving frame numbers:")
         self.parent.at_least_one_frame_number_not_found = False
         for _data_type in self.parent.list_of_runs.keys():
+            logging.info(f"\t{_data_type}:")
             list_of_frame_number = []
             for _run in self.parent.list_of_runs[_data_type]:
                 # _, number = os.path.basename(_run).split("_")
@@ -64,7 +66,16 @@ class CheckingData(Parent):
                 self.parent.list_of_runs[_data_type][_run][Run.frame_number] = frame_number
                 if frame_number is None:
                     self.parent.at_least_one_frame_number_not_found = True
-            logging.info(f"\t{_data_type}: {list_of_frame_number}")
+            logging.info(f"\t\t{list_of_frame_number}")
+
+            logging.info(f"calculating the frame correction factor")
+            frame_max = np.max(np.array(list_of_frame_number))
+            list_of_frame_coefficient_number = []
+            for _run in self.parent.list_of_runs[_data_type]:
+                _coeff = frame_max / self.parent.list_of_runs[_data_type][_run][Run.frame_number]
+                self.parent.list_of_runs[_data_type][_run][Run.frame_correction_factor] = _coeff
+                list_of_frame_coefficient_number.append(_coeff)
+            logging.info(f"\t\t{list_of_frame_coefficient_number}")
 
     def retrieve_rotation_angle(self):
         list_of_sample_runs = self.parent.list_of_runs[DataType.sample]
@@ -95,6 +106,7 @@ class CheckingData(Parent):
                                                                                 Run.angle: None,
                                                                                 Run.nexus: nexus_path,
                                                                                 Run.frame_number: None,
+                                                                                Run.frame_correction_factor: None,
                                                                                 }
 
     def reject_empty_runs(self):

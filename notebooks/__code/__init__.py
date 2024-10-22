@@ -47,6 +47,7 @@ class Run:
     use_it = 'use it'
     angle = 'angle'
     frame_number = 'number of frames'
+    frame_correction_factor = 'frame correction factor'
     nexus = 'nexus'
 
 
