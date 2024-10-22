@@ -50,6 +50,7 @@ class FinalProjectionsReview(Parent):
     def list_runs_to_reject(self):
         
         label_ui = widgets.HTML("<b>Select runs you want to exclude from the final reconstruction:</b>")
-        self.parent.runs_to_exclude_ui = widgets.SelectMultiple(options=self.list_runs_with_infos)
+        self.parent.runs_to_exclude_ui = widgets.SelectMultiple(options=self.list_runs_with_infos,
+                                                                layout=widgets.Layout(height="300px"))
         display(widgets.VBox([label_ui, self.parent.runs_to_exclude_ui]))
         

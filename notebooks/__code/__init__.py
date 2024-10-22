@@ -19,7 +19,7 @@ class OperatingMode:
 DEFAULT_OPERATING_MODE = OperatingMode.tof
 NBR_TOF_RANGES = 3
 
-DEBUG = True
+DEBUG = False
 # debug_folder = {DataType.sample: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/September20_2024_PurpleCar_GoldenRatio_CT_5_0_C_Cd_inBeam_Resonance",
 #                 DataType.ob: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/September26_2024_PurpleCar_OpenBean_5_0_C_Cd_inBeam_Resonance",
 #                 DataType.cleaned_images: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
@@ -35,6 +35,7 @@ debug_folder = {DataType.sample: "/HFIR/CG1D/IPTS-32519/raw/ct_scans/2024_10_18_
                 DataType.extra: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
 }
 
+
 roi = {'left': 0,
        'right': 74,
        'top': 0,
@@ -47,7 +48,6 @@ class Run:
     use_it = 'use it'
     angle = 'angle'
     frame_number = 'number of frames'
-    frame_correction_factor = 'frame correction factor'
     nexus = 'nexus'
 
 

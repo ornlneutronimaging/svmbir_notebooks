@@ -56,6 +56,7 @@ class Normalization(Parent):
 
     obs_combined = None
     mean_ob_proton_charge = None
+    mean_ob_frame_number = 1
 
     enable_frame_number = False
 
@@ -156,6 +157,18 @@ class Normalization(Parent):
 
         self.mean_ob_proton_charge = np.mean(list_proton_charge)
         logging.info(f"\tcalculated combined ob proton charge: {self.mean_ob_proton_charge}")
+
+        use_frame = self.use_frames_ui.value
+        if use_frame:
+            list_frame = []
+            for _run in self.parent.list_of_runs_to_use[DataType.ob]:
+                frame_number = self.parent.list_of_runs[DataType.ob][_run][Run.frame_number]
+                if frame_number:
+                    list_frame.append(frame_number)
+                else:
+                    self.mean_ob_frame_number = 1
+            mean_frame_number = np.mean(np.array(list_frame))
+            self.mean_ob_frame_number = mean_frame_number
     
     def normalize_runs(self):
         master_3d_data = self.parent.master_3d_data_array_cleaned
@@ -199,7 +212,8 @@ class Normalization(Parent):
                 coeff *= self.mean_ob_proton_charge / sample_proton_charge
 
             if use_frame:
-                raise NotImplementedError("using frame is not working yet!")
+                _sample_frame = self.parent.list_of_runs[DataType.sample][_run][Run.frame_number]
+                coeff *= self.mean_ob_frame_number / _sample_frame
 
             if use_roi:
                 sample_roi_counts = np.sum(sample_data[top: bottom+1, left: right+1])
