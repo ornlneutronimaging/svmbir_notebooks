@@ -11,6 +11,7 @@ import subprocess
 from __code.utilities.folder import find_first_real_dir
 
 list_instrument_per_facility = {'SNS': ['VENUS', 'SNAP'],
+'HFIR': ['CG1D'],
                                 }
 
 
