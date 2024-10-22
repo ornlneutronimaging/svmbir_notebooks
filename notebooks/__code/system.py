@@ -64,6 +64,7 @@ class System:
             cls.instrument_ui.observe(cls.check_instrument_input, names='value')
         else:
             select_instrument_ui = widgets.HTML("<b>Instrument</b>: MARS (CG1D)<br><hr>")
+            cls.instrument_ui = widgets.Select(options=['CG1D'], value='CG1D')
 
         help_ui = widgets.Button(description="HELP",
                                  button_style='info')
@@ -161,6 +162,7 @@ class System:
     @classmethod
     def get_instrument_selected(cls):
         return cls.instrument_ui.value
+    
 
     @classmethod
     def get_facility_selected(cls):
