@@ -45,6 +45,8 @@ class Load(Parent):
         print(f"Top {self.data_type} folder selected: {top_folder}")
 
     def load_data(self, combine=False):
+        """combine is for TOF mode"""
+        
         logging.info(f"importing the data:")
        
         if combine:

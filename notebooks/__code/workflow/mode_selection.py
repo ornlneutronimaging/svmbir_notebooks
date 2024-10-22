@@ -48,7 +48,7 @@ class ModeSelection(Parent):
             o_load = Load(parent=self.parent)
             o_load.load_data(combine=combine_mode)
 
-            if not combine_mode:
+            if self.mode_selection_ui.value == OperatingMode.tof:
 
                 master_3d_data_array = self.parent.master_3d_data_array[DataType.sample]
                 logging.info(f"combining all the slices:")
@@ -62,6 +62,9 @@ class ModeSelection(Parent):
                 # will display the profile of the region with lambda as x-axis
                 self.parent.o_tof_range_mode = TofRangeMode(parent=self.parent)
                 self.parent.o_tof_range_mode.run()
+
+            # else:  # white beam mode
+            #     self.parent.master_tof_3d_data_array = {'0': self.parent.master_3d_data_array}
 
         else:
             o_check.minimum_requirement_not_met()

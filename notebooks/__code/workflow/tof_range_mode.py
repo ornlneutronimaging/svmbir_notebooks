@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
-from IPython.display import display
+from IPython.display import display, HTML
 import ipywidgets as widgets
 import logging
 from matplotlib.patches import Rectangle
@@ -10,7 +10,7 @@ from neutronbraggedge.experiment_handler.tof import TOF
 from neutronbraggedge.experiment_handler.experiment import Experiment
 
 from __code.parent import Parent
-from __code import LAMBDA, ANGSTROMS
+from __code import LAMBDA, ANGSTROMS, NBR_TOF_RANGES
 from __code.config import DISTANCE_SOURCE_DETECTOR
 
 
@@ -123,51 +123,51 @@ class TofRangeMode(Parent):
 
     def select_tof_range(self):
 
-        max_y = np.max(self.y_axis)
+            max_y = np.max(self.y_axis)
 
-        def display_profile(left_tof, right_tof):
+            def display_profile(left_tof, right_tof):
 
-            fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(10,10))
+                fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(10,10))
 
-            x_axis = self.lambda_array_angstroms
-            y_axis = self.y_axis
+                x_axis = self.lambda_array_angstroms
+                y_axis = self.y_axis
 
-            if self.y_log_scale:
-                axs.semilogy(x_axis, y_axis)
-            else:
-                axs.plot(x_axis, y_axis)
+                if self.y_log_scale:
+                    axs.semilogy(x_axis, y_axis)
+                else:
+                    axs.plot(x_axis, y_axis)
 
-            axs.annotate(f"{self.lambda_array_angstroms[left_tof]:0.3f} {ANGSTROMS}",
-                         (self.lambda_array_angstroms[left_tof], max_y),
-                         color='red',
-                         horizontalalignment='right',
-                         )
+                axs.annotate(f"{self.lambda_array_angstroms[left_tof]:0.3f} {ANGSTROMS}",
+                            (self.lambda_array_angstroms[left_tof], max_y),
+                            color='red',
+                            horizontalalignment='right',
+                            )
 
-            axs.annotate(f"{self.lambda_array_angstroms[right_tof]:0.3f} {ANGSTROMS}",
-                         (self.lambda_array_angstroms[right_tof], max_y),
-                         color='red',
-                         horizontalalignment='left',
-                         )
+                axs.annotate(f"{self.lambda_array_angstroms[right_tof]:0.3f} {ANGSTROMS}",
+                            (self.lambda_array_angstroms[right_tof], max_y),
+                            color='red',
+                            horizontalalignment='left',
+                            )
 
 
-            axs.axvspan(self.lambda_array_angstroms[left_tof], 
-                        self.lambda_array_angstroms[right_tof], 
-                        alpha=0.5,
-                        linestyle="--",
-                        edgecolor='green')
-            plt.show()
+                axs.axvspan(self.lambda_array_angstroms[left_tof], 
+                            self.lambda_array_angstroms[right_tof], 
+                            alpha=0.5,
+                            linestyle="--",
+                            edgecolor='green')
+                plt.show()
 
-            return left_tof, right_tof
+                return left_tof, right_tof
 
-        self.plot_tof_profile = interactive(display_profile,
-                                            left_tof=widgets.IntSlider(min=0,
-                                                                         max=len(self.lambda_array_angstroms)-1,
-                                                                         value=0),
-                                            right_tof=widgets.IntSlider(min=0,
-                                                                          max=len(self.lambda_array_angstroms)-1,
-                                                                          value=len(self.lambda_array_angstroms)-1),
-        )
-        display(self.plot_tof_profile)
+            self.plot_tof_profile = interactive(display_profile,
+                                                left_tof=widgets.IntSlider(min=0,
+                                                                            max=len(self.lambda_array_angstroms)-1,
+                                                                            value=0),
+                                                right_tof=widgets.IntSlider(min=0,
+                                                                            max=len(self.lambda_array_angstroms)-1,
+                                                                            value=len(self.lambda_array_angstroms)-1),
+            )
+            display(self.plot_tof_profile)
 
     def combine_tof_mode_data(self):
         
@@ -186,3 +186,93 @@ class TofRangeMode(Parent):
             master_3d_data_array[_data_type] = np.array(new_master_3d_data_array)
             logging.info(f"\tafter: {np.shape(master_3d_data_array[_data_type]) = }")
         self.parent.master_3d_data_array = master_3d_data_array
+
+
+    # def select_multi_tof_range(self):
+
+    #     self.list_of_tof_ranges_ui = []
+    #     list_default_use_it = [False for i in range(NBR_TOF_RANGES)]
+    #     list_default_use_it[0] = True
+    #     max_y = np.max(self.y_axis)
+
+    #     for i in range(NBR_TOF_RANGES):
+
+    #         def display_profile(use_it, left_tof, right_tof):
+
+    #             fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(10,10))
+
+    #             axs.set_title(f"TOF range {i}/{NBR_TOF_RANGES-1}")
+
+    #             x_axis = self.lambda_array_angstroms
+    #             y_axis = self.y_axis
+
+    #             if self.y_log_scale:
+    #                 axs.semilogy(x_axis, y_axis)
+    #             else:
+    #                 axs.plot(x_axis, y_axis)
+
+    #             axs.annotate(f"{self.lambda_array_angstroms[left_tof]:0.3f} {ANGSTROMS}",
+    #                         (self.lambda_array_angstroms[left_tof], max_y),
+    #                         color='red',
+    #                         horizontalalignment='right',
+    #                         )
+
+    #             axs.annotate(f"{self.lambda_array_angstroms[right_tof]:0.3f} {ANGSTROMS}",
+    #                         (self.lambda_array_angstroms[right_tof], max_y),
+    #                         color='red',
+    #                         horizontalalignment='left',
+    #                         )
+
+
+    #             axs.axvspan(self.lambda_array_angstroms[left_tof], 
+    #                         self.lambda_array_angstroms[right_tof], 
+    #                         alpha=0.5,
+    #                         linestyle="--",
+    #                         edgecolor='green')
+    #             plt.show()
+
+    #             return use_it, left_tof, right_tof
+
+    #         _plot_tof_profile = interactive(display_profile,
+    #                                             use_it=widgets.Checkbox(value=list_default_use_it[i]),
+    #                                             left_tof=widgets.IntSlider(min=0,
+    #                                                                         max=len(self.lambda_array_angstroms)-1,
+    #                                                                         value=0),
+    #                                             right_tof=widgets.IntSlider(min=0,
+    #                                                                         max=len(self.lambda_array_angstroms)-1,
+    #                                                                         value=len(self.lambda_array_angstroms)-1),
+    #         )
+    #         display(_plot_tof_profile)
+    #         display(HTML("<hr style='border-bottom: dotted 1px;'>"))
+
+    #     self.list_of_tof_ranges_ui.append(_plot_tof_profile)
+ 
+    # def combine_tof_mode_data(self):
+        
+    #     logging.info(f"combining in tof mode:")
+
+    #     logging.info(f"\tlooking at {NBR_TOF_RANGES} potential TOF ranges!")
+    #     for _index, _widgets in enumerate(self.list_of_tof_ranges_ui):
+    #         _use_it, _left_index, _right_index = _widgets.result
+    #         logging.info(f"\ttof range index {_index}:")
+    #         logging.info(f"\t\t{_use_it = }")
+    #         logging.info(f"\t\t{_left_index = }")
+    #         logging.info(f"\t\t{_right_index = }")
+
+
+
+
+        # left_tof_index, right_tof_index = self.plot_tof_profile.result
+        # logging.info(f"\tfrom index {left_tof_index} ({self.lambda_array_angstroms[left_tof_index]:0.3f} {ANGSTROMS})")
+        # logging.info(f"\tto index {right_tof_index} ({self.lambda_array_angstroms[right_tof_index]:0.3f} {ANGSTROMS})")
+
+        # master_3d_data_array = self.parent.master_3d_data_array
+
+        # for _data_type in master_3d_data_array.keys():
+        #     logging.info(f"\tbefore: {np.shape(master_3d_data_array[_data_type]) = }")
+        #     new_master_3d_data_array = []
+        #     for _data in master_3d_data_array[_data_type]:
+        #         new_master_3d_data_array.append(np.mean(_data[left_tof_index:right_tof_index+1, :, :], axis=0))
+        #     master_3d_data_array[_data_type] = np.array(new_master_3d_data_array)
+        #     logging.info(f"\tafter: {np.shape(master_3d_data_array[_data_type]) = }")
+        # self.parent.master_3d_data_array = master_3d_data_array

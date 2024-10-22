@@ -76,8 +76,21 @@ class SvmbirReconstruction:
     # set up in the checking_data. True if at least one of the run doesn't have this metadata in the NeXus
     at_least_one_frame_number_not_found = False
 
+    # dictionary used just after loading the data, not knowing the mode yet
     master_3d_data_array = {DataType.sample: None,  # [angle, y, x]
                             DataType.ob: None}
+    
+    # each element of the dictionary is an master_3d_data_array of each TOF range
+    # {'0': {'use_it': True,
+    #         'data': master_3d_data_array, 
+    #       },
+    # '1': {'use_it': False,
+    #       'data': master_3d_data_array,
+    #       },
+    #  ...
+    #}
+    # this is the master dictionary used no matter the mode
+    master_tof_3d_data_array = None
 
     master_3d_data_array_cleaned = {DataType.sample: None,  # [angle, y, x]
                                     DataType.ob: None}
@@ -165,10 +178,11 @@ class SvmbirReconstruction:
     def load_data(self):
         self.o_mode.load()
         
-    def select_tof_range(self):
+    def select_tof_ranges(self):
         if self.operating_mode == OperatingMode.white_beam:
             return
 
+        # self.o_tof_range_mode.select_multi_tof_range()
         self.o_tof_range_mode.select_tof_range()
 
     def combine_tof_mode_data(self):
