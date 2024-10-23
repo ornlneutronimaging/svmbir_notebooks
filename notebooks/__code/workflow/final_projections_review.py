@@ -35,7 +35,8 @@ class FinalProjectionsReview(Parent):
                 title = f"{list_runs[_index]}, {list_angles[_index]}"
                 list_runs_with_infos.append(title)
                 flat_axs[_index].set_title(title)
-                flat_axs[_index].imshow(array[_index], vmin=0, vmax=1)
+                im1 = flat_axs[_index].imshow(array[_index])
+                plt.colorbar(im1, ax=flat_axs[_index], shrink=0.5)
            
         for _row in np.arange(nbr_rows):
             for _col in np.arange(nbr_cols):

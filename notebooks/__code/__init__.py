@@ -19,21 +19,21 @@ class OperatingMode:
 DEFAULT_OPERATING_MODE = OperatingMode.tof
 NBR_TOF_RANGES = 3
 
-DEBUG = False
-# debug_folder = {DataType.sample: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/September20_2024_PurpleCar_GoldenRatio_CT_5_0_C_Cd_inBeam_Resonance",
-#                 DataType.ob: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/September26_2024_PurpleCar_OpenBean_5_0_C_Cd_inBeam_Resonance",
-#                 DataType.cleaned_images: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
-#                 DataType.normalized: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
-#                 DataType.reconstructed: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
-#                 DataType.extra: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
-# }
-debug_folder = {DataType.sample: "/HFIR/CG1D/IPTS-32519/raw/ct_scans/2024_10_18_fossil_60s/",
-                DataType.ob: "/HFIR/CG1D/IPTS-32519/raw/ob/2024_10_18_fossil_60s/",
-                DataType.cleaned_images: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
-                DataType.normalized: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
-                DataType.reconstructed: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
-                DataType.extra: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
+DEBUG = True
+debug_folder = {DataType.sample: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/September20_2024_PurpleCar_GoldenRatio_CT_5_0_C_Cd_inBeam_Resonance",
+                DataType.ob: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/September26_2024_PurpleCar_OpenBean_5_0_C_Cd_inBeam_Resonance",
+                DataType.cleaned_images: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
+                DataType.normalized: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
+                DataType.reconstructed: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
+                DataType.extra: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
 }
+# debug_folder = {DataType.sample: "/HFIR/CG1D/IPTS-32519/raw/ct_scans/2024_10_18_fossil_60s/",
+#                 DataType.ob: "/HFIR/CG1D/IPTS-32519/raw/ob/2024_10_18_fossil_60s/",
+#                 DataType.cleaned_images: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
+#                 DataType.normalized: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
+#                 DataType.reconstructed: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
+#                 DataType.extra: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
+# }
 
 
 roi = {'left': 0,

@@ -49,6 +49,8 @@ class Load(Parent):
         
         logging.info(f"importing the data:")
        
+        final_list_of_angles = []
+
         if combine:
             logging.info(f"\t combine mode is ON")
         else:
@@ -61,12 +63,17 @@ class Load(Parent):
             logging.info(f"\tworking with {_data_type}:")
             for _run in tqdm(list_of_runs_sorted[_data_type]):
                 _full_path_run = self.parent.list_of_runs[_data_type][_run][Run.full_path]
+                if _data_type == DataType.sample:
+                    final_list_of_angles.append(self.parent.list_of_runs[_data_type][_run][Run.angle])
+
                 logging.info(f"\t\tloading {os.path.basename(_full_path_run)} ...")
                 list_tif = retrieve_list_of_tif(_full_path_run)
                 _master_data.append(load_data_using_multithreading(list_tif,
                                                                    combine_tof=combine))
                 logging.info(f"\t\t loading done!")
             self.parent.master_3d_data_array[_data_type] = np.array(_master_data)
+        
+        self.parent.final_list_of_angles = final_list_of_angles
 
         if combine:
             height, width = np.shape(self.parent.master_3d_data_array[DataType.sample][0])

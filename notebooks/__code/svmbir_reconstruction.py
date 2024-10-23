@@ -18,6 +18,7 @@ from __code.workflow.remove_strips import RemoveStrips
 from __code.workflow.svmbir_handler import SvmbirHandler
 from __code.workflow.final_projections_review import FinalProjectionsReview
 from __code.workflow.export import ExportExtra
+from __code.workflow.visualization import Visualization
 
 LOG_BASENAME_FILENAME = "svmbir_white_beam"
 
@@ -118,6 +119,8 @@ class SvmbirReconstruction:
     o_center_and_tilt = None
     # remove strips
     o_remove = None
+    # remove outliers
+    o_clean = None
     # normalization
     o_norm = None
     # svmbir 
@@ -190,21 +193,32 @@ class SvmbirReconstruction:
             self.o_tof_range_mode.combine_tof_mode_data()
 
     # cleaning low/high pixels
+    def clean_images_settings(self):
+        self.o_clean = ImagesCleaner(parent=self)
+        self.o_clean.settings()
+
     def clean_images_setup(self):
-        o_clean = ImagesCleaner(parent=self)
-        o_clean.cleaning_setup()
+        self.o_clean.cleaning_setup()
 
     def clean_images(self):
-        o_clean = ImagesCleaner(parent=self)
-        o_clean.cleaning()
+        self.o_clean.cleaning()
+
+    def visualization_cleaning_settings(self):
+        self.o_vizu = Visualization(parent=self)
+        self.o_vizu.settings()
+
+    def visualization_cleaning(self):
+        self.o_vizu.visualize(data_after=self.master_3d_data_array_cleaned[DataType.sample],
+                              label_after='cleaned',
+                              label_before='raw',
+                              data_before=self.master_3d_data_array[DataType.sample],
+                              turn_on_vrange=False)
 
     def select_export_folder(self):
-        o_clean = ImagesCleaner(parent=self)
-        o_clean.select_export_folder()
+        self.o_clean.select_export_folder()
 
     def export_cleaned_images(self):
-        o_clean = ImagesCleaner(parent=self)
-        o_clean.export_clean_images()
+        self.o_clean.export_clean_images()
 
     # normalization
     def normalization_settings(self):
@@ -218,10 +232,18 @@ class SvmbirReconstruction:
         self.o_norm.run()
 
     def visualization_normalization_settings(self):
-        self.o_norm.visualization_normalization_settings()
+        self.o_vizu = Visualization(parent=self)
+        self.o_vizu.settings()
+
+        # self.o_norm.visualization_normalization_settings()
 
     def visualize_normalization(self):
-        self.o_norm.visualize_normalization()
+        self.o_vizu.visualize(data_after=self.normalized_images,
+                              label_before='cleaned',
+                              label_after='normalized',
+                              data_before=self.master_3d_data_array_cleaned[DataType.sample],
+                              turn_on_vrange=True)
+        # self.o_norm.visualize_normalization()
 
     def select_export_normalized_folder(self):
         o_select = Load(parent=self)

@@ -229,54 +229,53 @@ class Normalization(Parent):
         self.parent.normalized_images = normalized_data
         self.parent.final_list_of_angles = final_list_of_angles
 
-    def visualization_normalization_settings(self):
-        self.display_ui = widgets.ToggleButtons(options=['1 image at a time',
-                                                               'All images'],
-                                                               description="How to plot?",
-                                                               )
-        display(self.display_ui)
+    # def visualization_normalization_settings(self):
+    #     self.display_ui = widgets.ToggleButtons(options=['1 image at a time',
+    #                                                            'All images'],
+    #                                                            description="How to plot?",
+    #                                                            )
+    #     display(self.display_ui)
 
-    def visualize_normalization(self):
+    # def visualize_normalization(self):
 
-        if self.display_ui.value == '1 image at a time':
+    #     if self.display_ui.value == '1 image at a time':
 
-            normalized_data = self.parent.normalized_images
-            list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
-            master_3d_sample_data = self.parent.master_3d_data_array_cleaned[DataType.sample]
+    #         normalized_data = self.parent.normalized_images
+    #         list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
+    #         master_3d_sample_data = self.parent.master_3d_data_array_cleaned[DataType.sample]
 
-            def plot_norm(image_index=0, vmin=0, vmax=1):
+    #         def plot_norm(image_index=0, vmin=0, vmax=1):
 
-                fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
+    #             fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
 
-                _norm_data = normalized_data[image_index]
-                _run_number = list_of_runs_to_use[image_index]
-                _raw_data = master_3d_sample_data[image_index]
+    #             _norm_data = normalized_data[image_index]
+    #             _run_number = list_of_runs_to_use[image_index]
+    #             _raw_data = master_3d_sample_data[image_index]
 
-                im0 = axs[0].imshow(_raw_data)
-                axs[0].set_title("Raw data")
-                plt.colorbar(im0, ax=axs[0], shrink=0.5)
+    #             im0 = axs[0].imshow(_raw_data)
+    #             axs[0].set_title("Raw data")
+    #             plt.colorbar(im0, ax=axs[0], shrink=0.5)
 
-                im1 = axs[1].imshow(_norm_data, vmin=vmin, vmax=vmax)
-                axs[1].set_title('Normalized')
-                plt.colorbar(im1, ax=axs[1], shrink=0.5)
+    #             im1 = axs[1].imshow(_norm_data, vmin=vmin, vmax=vmax)
+    #             axs[1].set_title('Normalized')
+    #             plt.colorbar(im1, ax=axs[1], shrink=0.5)
         
-                # fig.set_title(f"{_run_number}")
+    #             # fig.set_title(f"{_run_number}")
                 
-                plt.tight_layout()
-                plt.show()
+    #             plt.tight_layout()
+    #             plt.show()
 
-            display_plot = interactive(plot_norm,
-                                    image_index=widgets.IntSlider(min=0,
-                                                                    max=len(list_of_runs_to_use)-1,
-                                                                    value=0),
-                                    vmin=widgets.IntSlider(min=0, max=10, value=0),
-                                    vmax=widgets.IntSlider(min=0, max=10, value=1))
-            display(display_plot)
+    #         display_plot = interactive(plot_norm,
+    #                                 image_index=widgets.IntSlider(min=0,
+    #                                                                 max=len(list_of_runs_to_use)-1,
+    #                                                                 value=0),
+    #                                 vmin=widgets.IntSlider(min=0, max=10, value=0),
+    #                                 vmax=widgets.IntSlider(min=0, max=10, value=1))
+    #         display(display_plot)
 
-        else:
-            o_review = FinalProjectionsReview(parent=self.parent)
-            o_review.run(array=self.parent.normalized_images)
-
+    #     else:
+    #         o_review = FinalProjectionsReview(parent=self.parent)
+    #         o_review.run(array=self.parent.normalized_images)
 
     def export_images(self):
         

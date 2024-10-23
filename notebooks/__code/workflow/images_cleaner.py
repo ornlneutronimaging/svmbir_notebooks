@@ -1,17 +1,16 @@
 import numpy as np
 from tqdm import tqdm
 import os
-import dxchange
 import matplotlib.pyplot as plt
-import pandas as pd
 import logging
 from ipywidgets import interactive
 from IPython.display import display
 import ipywidgets as widgets
 from scipy.ndimage import median_filter
-
+from imars3d.backend.corrections.gamma_filter import gamma_filter
+ 
 from __code import DataType
-from __code.config import clean_paras
+from __code.config import clean_paras, NUM_THREADS, TOMOPY_REMOVE_OUTLIER_THRESHOLD_RATIO
 from __code.parent import Parent
 from __code.workflow.load import Load
 from __code.workflow.export import Export
@@ -42,68 +41,102 @@ class ImagesCleaner(Parent):
     edge_nbr_pixels = clean_paras['edge_nbr_pixels']
     nbr_bins = clean_paras['nbr_bins']
             
+    def settings(self):
+        self.histo_ui = widgets.Checkbox(value=False,
+                                         description="Histogram")
+        self.tomo_ui = widgets.Checkbox(value=False,
+                                        description="Threshold")
+        v_box = widgets.VBox([self.histo_ui, self.tomo_ui])
+        display(v_box)
+
     def cleaning_setup(self):
-        sample_data = self.parent.master_3d_data_array[DataType.sample]
-        ob_data = self.parent.master_3d_data_array[DataType.ob]
 
-        sample_histogram = sample_data.sum(axis=0)[self.edge_nbr_pixels: -self.edge_nbr_pixels,
-                                                   self.edge_nbr_pixels: -self.edge_nbr_pixels]
-        ob_histogram = ob_data.sum(axis=0)[self.edge_nbr_pixels: -self.edge_nbr_pixels,
-                                           self.edge_nbr_pixels: -self.edge_nbr_pixels]
+        if self.histo_ui.value:
+            sample_data = self.parent.master_3d_data_array[DataType.sample]
+            ob_data = self.parent.master_3d_data_array[DataType.ob]
 
-        def plot_histogram(nbr_bins=10, nbr_exclude=1):
-        
-            fig, axs = plt.subplots(nrows=2, ncols=1)
-            _, sample_bin_edges = np.histogram(sample_histogram.flatten(), bins=nbr_bins, density=False)
-            axs[0].hist(sample_histogram.flatten(), bins=nbr_bins)
-            axs[0].set_title('sample histogram')
-            axs[0].set_yscale('log')
-            axs[0].axvspan(sample_bin_edges[0], sample_bin_edges[nbr_exclude], facecolor='red', alpha=0.2)
-            axs[0].axvspan(sample_bin_edges[-nbr_exclude-1], sample_bin_edges[-1], facecolor='red', alpha=0.2)
+            sample_histogram = sample_data.sum(axis=0)[self.edge_nbr_pixels: -self.edge_nbr_pixels,
+                                                    self.edge_nbr_pixels: -self.edge_nbr_pixels]
+            ob_histogram = ob_data.sum(axis=0)[self.edge_nbr_pixels: -self.edge_nbr_pixels,
+                                            self.edge_nbr_pixels: -self.edge_nbr_pixels]
+
+            def plot_histogram(nbr_bins=10, nbr_exclude=1):
             
-            _, ob_bin_edges = np.histogram(ob_histogram.flatten(), bins=nbr_bins, density=False)
-            axs[1].hist(ob_histogram.flatten(), bins=nbr_bins)
-            axs[1].set_title('ob histogram')
-            axs[1].set_yscale('log')
-            axs[1].axvspan(ob_bin_edges[0], ob_bin_edges[nbr_exclude], facecolor='red', alpha=0.2)
-            axs[1].axvspan(ob_bin_edges[-nbr_exclude-1], ob_bin_edges[-1], facecolor='red', alpha=0.2)
-            plt.tight_layout()
-            plt.show()
+                fig, axs = plt.subplots(nrows=2, ncols=1)
+                _, sample_bin_edges = np.histogram(sample_histogram.flatten(), bins=nbr_bins, density=False)
+                axs[0].hist(sample_histogram.flatten(), bins=nbr_bins)
+                axs[0].set_title('sample histogram')
+                axs[0].set_yscale('log')
+                axs[0].axvspan(sample_bin_edges[0], sample_bin_edges[nbr_exclude], facecolor='red', alpha=0.2)
+                axs[0].axvspan(sample_bin_edges[-nbr_exclude-1], sample_bin_edges[-1], facecolor='red', alpha=0.2)
+                
+                _, ob_bin_edges = np.histogram(ob_histogram.flatten(), bins=nbr_bins, density=False)
+                axs[1].hist(ob_histogram.flatten(), bins=nbr_bins)
+                axs[1].set_title('ob histogram')
+                axs[1].set_yscale('log')
+                axs[1].axvspan(ob_bin_edges[0], ob_bin_edges[nbr_exclude], facecolor='red', alpha=0.2)
+                axs[1].axvspan(ob_bin_edges[-nbr_exclude-1], ob_bin_edges[-1], facecolor='red', alpha=0.2)
+                plt.tight_layout()
+                plt.show()
 
-            return nbr_bins, nbr_exclude
+                return nbr_bins, nbr_exclude
 
-        self.parent.display_histogram = interactive(plot_histogram,
-                                                     nbr_bins = widgets.IntSlider(min=10,
-                                                                                max=1000,
-                                                                                value=10,
-                                                                                description='Nbr bins',
-                                                                                continuous_update=False),
-                                                    nbr_exclude = widgets.IntSlider(min=0,
-                                                                                    max=10,
-                                                                                    value=1,
-                                                                                    description='Bins to excl.',
-                                                                                    continuous_update=False,
-                                                                                    ),
-                                                    )
-        display(self.parent.display_histogram)
+            self.parent.display_histogram = interactive(plot_histogram,
+                                                        nbr_bins = widgets.IntSlider(min=10,
+                                                                                    max=1000,
+                                                                                    value=10,
+                                                                                    description='Nbr bins',
+                                                                                    continuous_update=False),
+                                                        nbr_exclude = widgets.IntSlider(min=0,
+                                                                                        max=10,
+                                                                                        value=1,
+                                                                                        description='Bins to excl.',
+                                                                                        continuous_update=False,
+                                                                                        ),
+                                                        )
+            display(self.parent.display_histogram)
 
     def cleaning(self):
 
-        self.nbr_bins, nbr_bins_to_exclude = self.parent.display_histogram.result
-
         sample_data = self.parent.master_3d_data_array[DataType.sample]
         ob_data = self.parent.master_3d_data_array[DataType.ob]
+        self.parent.master_3d_data_array_cleaned = {DataType.sample: sample_data,
+                                                    DataType.ob: ob_data}
+
+        self.cleaning_by_histogram()
+        self.cleaning_by_imars3d()
+
+    def cleaning_by_imars3d(self):
+        
+        if not self.tomo_ui.value:
+            logging.info(f"cleaning using tomopy: OFF")
+            return
+    
+        sample_data = self.parent.master_3d_data_array_cleaned[DataType.sample]
+        cleaned_sample = gamma_filter(arrays=sample_data)
+        self.parent.master_3d_data_array_cleaned[DataType.sample] = cleaned_sample
+                
+        ob_data = self.parent.master_3d_data_array_cleaned[DataType.ob]
+        cleaned_ob = gamma_filter(arrays=ob_data)
+        self.parent.master_3d_data_array_cleaned[DataType.ob] = cleaned_ob
+
+    def cleaning_by_histogram(self):
+
+        if not self.histo_ui.value:
+            logging.info(f"cleaning by histogram: OFF")
+            return
+
+        self.nbr_bins, nbr_bins_to_exclude = self.parent.display_histogram.result
+
+        sample_data = self.parent.master_3d_data_array_cleaned[DataType.sample]
+        ob_data = self.parent.master_3d_data_array_cleaned[DataType.ob]
 
         if nbr_bins_to_exclude == 0:
-
             logging.info(f"0 bin selected, the raw data will be used!")
-            self.parent.master_3d_data_array_cleaned = {DataType.sample: sample_data,
-                                                        DataType.ob: ob_data}
-        else:
-            
-            logging.info(f"user selected {nbr_bins_to_exclude} bins to exclude")
 
-            
+        else:         
+            logging.info(f"user selected {nbr_bins_to_exclude} bins to exclude")
+          
             # _clean_paras['low_gate'] = nbr_bins_to_exclude
             # _clean_paras['high_gate'] = clean_paras['nbr_bins'] - nbr_bins_to_exclude
             # _clean_paras['nbr_bins'] = nbr_bins
