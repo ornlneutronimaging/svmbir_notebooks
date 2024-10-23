@@ -41,14 +41,11 @@ class Visualization(Parent):
                     _run_number = list_of_runs_to_use[image_index]
                     _raw_data = data_before[image_index]
 
-                    im0 = axs[0].imshow(_raw_data)
+                    im0 = axs[0].imshow(_raw_data, vmin=vmin_before, vmax=vmax_before)
                     axs[0].set_title(label_before)
-                    plt.colorbar(im0, ax=axs[0], shrink=0.5, vmin=vmin_before, vmax=vmax_before)
+                    plt.colorbar(im0, ax=axs[0], shrink=0.5)
 
-                    if turn_on_vrange:
-                        im1 = axs[1].imshow(_norm_data, vmin=vmin_after, vmax=vmax_after)
-                    else:
-                        im1 = axs[1].imshow(_norm_data)
+                    im1 = axs[1].imshow(_norm_data, vmin=vmin_after, vmax=vmax_after)
                     axs[1].set_title(label_after)
                     plt.colorbar(im1, ax=axs[1], shrink=0.5)
             
@@ -80,10 +77,7 @@ class Visualization(Parent):
                     axs[0].set_title(label_before)
                     plt.colorbar(im0, ax=axs[0], shrink=0.5)
 
-                    if turn_on_vrange:
-                        im1 = axs[1].imshow(_norm_data)
-                    else:
-                        im1 = axs[1].imshow(_norm_data)
+                    im1 = axs[1].imshow(_norm_data)
                     axs[1].set_title(label_after)
                     plt.colorbar(im1, ax=axs[1], shrink=0.5)
             

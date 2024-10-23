@@ -112,11 +112,11 @@ class ImagesCleaner(Parent):
             logging.info(f"cleaning using tomopy: OFF")
             return
     
-        sample_data = self.parent.master_3d_data_array_cleaned[DataType.sample]
+        sample_data = np.array(self.parent.master_3d_data_array_cleaned[DataType.sample])
         cleaned_sample = gamma_filter(arrays=sample_data)
         self.parent.master_3d_data_array_cleaned[DataType.sample] = cleaned_sample
                 
-        ob_data = self.parent.master_3d_data_array_cleaned[DataType.ob]
+        ob_data = np.array(self.parent.master_3d_data_array_cleaned[DataType.ob])
         cleaned_ob = gamma_filter(arrays=ob_data)
         self.parent.master_3d_data_array_cleaned[DataType.ob] = cleaned_ob
 
