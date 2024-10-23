@@ -1,6 +1,7 @@
 class DataType:
     sample = 'sample'
     ob = 'ob'
+    dc = 'dc'
     ipts = 'ipts'
     top = 'top'
     nexus = 'nexus'
@@ -29,6 +30,7 @@ DEBUG = True
 # }
 debug_folder = {DataType.sample: "/HFIR/CG1D/IPTS-32519/raw/ct_scans/2024_10_18_fossil_60s/",
                 DataType.ob: "/HFIR/CG1D/IPTS-32519/raw/ob/2024_10_18_fossil_60s/",
+                DataType.dc: "/HFIR/CG1D/IPTS-32519/raw/dc/2024_10_15_DC_60s",
                 DataType.cleaned_images: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
                 DataType.normalized: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
                 DataType.reconstructed: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',

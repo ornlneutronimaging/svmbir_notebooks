@@ -56,7 +56,11 @@ class SvmbirReconstruction:
     # }
     list_of_runs = {DataType.sample: OrderedDict(),
                     DataType.ob: OrderedDict(),
+                    DataType.dc: None,
                     }
+    
+
+
     
     list_of_runs_checking_data = {DataType.sample: {},
                                    DataType.ob: {},
@@ -152,6 +156,13 @@ class SvmbirReconstruction:
     def select_top_ob_folder(self):
         o_load = Load(parent=self)
         o_load.select_folder(data_type=DataType.ob)
+
+    def select_dc_options(self):
+        self.o_load_dc = Load(parent=self)
+        self.o_load_dc.select_dc_options()
+
+    def select_top_dc_folder(self):
+        self.o_load_dc.select_folder(data_type=DataType.dc)
 
     # Checking data (proton charge, empty runs ...)
     def checking_data(self):

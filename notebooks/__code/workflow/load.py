@@ -3,6 +3,8 @@ import os
 import numpy as np
 import logging
 from tqdm import tqdm
+from IPython.display import display
+import ipywidgets as widgets
 
 from __code import DataType, Run
 from __code import DEBUG, debug_folder
@@ -16,6 +18,7 @@ class Load(Parent):
 
     list_of_runs_to_use = {DataType.sample: [],
                            DataType.ob: [],
+                           DataType.dc: [],
     }
 
     def select_folder(self, data_type=DataType.sample, multiple_flag=False):
@@ -38,6 +41,11 @@ class Load(Parent):
                                            next_function=self.data_selected)
         o_file_browser.select_input_folder(instruction=f"Select Top Folder of {data_type}",
                                            multiple_flag=multiple_flag)
+
+    def select_dc_options(self):
+        self.select_dc = widgets.Checkbox(value=True,
+                                          description='Use DC?')
+        display(self.select_dc)
 
     def data_selected(self, top_folder):
         logging.info(f"{self.parent.current_data_type} top folder selected: {top_folder}")
