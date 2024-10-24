@@ -82,6 +82,10 @@ class CenterOfRotationAndTilt(Parent):
         logging_3d_array_infos(message="before", array=self.parent.corrected_images)
 
         y_top, y_bottom = self.display_plot.result
+
+        # update configuration
+        self.parent.configuration.range_of_slices_for_center_of_rotation = [y_top, y_bottom]
+
         mid_point = int(np.mean([y_top, y_bottom]))
         rois = ((y_top, mid_point+1), (mid_point, y_bottom))
 

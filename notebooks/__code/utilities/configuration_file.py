@@ -91,6 +91,15 @@ class NormalizationRoi(BaseModel):
     right: int = 1
 
 
+class SvmbirConfig(BaseModel):
+
+    sharpness: float = 0
+    snr_db: float = 30.0
+    positivity: bool = True
+    max_iterations: int = 200
+    verbose: bool = False
+
+
 class Configuration(BaseModel):
     top_folder: TopFolder = Field(default=TopFolder())
     operating_mode: str = Field(default=OperatingMode.tof) 
@@ -118,9 +127,6 @@ class Configuration(BaseModel):
     remove_stripe_based_interpolation_options: RemoveStripeBasedInterpolation = Field(default=RemoveStripeBasedInterpolation())
     
     range_of_slices_for_center_of_rotation: list[int, int] = []
-    svmbir_sharpness: float = 0
-    svmbir_snr_db: float = 30.0
-    svmbir_positivity: bool = True
-    svmbir_max_iterations: int = 200
-    svmbir_verbose: bool = False
+    
+    svmbir_config: SvmbirConfig = Field(default=SvmbirConfig())
     output_folder: str = ""

@@ -12,6 +12,7 @@ import svmbir
 
 from __code.workflow.export import Export
 from __code.utilities.files import make_or_reset_folder
+from __code.utilities.configuration_file import SvmbirConfig
 from __code.parent import Parent
 from __code import DataType
 from __code.config import NUM_THREADS
@@ -29,6 +30,8 @@ class SvmbirHandler(Parent):
         list_runs = self.parent.list_of_runs_to_use[DataType.sample]
 
         display(widgets.HTML("<font size=5>Select range of slices to reconstruct</font"))
+
+        [default_top, default_bottom] = self.parent.configuration.range_of_slices_for_center_of_rotation
 
         def plot_range(image_index, top_slice, bottom_slice):
 
@@ -51,15 +54,13 @@ class SvmbirHandler(Parent):
                                                                                     value=0),
                                                    top_slice = widgets.IntSlider(min=0,
                                                                                  max=height-1,
-                                                                                 value=0),
+                                                                                 value=default_top),
                                                     bottom_slice = widgets.IntSlider(min=0,
                                                                                      max=height-1,
-                                                                                     value=height-1),
+                                                                                     value=default_bottom),
                                                     )
         display(self.display_corrected_range)
-
         display(widgets.HTML("<hr>"))
-
         display(widgets.HTML("<font size=5>Define reconstruction settings</font"))
 
         self.sharpness_ui = widgets.FloatSlider(min=0,
@@ -141,6 +142,15 @@ class SvmbirHandler(Parent):
         max_iterations = self.max_iterations_ui.value
         verbose = 1 if self.verbose_ui.value else 0
 
+        # update configuration
+        svmbir_config = SvmbirConfig()
+        svmbir_config.sharpness = sharpness
+        svmbir_config.snr_db = snr_db
+        svmbir_config.positivity = positivity
+        svmbir_config.max_iterations = max_iterations
+        svmbir_config.verbose = verbose
+        self.parent.configuration.svmbir_config = svmbir_config
+
         logging.info(f"\t{top_slice = }")
         logging.info(f"\t{bottom_slice = }")
         logging.info(f"\t{sharpness = }")
@@ -217,3 +227,6 @@ class SvmbirHandler(Parent):
                           output_folder=full_output_folder)
         o_export.run()
         logging.info(f"\texporting reconstructed images ... Done!")
+
+        # update configuration
+        self.parent.configuration.output_folder = full_output_folder
