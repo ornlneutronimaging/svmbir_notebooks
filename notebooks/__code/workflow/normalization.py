@@ -10,7 +10,7 @@ from scipy.ndimage import median_filter
 
 from __code.parent import Parent
 from __code import DEBUG, roi
-from __code import Run, DataType
+from __code import Run, DataType, NormalizationSettings
 from __code.workflow.load import Load
 from __code.workflow.export import Export
 from __code.utilities.files import make_or_reset_folder
@@ -193,9 +193,22 @@ class Normalization(Parent):
 
         if use_roi:
             left, right, top, bottom = self.display_roi.result
+            self.parent.configuration.normalization_roi.top = top
+            self.parent.configuration.normalization_roi.bottom = bottom
+            self.parent.configuration.normalization_roi.left = left
+            self.parent.configuration.normalization_roi.right = right
 
         obs_combined = self.obs_combined
         final_list_of_angles = []
+
+        # update configuration
+        list_norm_settings = []
+        if use_proton_charge:
+            list_norm_settings.append(NormalizationSettings.pc)
+        if use_frame:
+            list_norm_settings.append(NormalizationSettings.frame_number)
+        if use_roi:
+            list_norm_settings.append(NormalizationSettings.roi)
 
         for _index, _run in enumerate(list_of_runs_used[DataType.sample]):
 

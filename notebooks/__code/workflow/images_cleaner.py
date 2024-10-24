@@ -137,7 +137,8 @@ class ImagesCleaner(Parent):
         self.nbr_bins, nbr_bins_to_exclude = self.parent.display_histogram.result
 
         # update configuration
-        self.parent.configuration.histogram_cleaning_settings............................. FIXME
+        self.parent.configuration.histogram_cleaning_settings.nbr_bins = self.nbr_bins
+        self.parent.configuration.histogram_cleaning_settings.bins_to_exclude = nbr_bins_to_exclude
 
         sample_data = self.parent.master_3d_data_array_cleaned[DataType.sample]
         ob_data = self.parent.master_3d_data_array_cleaned[DataType.ob]

@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from ipywidgets import interactive
 
 from __code import DataType, RemoveStripeAlgo
+from __code.utilities import configuration_file
 
 
 class RemoveStrips:
@@ -211,6 +212,9 @@ class RemoveStrips:
         for _option in list_options_to_use:
             _children.append(self.list_algo[_option]['settings'])
 
+        # update configuration
+        self.parent.configuration.list_clean_stripes_algorithm = _children
+
         accordion = widgets.Accordion(children=_children,
                                       titles=list_options_to_use)
         display(accordion)
@@ -266,6 +270,39 @@ class RemoveStrips:
             list_arguments[_arg_name] = _arg_value
         return list_arguments
 
+    def saving_configuration(self, algorithm_name=RemoveStripeAlgo.remove_stripe_fw):
+        list_widgets = self.list_algo[algorithm_name]['settings'].children
+
+        if algorithm_name == RemoveStripeAlgo.remove_stripe_fw:
+            my_instance = configuration_file.RemoveStripeFw
+        elif algorithm_name == RemoveStripeAlgo.remove_stripe_ti:
+            my_instance = configuration_file.RemoveStripeTi
+        elif algorithm_name == RemoveStripeAlgo.remove_stripe_sf:
+            my_instance = configuration_file.RemoveStripeSf
+        elif algorithm_name == RemoveStripeAlgo.remove_stripe_based_sorting:
+            my_instance = configuration_file.RemoveStripeBasedSorting
+        elif algorithm_name == RemoveStripeAlgo.remove_stripe_based_filtering:
+            my_instance = configuration_file.RemoveStripeBasedFiltering
+        elif algorithm_name == RemoveStripeAlgo.remove_stripe_based_fitting:
+            my_instance = configuration_file.RemoveStripeBasedFitting
+        elif algorithm_name == RemoveStripeAlgo.remove_large_stripe:
+            my_instance = configuration_file.RemoveLargeStripe
+        elif algorithm_name == RemoveStripeAlgo.remove_dead_stripe:
+            my_instance = configuration_file.RemoveDeadStripe
+        elif algorithm_name == RemoveStripeAlgo.remove_all_stripe:
+            my_instance = configuration_file.RemoveAllStripe
+        elif algorithm_name == RemoveStripeAlgo.remove_stripe_based_interpolation:
+            my_instance = configuration_file.RemoveStripeBasedInterpolation
+        else:
+            raise NotImplementedError("filter not implemented")
+
+        for _widget in list_widgets:
+            _arg_name = _widget.description
+            _arg_value = _widget.value
+            setattr(my_instance, _arg_name, _arg_value)
+
+        setattr(self.parent.configuration, f"{algorithm_name}_options", my_instance)
+
     def perform_cleaning(self):
         list_algo_to_use = self.list_to_use_widget.options
         logging.info(f"Strip cleaning:")
@@ -281,6 +318,7 @@ class RemoveStrips:
                     tomography_array = RemoveStrips.run_algo(self.list_algo[_algo]['function'], 
                                                             tomography_array, 
                                                             **kwargs)
+                    self.saving_configuration(algorithm_name=_algo)
                     logging.info(f"\t{_algo} done!")
                     list_algo_that_worked.append(_algo)
             except np.linalg.LinAlgError:

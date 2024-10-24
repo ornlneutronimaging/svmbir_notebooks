@@ -84,6 +84,13 @@ class TopFolder(BaseModel):
     ob: str = ""
 
 
+class NormalizationRoi(BaseModel):
+    top: int = 0
+    bottom: int = 1
+    left: int = 0
+    right: int = 1
+
+
 class Configuration(BaseModel):
     top_folder: TopFolder = Field(default=TopFolder())
     operating_mode: str = Field(default=OperatingMode.tof) 
@@ -93,12 +100,12 @@ class Configuration(BaseModel):
     range_of_tof_to_combine:  List[tuple[int, int]] = [[-1, -1]]
     list_clean_algorithm: List[str] = [CleaningAlgorithm.histogram, CleaningAlgorithm.threshold]
     histogram_cleaning_settings: HistogramCleaningSettings = Field(default=HistogramCleaningSettings())
-
     list_normalization_settings: List[str] = [NormalizationSettings.pc, 
                                               NormalizationSettings.frame_number,
                                               NormalizationSettings.roi]
+    normalization_roi: NormalizationRoi = Field(default=NormalizationRoi)
+    
     list_clean_stripes_algorithm: List[str] = []
-
     remove_stripe_fw_options: RemoveStripeFw = Field(default=RemoveStripeFw())
     remove_stripe_ti_options: RemoveStripeTi = Field(default=RemoveStripeTi())
     remove_stripe_sf_options: RemoveStripeSf = Field(default=RemoveStripeSf())
