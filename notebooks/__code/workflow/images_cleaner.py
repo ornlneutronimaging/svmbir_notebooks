@@ -9,7 +9,7 @@ import ipywidgets as widgets
 from scipy.ndimage import median_filter
 from imars3d.backend.corrections.gamma_filter import gamma_filter
  
-from __code import DataType
+from __code import DataType, CleaningAlgorithm
 from __code.config import clean_paras, NUM_THREADS, TOMOPY_REMOVE_OUTLIER_THRESHOLD_RATIO
 from __code.parent import Parent
 from __code.workflow.load import Load
@@ -50,6 +50,14 @@ class ImagesCleaner(Parent):
         display(v_box)
 
     def cleaning_setup(self):
+
+        # update configuration
+        list_algo = []
+        if self.histo_ui.value:
+            list_algo.append(CleaningAlgorithm.histogram)
+        if self.tomo_ui.value:
+            list_algo.append(CleaningAlgorithm.threshold)
+        self.parent.configuration.list_clean_algorithm = list_algo
 
         if self.histo_ui.value:
             sample_data = self.parent.master_3d_data_array[DataType.sample]
@@ -127,6 +135,9 @@ class ImagesCleaner(Parent):
             return
 
         self.nbr_bins, nbr_bins_to_exclude = self.parent.display_histogram.result
+
+        # update configuration
+        self.parent.configuration.histogram_cleaning_settings............................. FIXME
 
         sample_data = self.parent.master_3d_data_array_cleaned[DataType.sample]
         ob_data = self.parent.master_3d_data_array_cleaned[DataType.ob]

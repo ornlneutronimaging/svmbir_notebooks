@@ -21,7 +21,7 @@ from __code.workflow.final_projections_review import FinalProjectionsReview
 from __code.workflow.export import ExportExtra
 from __code.workflow.visualization import Visualization
 
-LOG_BASENAME_FILENAME = "svmbir_white_beam"
+LOG_BASENAME_FILENAME = "svmbir_reconstruction"
 
 
 class SvmbirReconstruction:

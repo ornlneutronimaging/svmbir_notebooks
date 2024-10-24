@@ -43,6 +43,7 @@ class Load(Parent):
         logging.info(f"{self.parent.current_data_type} top folder selected: {top_folder}")
         self.parent.working_dir[self.data_type] = top_folder
         print(f"Top {self.data_type} folder selected: {top_folder}")
+        self.parent.configuration.top_folder.sample = top_folder
 
     def load_data(self, combine=False):
         """combine is for TOF mode"""
@@ -57,6 +58,8 @@ class Load(Parent):
             logging.info(f"\t not combining the TOF images")
 
         list_of_runs_sorted = self.parent.list_of_runs_to_use
+        self.parent.configuration.list_of_sample_runs = list_of_runs_sorted[DataType.sample]
+        self.parent.configuration.list_of_ob_runs = list_of_runs_sorted[DataType.ob]
 
         for _data_type in self.parent.list_of_runs.keys():
             _master_data = []
@@ -74,6 +77,7 @@ class Load(Parent):
             self.parent.master_3d_data_array[_data_type] = np.array(_master_data)
         
         self.parent.final_list_of_angles = final_list_of_angles
+        self.parent.configuration.list_of_angles = final_list_of_angles
 
         if combine:
             height, width = np.shape(self.parent.master_3d_data_array[DataType.sample][0])

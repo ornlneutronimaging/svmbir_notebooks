@@ -175,6 +175,7 @@ class TofRangeMode(Parent):
         left_tof_index, right_tof_index = self.plot_tof_profile.result
         logging.info(f"\tfrom index {left_tof_index} ({self.lambda_array_angstroms[left_tof_index]:0.3f} {ANGSTROMS})")
         logging.info(f"\tto index {right_tof_index} ({self.lambda_array_angstroms[right_tof_index]:0.3f} {ANGSTROMS})")
+        self.parent.configuration.range_of_tof_to_combine = list([left_tof_index, right_tof_index])
 
         master_3d_data_array = self.parent.master_3d_data_array
 

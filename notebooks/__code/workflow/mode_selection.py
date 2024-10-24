@@ -31,7 +31,7 @@ class ModeSelection(Parent):
         else:
             self.parent.operating_mode = OperatingMode.tof
         
-        self.mode_selection_ui.value
+        self.parent.configuration.operating_mode = self.mode_selection_ui.value
 
         logging.info(f"Working in {self.mode_selection_ui.value} mode")
         o_check = CheckingData(parent=self.parent)

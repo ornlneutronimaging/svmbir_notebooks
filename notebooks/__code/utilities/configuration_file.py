@@ -1,7 +1,9 @@
 from pydantic import BaseModel, Field
 from typing import List
 
-from __code import CleaningAlgorithm, NormalizationSettings
+from __code import CleaningAlgorithm, NormalizationSettings, OperatingMode
+from __code import DataType
+
 
 class RemoveStripeFwWnameOptions:
     haar = 'haar'
@@ -72,12 +74,26 @@ class RemoveStripeBasedInterpolation(BaseModel):
     norm: bool = True
 
 
+class HistogramCleaningSettings(BaseModel):
+    nbr_bins: int = 10
+    bins_to_exclude: int = 1
+
+
+class TopFolder(BaseModel):
+    sample: str = ""
+    ob: str = ""
+
+
 class Configuration(BaseModel):
+    top_folder: TopFolder = Field(default=TopFolder())
+    operating_mode: str = Field(default=OperatingMode.tof) 
     list_of_sample_runs: List[str] = []
     list_of_angles: List[str] = []
     list_of_ob_runs: List[str] = []
     range_of_tof_to_combine:  List[tuple[int, int]] = [[-1, -1]]
     list_clean_algorithm: List[str] = [CleaningAlgorithm.histogram, CleaningAlgorithm.threshold]
+    histogram_cleaning_settings: HistogramCleaningSettings = Field(default=HistogramCleaningSettings())
+
     list_normalization_settings: List[str] = [NormalizationSettings.pc, 
                                               NormalizationSettings.frame_number,
                                               NormalizationSettings.roi]
