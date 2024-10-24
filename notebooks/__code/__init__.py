@@ -41,6 +41,9 @@ roi = {'left': 0,
        'top': 0,
        'bottom': 49}
 
+ANGSTROMS = u"\u212b"
+LAMBDA = u"\u03bb"
+
 
 class Run:
     full_path = 'full path'
@@ -51,5 +54,26 @@ class Run:
     nexus = 'nexus'
 
 
-ANGSTROMS = u"\u212b"
-LAMBDA = u"\u03bb"
+class CleaningAlgorithm:
+    histogram = 'histogram'
+    threshold = 'threshold'
+
+
+class NormalizationSettings:
+    pc = 'proton charge'
+    frame_number = 'frame number'
+    roi = 'roi'
+
+
+class RemoveStripeAlgo:
+
+    remove_stripe_fw = "remove_stripe_fw"
+    remove_stripe_ti = "remove_stripe_ti"
+    remove_stripe_sf = "remove_stripe_sf"
+    remove_stripe_based_sorting = "remove_stripe_based_sorting"
+    remove_stripe_based_filtering = "remove_stripe_based_filtering"
+    remove_stripe_based_fitting = "remove_stripe_based_fitting"
+    remove_large_stripe = "remove_large_stripe"
+    remove_all_stripe = "remove_all_stripe"
+    remove_dead_stripe = "remove_dead_stripe"
+    remove_stripe_based_interpolation = "remove_stripe_based_interpolation"

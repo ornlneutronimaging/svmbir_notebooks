@@ -10,35 +10,22 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
 
-from __code import DataType
-
-
-class ListAlgo:
-
-    remove_stripe_fw = "remove_stripe_fw"
-    remove_stripe_ti = "remove_stripe_ti"
-    remove_stripe_sf = "remove_stripe_sf"
-    remove_stripe_based_sorting = "remove_stripe_based_sorting"
-    remove_stripe_based_filtering = "remove_stripe_based_filtering"
-    remove_stripe_based_fitting = "remove_stripe_based_fitting"
-    remove_large_stripe = "remove_large_stripe"
-    remove_all_stripe = "remove_all_stripe"
-    remove_dead_stripe = "remove_dead_stripe"
-    remove_stripe_based_interpolation = "remove_stripe_based_interpolation"
+from __code import DataType, RemoveStripeAlgo
 
 
 class RemoveStrips:
 
     sinogram = None
 
-    default_list_algo_to_use = [ListAlgo.remove_all_stripe]
+    default_list_algo_to_use = [RemoveStripeAlgo.remove_all_stripe]
 
-    list_algo = {ListAlgo.remove_stripe_fw: {'help': 'Remove horizontal stripes from sinogram using the Fourier-Wavelet (FW) based method',
+    list_algo = {RemoveStripeAlgo.remove_stripe_fw: {'help': 'Remove horizontal stripes from sinogram using the Fourier-Wavelet (FW) based method',
                                              'function': stripe.remove_stripe_fw,
                                              'settings': widgets.VBox([
                                                             widgets.Text(value="None",
                                                                             description="level"),
                                                             widgets.Dropdown(options=['haar', 'db5', 'sym5'],
+                                                                             value='haar',
                                                                 description="wname"
                                                             ),
                                                             widgets.FloatText(value=2,
@@ -47,7 +34,7 @@ class RemoveStrips:
                                                                             description='pad')
                                                         ]),
                 },
-                 ListAlgo.remove_stripe_ti: {'help': "Remove horizontal stripes from sinogram using Titarenko's approach [B13]",
+                 RemoveStripeAlgo.remove_stripe_ti: {'help': "Remove horizontal stripes from sinogram using Titarenko's approach [B13]",
                                              'function': stripe.remove_stripe_ti,
                                               'settings': widgets.VBox([
                                                                         widgets.IntText(value=0,
@@ -56,14 +43,14 @@ class RemoveStrips:
                                                                             description="alpha"),
                                                         ]),
                  },
-                 ListAlgo.remove_stripe_sf: {'help': "Normalize raw projection data using a smoothing filter approach.",
+                 RemoveStripeAlgo.remove_stripe_sf: {'help': "Normalize raw projection data using a smoothing filter approach.",
                                              'function': stripe.remove_stripe_sf,
                                               'settings': widgets.VBox([
                                                                         widgets.IntText(value=5,
                                                                             description="size"),
                                                         ]),
                  },
-                 ListAlgo.remove_stripe_based_sorting: {'help': "Remove full and partial stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 3).",
+                 RemoveStripeAlgo.remove_stripe_based_sorting: {'help': "Remove full and partial stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 3).",
                                                         'function': stripe.remove_stripe_based_sorting,
                                                          'settings': widgets.VBox([
                                                                         widgets.Text(value="None",
@@ -73,7 +60,7 @@ class RemoveStrips:
                                                                             description="dim"),
                                                         ]),
                  },
-                 ListAlgo.remove_stripe_based_filtering: {'help': "Remove stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 2).",
+                 RemoveStripeAlgo.remove_stripe_based_filtering: {'help': "Remove stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 2).",
                                                           'function': stripe.remove_stripe_based_filtering,
                                                            'settings': widgets.VBox([
                                                             widgets.FloatSlider(value=3,
@@ -87,7 +74,7 @@ class RemoveStrips:
                                                                             description="dim")
                                                         ]),
                  },
-                 ListAlgo.remove_stripe_based_fitting: {'help': "Remove stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 1).",
+                 RemoveStripeAlgo.remove_stripe_based_fitting: {'help': "Remove stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 1).",
                                                         'function': stripe.remove_stripe_based_fitting,
                                                          'settings': widgets.VBox([
                                                             widgets.IntSlider(value=3,
@@ -98,7 +85,7 @@ class RemoveStrips:
                                                                             description="sigma"),
                                                         ]),
                  },
-                 ListAlgo.remove_large_stripe: {'help': "Remove unresponsive and fluctuating stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 6).",
+                 RemoveStripeAlgo.remove_large_stripe: {'help': "Remove unresponsive and fluctuating stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 6).",
                                                 'function': stripe.remove_large_stripe,
                                                 'settings': widgets.VBox([
                                                             widgets.FloatText(value=3,
@@ -113,7 +100,7 @@ class RemoveStrips:
                                                                              description='norm')
                                                         ]),
                  },
-                ListAlgo.remove_dead_stripe: {'help': "Remove unresponsive and fluctuating stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 6).",
+                RemoveStripeAlgo.remove_dead_stripe: {'help': "Remove unresponsive and fluctuating stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 6).",
                                               'function': stripe.remove_dead_stripe,
                                               'settings': widgets.VBox([
                                                             widgets.FloatText(value=3,
@@ -124,7 +111,7 @@ class RemoveStrips:
                                                                              description='norm'),
                                                         ]),
                 },
-                ListAlgo.remove_all_stripe: {'help': "Remove all types of stripe artifacts from sinogram using Nghia Vo's approach [B24] (combination of algorithm 3,4,5, and 6).",
+                RemoveStripeAlgo.remove_all_stripe: {'help': "Remove all types of stripe artifacts from sinogram using Nghia Vo's approach [B24] (combination of algorithm 3,4,5, and 6).",
                                               'function': stripe.remove_all_stripe,
                                               'settings': widgets.VBox([
                                                             widgets.FloatText(value=3,
@@ -138,7 +125,7 @@ class RemoveStrips:
                                                                             description='dim')
                                                         ]),
                  },
-                 ListAlgo.remove_stripe_based_interpolation: {'help': "Remove most types of stripe artifacts from sinograms based on interpolation.",
+                 RemoveStripeAlgo.remove_stripe_based_interpolation: {'help': "Remove most types of stripe artifacts from sinograms based on interpolation.",
                                                               'function': stripe.remove_stripe_based_interpolation,
                                                                 'settings': widgets.VBox([
                                                                 widgets.FloatText(value=3,

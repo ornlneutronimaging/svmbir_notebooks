@@ -5,6 +5,7 @@ from collections import OrderedDict
 
 from __code import DataType, OperatingMode, DEFAULT_OPERATING_MODE
 from __code.utilities.logging import setup_logging
+from __code.utilities.configuration_file import Configuration
 
 from __code.workflow.load import Load
 from __code.workflow.checking_data import CheckingData
@@ -24,6 +25,8 @@ LOG_BASENAME_FILENAME = "svmbir_white_beam"
 
 
 class SvmbirReconstruction:
+
+    configuration = Configuration()
 
     working_dir = {
         DataType.sample: "",
