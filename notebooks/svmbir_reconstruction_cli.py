@@ -6,7 +6,7 @@ import logging
 from __code.utilities.time import get_current_time_in_special_file_name_format
 from __code.utilities.logging import setup_logging
 from __code.utilities.json import load_json_string
-from __code.utilities.configuration_file import Configuration
+from __code.utilities.configuration_file import Configuration, loading_config_file_into_model
 
 setup_logging("svmbir_reconstruction_cli")
 
@@ -18,8 +18,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     config_file_name = args.config_file[0]
+    config_model = loading_config_file_into_model(config_file_path=config_file_name)
     logging.info(f"loading config file name: {config_file_name}")
-    config_dictionary = load_json_string(config_file_name)
-    logging.info(f"{config_dictionary}")    
-    my_model = Configuration.parse_obj(config_dictionary)
-    print(f"{my_model.top_folder.sample =}")   
+
+    # load sample and ob
+        

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import List
 
+from __code.utilities.json import load_json_string
 from __code import CleaningAlgorithm, NormalizationSettings, OperatingMode
 
 
@@ -103,8 +104,8 @@ class Configuration(BaseModel):
     top_folder: TopFolder = Field(default=TopFolder())
     operating_mode: str = Field(default=OperatingMode.tof) 
     list_of_sample_runs: List[str] = Field(default=None)
-    list_of_sample_index_to_reject: List[int] = Field(default=[])
-    list_of_angles: List[str] = Field(default=None)
+    # list_of_sample_index_to_reject: List[int] = Field(default=[])
+    list_of_angles: List[float] = Field(default=None)
     list_of_ob_runs: List[str] = Field(default=None)
     range_of_tof_to_combine: List[tuple[int, int]] = Field(default=[])
     
@@ -115,7 +116,7 @@ class Configuration(BaseModel):
                                               NormalizationSettings.roi])
     normalization_roi: NormalizationRoi = Field(default=NormalizationRoi())
     
-    list_clean_stripes_algorithm: List[str] = Field(default=None)
+    list_clean_stripes_algorithm: List[str] = Field(default=[])
     remove_stripe_fw_options: RemoveStripeFw = Field(default=RemoveStripeFw())
     remove_stripe_ti_options: RemoveStripeTi = Field(default=RemoveStripeTi())
     remove_stripe_sf_options: RemoveStripeSf = Field(default=RemoveStripeSf())
@@ -127,7 +128,13 @@ class Configuration(BaseModel):
     remove_all_stripe_options: RemoveAllStripe = Field(default=RemoveAllStripe())
     remove_stripe_based_interpolation_options: RemoveStripeBasedInterpolation = Field(default=RemoveStripeBasedInterpolation())
     
-    range_of_slices_for_center_of_rotation: list[int, int] = Field(default=[None, None])
+    range_of_slices_for_center_of_rotation: list[int, int] = Field(default=[0, -1])
     
     svmbir_config: SvmbirConfig = Field(default=SvmbirConfig())
     output_folder: str = Field(default="")
+
+
+def loading_config_file_into_model(config_file_path):
+    config_dictionary = load_json_string(config_file_path)
+    my_model = Configuration.parse_obj(config_dictionary)
+    return my_model
