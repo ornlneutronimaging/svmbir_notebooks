@@ -28,7 +28,10 @@ if __name__ == "__main__":
     # loading only the runs and ob of interest
     master_3d_data_array = load_data(config_model)
 
-    logging.info(f"{master_3d_data_array = }")
-
     # combining the data in tof
     master_3d_data_array = combine_tof_data(config_model, master_3d_data_array)
+
+    # clean images (histogram, threshold)
+    
+
+
