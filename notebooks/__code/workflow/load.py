@@ -46,7 +46,7 @@ class Load(Parent):
         self.parent.configuration.top_folder.sample = top_folder
 
     def load_data(self, combine=False):
-        """combine is for TOF mode"""
+        """combine is True when working with white beam"""
         
         logging.info(f"importing the data:")
        
