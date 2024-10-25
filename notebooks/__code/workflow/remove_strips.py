@@ -61,20 +61,20 @@ class RemoveStrips:
                                                                             description="dim"),
                                                         ]),
                  },
-                 RemoveStripeAlgo.remove_stripe_based_filtering: {'help': "Remove stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 2).",
-                                                          'function': stripe.remove_stripe_based_filtering,
-                                                           'settings': widgets.VBox([
-                                                            widgets.FloatSlider(value=3,
-                                                                                min=3,
-                                                                                max=10,
-                                                                            description="sigma"),
-                                                            widgets.Text(value="None",
-                                                                            description="size"),
-                                                            widgets.Dropdown(options=['1','2'],
-                                                                            value='1',
-                                                                            description="dim")
-                                                        ]),
-                 },
+                #  RemoveStripeAlgo.remove_stripe_based_filtering: {'help': "Remove stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 2).",
+                #                                           'function': stripe.remove_stripe_based_filtering,
+                #                                            'settings': widgets.VBox([
+                #                                             widgets.FloatSlider(value=3,
+                #                                                                 min=3,
+                #                                                                 max=10,
+                #                                                             description="sigma"),
+                #                                             widgets.Text(value="None",
+                #                                                             description="size"),
+                #                                             widgets.Dropdown(options=['1','2'],
+                #                                                             value='1',
+                #                                                             description="dim")
+                #                                         ]),
+                #  },
                  RemoveStripeAlgo.remove_stripe_based_fitting: {'help': "Remove stripe artifacts from sinogram using Nghia Vo's approach [B24] (algorithm 1).",
                                                         'function': stripe.remove_stripe_based_fitting,
                                                          'settings': widgets.VBox([
@@ -268,6 +268,20 @@ class RemoveStrips:
             _arg_name = _widget.description
             _arg_value = _widget.value
             list_arguments[_arg_name] = _arg_value
+
+        if algorithm_name == RemoveStripeAlgo.remove_stripe_fw:
+            if list_arguments['level'] == 'None':
+                del list_arguments['level']
+        elif algorithm_name == RemoveStripeAlgo.remove_stripe_based_sorting:
+            if list_arguments['size'] == 'None':
+                del list_arguments['size']
+        elif algorithm_name == RemoveStripeAlgo.remove_stripe_based_filtering:
+            if list_arguments['size'] == 'None':
+                del list_arguments['size']
+        elif algorithm_name == RemoveStripeAlgo.remove_stripe_based_fitting:
+            left_value, right_value = list_arguments['sigma'].split(",")
+            list_arguments['sigma'] = (int(left_value), int(right_value))
+
         return list_arguments
 
     def saving_configuration(self, algorithm_name=RemoveStripeAlgo.remove_stripe_fw):
@@ -326,18 +340,19 @@ class RemoveStrips:
 
             self.nothing_to_display = False
             self.parent.strip_corrected_images = tomography_array
+        
+            if list_algo_that_failed:
+                display(HTML("<font color=red><b>List of algo that failed:</b></font>"))
+                for _algo in list_algo_that_failed:
+                    display(HTML(f"<font color=red> * {_algo}</font>"))
+            if list_algo_that_worked:
+                display(HTML("<font color=green><b>List of algos that worked:</b></font>"))
+                for _algo in list_algo_that_worked:
+                    display(HTML(f"<font color=green> * {_algo}</font>"))
+        
         else:
             logging.info(f"\tskipped!")
-            self.parent.strip_corrected_images = tomography_array
-
-        if list_algo_that_failed:
-            display(HTML("<font color=red><b>List of algo that failed:</b></font>"))
-            for _algo in list_algo_that_failed:
-                display(HTML(f"<font color=red> * {_algo}</font>"))
-        if list_algo_that_worked:
-            display(HTML("<font color=green><b>List of algos that worked:</b></font>"))
-            for _algo in list_algo_that_worked:
-                display(HTML(f"<font color=green> * {_algo}</font>"))
+            self.parent.strip_corrected_images = self.parent.corrected_images      
 
     def run_algo(name_of_algo, array, **kwargs):
         return name_of_algo(array, **kwargs)
