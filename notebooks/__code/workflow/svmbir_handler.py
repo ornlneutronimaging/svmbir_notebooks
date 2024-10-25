@@ -108,13 +108,16 @@ class SvmbirHandler(Parent):
 
     def _get_list_of_index_of_runs_to_exclude(self):
         """this return the index of the runs selected and that need to be rejected from final reconstruction"""
-        list_options = self.parent.runs_to_exclude_ui.options
-        list_value = self.parent.runs_to_exclude_ui.value
-        list_index = []
-        for _index, _option in enumerate(list_options):
-            if _option in list_value:
-                list_index.append(_index)
-        return list_index, list_value
+        try:
+            list_options = self.parent.runs_to_exclude_ui.options
+            list_value = self.parent.runs_to_exclude_ui.value
+            list_index = []
+            for _index, _option in enumerate(list_options):
+                if _option in list_value:
+                    list_index.append(_index)
+            return list_index, list_value
+        except AttributeError:
+            return [], []
 
     def run_reconstruction(self):
 
@@ -132,6 +135,9 @@ class SvmbirHandler(Parent):
             logging.info(f"\tUser wants to reject the following runs: {list_runs_to_exclude}!")
             corrected_array = np.delete(corrected_array, list_of_index_of_runs_to_exlude, axis=0)
             list_of_angles_rad = np.delete(list_of_angles_rad, list_of_index_of_runs_to_exlude, axis=0)
+            # updating configuration
+            self.parent.configuration.list_of_sample_index_to_reject = list_of_index_of_runs_to_exlude
+
         else:
             logging.info(f"\tNo runs rejected before final reconstruction!")
 

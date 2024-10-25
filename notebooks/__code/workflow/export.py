@@ -4,8 +4,10 @@ import logging
 import shutil
 
 from __code.utilities.save import make_tiff
+from __code.utilities.json import save_json
 from __code.parent import Parent
 from __code import DataType
+from __code.utilities.time import get_current_time_in_special_file_name_format
 
 
 class Export:
@@ -33,3 +35,11 @@ class ExportExtra(Parent):
         output_folder = self.parent.working_dir[DataType.extra]
         shutil.copy(log_file_name, output_folder)
         print(f"\tlog file from {log_file_name} to {output_folder}!")
+
+        configuration = self.parent.configuration
+        base_sample_folder = os.path.basename(self.parent.working_dir[DataType.sample])
+        _time_ext = get_current_time_in_special_file_name_format()
+        config_file_name = f"/SNS/VENUS/shared/log/{base_sample_folder}_{_time_ext}.json"
+        config_json = configuration.model_dump_json()
+        save_json(config_file_name, json_dictionary=config_json)
+        print(f"\t\tconfig file {config_file_name}")

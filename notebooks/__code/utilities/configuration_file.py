@@ -2,7 +2,6 @@ from pydantic import BaseModel, Field
 from typing import List
 
 from __code import CleaningAlgorithm, NormalizationSettings, OperatingMode
-from __code import DataType
 
 
 class RemoveStripeFwWnameOptions:
@@ -103,18 +102,20 @@ class SvmbirConfig(BaseModel):
 class Configuration(BaseModel):
     top_folder: TopFolder = Field(default=TopFolder())
     operating_mode: str = Field(default=OperatingMode.tof) 
-    list_of_sample_runs: List[str] = []
-    list_of_angles: List[str] = []
-    list_of_ob_runs: List[str] = []
-    range_of_tof_to_combine:  List[tuple[int, int]] = [[-1, -1]]
-    list_clean_algorithm: List[str] = [CleaningAlgorithm.histogram, CleaningAlgorithm.threshold]
-    histogram_cleaning_settings: HistogramCleaningSettings = Field(default=HistogramCleaningSettings())
-    list_normalization_settings: List[str] = [NormalizationSettings.pc, 
-                                              NormalizationSettings.frame_number,
-                                              NormalizationSettings.roi]
-    normalization_roi: NormalizationRoi = Field(default=NormalizationRoi)
+    list_of_sample_runs: List[str] = Field(default=None)
+    list_of_sample_index_to_reject: List[int] = Field(default=None)
+    list_of_angles: List[str] = Field(default=None)
+    list_of_ob_runs: List[str] = Field(default=None)
+    range_of_tof_to_combine: List[tuple[int, int]] = Field(default=[])
     
-    list_clean_stripes_algorithm: List[str] = []
+    list_clean_algorithm: List[str] = Field(default=[CleaningAlgorithm.histogram, CleaningAlgorithm.threshold])
+    histogram_cleaning_settings: HistogramCleaningSettings = Field(default=HistogramCleaningSettings())
+    list_normalization_settings: List[str] = Field(default=[NormalizationSettings.pc, 
+                                              NormalizationSettings.frame_number,
+                                              NormalizationSettings.roi])
+    normalization_roi: NormalizationRoi = Field(default=NormalizationRoi())
+    
+    list_clean_stripes_algorithm: List[str] = Field(default=None)
     remove_stripe_fw_options: RemoveStripeFw = Field(default=RemoveStripeFw())
     remove_stripe_ti_options: RemoveStripeTi = Field(default=RemoveStripeTi())
     remove_stripe_sf_options: RemoveStripeSf = Field(default=RemoveStripeSf())
@@ -126,7 +127,7 @@ class Configuration(BaseModel):
     remove_all_stripe_options: RemoveAllStripe = Field(default=RemoveAllStripe())
     remove_stripe_based_interpolation_options: RemoveStripeBasedInterpolation = Field(default=RemoveStripeBasedInterpolation())
     
-    range_of_slices_for_center_of_rotation: list[int, int] = []
+    range_of_slices_for_center_of_rotation: list[int, int] = Field(default=[None, None])
     
     svmbir_config: SvmbirConfig = Field(default=SvmbirConfig())
-    output_folder: str = ""
+    output_folder: str = Field(default="")

@@ -213,7 +213,7 @@ class RemoveStrips:
             _children.append(self.list_algo[_option]['settings'])
 
         # update configuration
-        self.parent.configuration.list_clean_stripes_algorithm = _children
+        self.parent.configuration.list_clean_stripes_algorithm = list_options_to_use
 
         accordion = widgets.Accordion(children=_children,
                                       titles=list_options_to_use)
