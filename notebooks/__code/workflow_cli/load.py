@@ -9,6 +9,7 @@ from __code.utilities.load import load_data_using_multithreading
 def load_data(config_model):
 
     logging.info(f"loading the data:")
+    print(f"Loading the data ... ", end="")
     operating_mode = config_model.operating_mode
     combine = operating_mode == OperatingMode.white_beam
 
@@ -26,6 +27,8 @@ def load_data(config_model):
     list_of_runs = {DataType.sample: [os.path.join(sample_base_folder_name, _file) for _file in list_sample_runs],
                     DataType.ob: [os.path.join(ob_base_folder_name, _file) for _file in list_ob_runs]}
 
+    logging.info(f"{list_of_runs =}")
+
     master_3d_data_array = {DataType.sample: [],
                             DataType.ob: []}
     for _data_type in list_of_runs.keys():
@@ -36,4 +39,5 @@ def load_data(config_model):
             master_3d_data_array[_data_type].append(load_data_using_multithreading(list_tif,
                                                                combine_tof=combine))
 
+    print(f"done!")
     return master_3d_data_array

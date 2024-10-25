@@ -43,7 +43,10 @@ class Load(Parent):
         logging.info(f"{self.parent.current_data_type} top folder selected: {top_folder}")
         self.parent.working_dir[self.data_type] = top_folder
         print(f"Top {self.data_type} folder selected: {top_folder}")
-        self.parent.configuration.top_folder.sample = top_folder
+        if self.data_type == DataType.sample:
+            self.parent.configuration.top_folder.sample = top_folder
+        elif self.data_type == DataType.ob:
+            self.parent.configuration.top_folder.ob = top_folder
 
     def load_data(self, combine=False):
         """combine is True when working with white beam"""

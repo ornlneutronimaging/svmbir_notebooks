@@ -10,6 +10,7 @@ from __code.utilities.json import load_json_string
 from __code.utilities.configuration_file import Configuration, loading_config_file_into_model
 
 from __code.workflow_cli.load import load_data
+from __code.workflow_cli.combine import combine_tof_data
 
 setup_logging("svmbir_reconstruction_cli")
 
@@ -24,4 +25,10 @@ if __name__ == "__main__":
     config_model = loading_config_file_into_model(config_file_path=config_file_name)
     logging.info(f"loading config file name: {config_file_name}")
 
+    # loading only the runs and ob of interest
     master_3d_data_array = load_data(config_model)
+
+    logging.info(f"{master_3d_data_array = }")
+
+    # combining the data in tof
+    master_3d_data_array = combine_tof_data(config_model, master_3d_data_array)
