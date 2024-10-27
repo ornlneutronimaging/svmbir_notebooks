@@ -5,10 +5,21 @@ from __code.utilities.json import load_json_string
 from __code import CleaningAlgorithm, NormalizationSettings, OperatingMode
 
 
+class ImageCleaner(BaseModel):
+    low_gate: int = 1
+    high_gate: int = 9
+    if_clean: bool = True
+    if_save_clean: bool = False
+    correct_radius: int = 1
+    edge_nbr_pixels: int = 10
+    nbr_bins: int = 10
+
+
 class RemoveStripeFwWnameOptions:
     haar = 'haar'
     db5 = 'db5'
     sym5 = 'sym5'
+
 
 class RemoveStripeDim:
     one = '1'
@@ -92,7 +103,6 @@ class NormalizationRoi(BaseModel):
 
 
 class SvmbirConfig(BaseModel):
-
     sharpness: float = 0
     snr_db: float = 30.0
     positivity: bool = True
@@ -101,6 +111,9 @@ class SvmbirConfig(BaseModel):
 
 
 class Configuration(BaseModel):
+
+    image_cleaner: ImageCleaner = Field(default=ImageCleaner())
+
     top_folder: TopFolder = Field(default=TopFolder())
     operating_mode: str = Field(default=OperatingMode.tof) 
     list_of_sample_runs: List[str] = Field(default=None)

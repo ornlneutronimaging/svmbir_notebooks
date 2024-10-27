@@ -15,6 +15,7 @@ from __code.parent import Parent
 from __code.workflow.load import Load
 from __code.workflow.export import Export
 from __code.utilities.files import make_or_reset_folder
+from __code.utilities.images import replace_pixels
 
 
 class ImagesCleaner(Parent): 
@@ -160,6 +161,11 @@ class ImagesCleaner(Parent):
             cleaned_sample_data = []
             for _data in tqdm(sample_data):
                 cleaned_im = self.replace_pixels(im=_data.copy())
+                cleaned_im = replace_pixels(im=_data.copy(),
+                                            nbr_bins=nbr_bins_to_exclude,
+                                            low_gate=self.low_gate,
+                                            high_gate=self.high_gate,
+                                            correct_radius=self.r)
                 cleaned_sample_data.append(cleaned_im)          
             self.parent.master_3d_data_array_cleaned[DataType.sample] = cleaned_sample_data
             logging.info(f"\tcleaned sample!")
@@ -167,25 +173,15 @@ class ImagesCleaner(Parent):
             logging.info(f"\tcleaning ob ...")
             cleaned_ob_data = []
             for _data in tqdm(ob_data):
-                cleaned_im = self.replace_pixels(im=_data.copy())
+                cleaned_im = replace_pixels(im=_data.copy(),
+                            nbr_bins=nbr_bins_to_exclude,
+                            low_gate=self.low_gate,
+                            high_gate=self.high_gate,
+                            correct_radius=self.r)
                 cleaned_ob_data.append(cleaned_im)          
             self.parent.master_3d_data_array_cleaned[DataType.ob] = cleaned_ob_data
             logging.info(f"\tcleaned ob!")
-
-    def replace_pixels(self, im):
-
-        _, bin_edges = np.histogram(im.flatten(), bins=self.nbr_bins, density=False)
-        thres_low = bin_edges[self.low_gate]
-        thres_high = bin_edges[self.high_gate]
-        y_coords, x_coords = np.nonzero(np.logical_or(im <= thres_low, im > thres_high))
-        r = self.r
-
-        full_median_filter_corr_im = median_filter(im, size=r)
-        for y, x in zip(y_coords, x_coords):
-            im[y, x] = full_median_filter_corr_im[y, x]
-
-        return im
-          
+             
     def check_cleaned_pixels(self):
 
         sample_data = self.parent.master_3d_data_array[DataType.sample]  
