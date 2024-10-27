@@ -27,8 +27,6 @@ LOG_BASENAME_FILENAME = "svmbir_reconstruction"
 
 class SvmbirReconstruction:
 
-    configuration = Configuration()
-
     working_dir = {
         DataType.sample: "",
         DataType.ob: "",
@@ -139,6 +137,8 @@ class SvmbirReconstruction:
     reconstruction_array = None
 
     def __init__(self, system=None):
+
+        self.configuration = Configuration()
 
         o_init = Initialization(parent=self)
         o_init.configuration()

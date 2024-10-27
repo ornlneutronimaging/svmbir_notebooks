@@ -160,7 +160,6 @@ class ImagesCleaner(Parent):
             logging.info(f"\tcleaning sample ...")
             cleaned_sample_data = []
             for _data in tqdm(sample_data):
-                cleaned_im = self.replace_pixels(im=_data.copy())
                 cleaned_im = replace_pixels(im=_data.copy(),
                                             nbr_bins=nbr_bins_to_exclude,
                                             low_gate=self.low_gate,

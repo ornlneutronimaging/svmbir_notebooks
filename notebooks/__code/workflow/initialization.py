@@ -23,5 +23,5 @@ class Initialization(Parent):
                                        edge_nbr_pixels=edge_nbr_pixels,
                                        nbr_bins=nbr_bins)
 
-        self.configuration.image_cleaner = o_image_cleaner
+        self.parent.configuration.image_cleaner = o_image_cleaner
         
