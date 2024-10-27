@@ -7,7 +7,6 @@ from __code import DataType, OperatingMode, DEFAULT_OPERATING_MODE
 from __code.utilities.logging import setup_logging
 from __code.utilities.configuration_file import Configuration
 
-from __code.workflow.initialization import Initialization
 from __code.workflow.load import Load
 from __code.workflow.checking_data import CheckingData
 from __code.workflow.recap_data import RecapData
@@ -140,8 +139,8 @@ class SvmbirReconstruction:
 
         self.configuration = Configuration()
 
-        o_init = Initialization(parent=self)
-        o_init.configuration()
+        # o_init = Initialization(parent=self)
+        # o_init.configuration()
 
         top_sample_dir = system.System.get_working_dir()
         self.instrument = system.System.get_instrument_selected()

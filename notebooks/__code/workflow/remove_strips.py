@@ -288,25 +288,25 @@ class RemoveStrips:
         list_widgets = self.list_algo[algorithm_name]['settings'].children
 
         if algorithm_name == RemoveStripeAlgo.remove_stripe_fw:
-            my_instance = configuration_file.RemoveStripeFw
+            my_instance = configuration_file.RemoveStripeFw()
         elif algorithm_name == RemoveStripeAlgo.remove_stripe_ti:
-            my_instance = configuration_file.RemoveStripeTi
+            my_instance = configuration_file.RemoveStripeTi()
         elif algorithm_name == RemoveStripeAlgo.remove_stripe_sf:
-            my_instance = configuration_file.RemoveStripeSf
+            my_instance = configuration_file.RemoveStripeSf()
         elif algorithm_name == RemoveStripeAlgo.remove_stripe_based_sorting:
-            my_instance = configuration_file.RemoveStripeBasedSorting
+            my_instance = configuration_file.RemoveStripeBasedSorting()
         elif algorithm_name == RemoveStripeAlgo.remove_stripe_based_filtering:
-            my_instance = configuration_file.RemoveStripeBasedFiltering
+            my_instance = configuration_file.RemoveStripeBasedFiltering()
         elif algorithm_name == RemoveStripeAlgo.remove_stripe_based_fitting:
-            my_instance = configuration_file.RemoveStripeBasedFitting
+            my_instance = configuration_file.RemoveStripeBasedFitting()
         elif algorithm_name == RemoveStripeAlgo.remove_large_stripe:
-            my_instance = configuration_file.RemoveLargeStripe
+            my_instance = configuration_file.RemoveLargeStripe()
         elif algorithm_name == RemoveStripeAlgo.remove_dead_stripe:
-            my_instance = configuration_file.RemoveDeadStripe
+            my_instance = configuration_file.RemoveDeadStripe()
         elif algorithm_name == RemoveStripeAlgo.remove_all_stripe:
-            my_instance = configuration_file.RemoveAllStripe
+            my_instance = configuration_file.RemoveAllStripe()
         elif algorithm_name == RemoveStripeAlgo.remove_stripe_based_interpolation:
-            my_instance = configuration_file.RemoveStripeBasedInterpolation
+            my_instance = configuration_file.RemoveStripeBasedInterpolation()
         else:
             raise NotImplementedError("filter not implemented")
 
