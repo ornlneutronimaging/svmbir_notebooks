@@ -6,8 +6,8 @@ from __code import CleaningAlgorithm, NormalizationSettings, OperatingMode
 
 
 class ImageCleaner(BaseModel):
-    low_gate: int = 1
-    high_gate: int = 9
+    # low_gate: int = 1
+    # high_gate: int = 9
     if_clean: bool = True
     if_save_clean: bool = False
     correct_radius: int = 1

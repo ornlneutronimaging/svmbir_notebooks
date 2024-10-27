@@ -150,10 +150,6 @@ class ImagesCleaner(Parent):
         else:         
             logging.info(f"user selected {nbr_bins_to_exclude} bins to exclude")
           
-            # _clean_paras['low_gate'] = nbr_bins_to_exclude
-            # _clean_paras['high_gate'] = clean_paras['nbr_bins'] - nbr_bins_to_exclude
-            # _clean_paras['nbr_bins'] = nbr_bins
-
             logging.info(f"\t {np.shape(sample_data) = }")
             logging.info(f"\t {np.shape(ob_data) = }")
 
@@ -161,9 +157,9 @@ class ImagesCleaner(Parent):
             cleaned_sample_data = []
             for _data in tqdm(sample_data):
                 cleaned_im = replace_pixels(im=_data.copy(),
-                                            nbr_bins=nbr_bins_to_exclude,
-                                            low_gate=self.low_gate,
-                                            high_gate=self.high_gate,
+                                            nbr_bins=self.nbr_bins,
+                                            low_gate=nbr_bins_to_exclude,
+                                            high_gate=self.nbr_bins - nbr_bins_to_exclude,
                                             correct_radius=self.r)
                 cleaned_sample_data.append(cleaned_im)          
             self.parent.master_3d_data_array_cleaned[DataType.sample] = cleaned_sample_data
@@ -173,10 +169,10 @@ class ImagesCleaner(Parent):
             cleaned_ob_data = []
             for _data in tqdm(ob_data):
                 cleaned_im = replace_pixels(im=_data.copy(),
-                            nbr_bins=nbr_bins_to_exclude,
-                            low_gate=self.low_gate,
-                            high_gate=self.high_gate,
-                            correct_radius=self.r)
+                                            nbr_bins=self.nbr_bins,
+                                            low_gate=nbr_bins_to_exclude,
+                                            high_gate=self.nbr_bins - nbr_bins_to_exclude,
+                                            correct_radius=self.r)
                 cleaned_ob_data.append(cleaned_im)          
             self.parent.master_3d_data_array_cleaned[DataType.ob] = cleaned_ob_data
             logging.info(f"\tcleaned ob!")

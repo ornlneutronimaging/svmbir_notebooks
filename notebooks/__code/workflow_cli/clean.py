@@ -14,20 +14,20 @@ def clean_by_histogram(config_model, master_data):
     print("cleaning by histogram ... ", end="")
     histogram_cleaning_settings = config_model.histogram_cleaning_settings
     nbr_bins = histogram_cleaning_settings.nbr_bins
-    bins_to_exclude = histogram_cleaning_settings.bins_to_exclude
+    nbr_bins_to_exclude = histogram_cleaning_settings.bins_to_exclude
 
     if nbr_bins != 0:
-        low_gate = config_model.image_cleaner.low_gate
-        high_gate = config_model.image_cleaner.high_gate
+        # low_gate = config_model.image_cleaner.low_gate
+        # high_gate = config_model.image_cleaner.high_gate
         correct_radius = config_model.image_cleaner.correct_radius
 
         for _data_type in master_data.keys():
             cleaned_data = []
             for _data in tqdm(master_data[_data_type]):
                 _cleaned_data = replace_pixels(im=_data,
-                                               low_gate=low_gate,
-                                               high_gate=high_gate,
-                                               nbr_bins=bins_to_exclude,
+                                               low_gate=nbr_bins_to_exclude,
+                                               high_gate=nbr_bins - nbr_bins_to_exclude,
+                                               nbr_bins=nbr_bins,
                                                correct_radius=correct_radius)
                 cleaned_data.append(_cleaned_data)
             master_data[_data_type] = cleaned_data
