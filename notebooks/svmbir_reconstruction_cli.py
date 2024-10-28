@@ -11,6 +11,7 @@ from __code.utilities.configuration_file import Configuration, loading_config_fi
 
 from __code.workflow_cli.load import load_data
 from __code.workflow_cli.combine import combine_tof_data
+from __code.workflow_cli.clean import clean_images
 
 setup_logging("svmbir_reconstruction_cli")
 
@@ -32,6 +33,4 @@ if __name__ == "__main__":
     master_3d_data_array = combine_tof_data(config_model, master_3d_data_array)
 
     # clean images (histogram, threshold)
-    
-
-
+    master_3d_data_array = clean_images(config_model, master_3d_data_array)

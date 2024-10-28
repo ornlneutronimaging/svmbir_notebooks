@@ -66,7 +66,6 @@ class NormalizationSettings:
 
 
 class RemoveStripeAlgo:
-
     remove_stripe_fw = "remove_stripe_fw"
     remove_stripe_ti = "remove_stripe_ti"
     remove_stripe_sf = "remove_stripe_sf"
