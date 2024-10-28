@@ -42,6 +42,9 @@ class SvmbirReconstruction:
 
     spectra_file_full_path = None
 
+    final_dict_of_pc = {}
+    final_dict_of_frame_number = {}
+
     # used to displya profile vs lambda in TOF mode
     # np.shape of y, x, tof
     data_3d_of_all_projections_merged = None
