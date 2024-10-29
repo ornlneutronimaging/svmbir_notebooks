@@ -16,9 +16,9 @@ def update_normalize_coeff_by_pc(config_model, list_coeff, mean_ob_proton_charge
 
 def update_normalize_coeff_by_frame_number(config_model, list_coeff, mean_ob_frame_number):
     print(f"updating coeff by frame number ...", end="")
-    list_sample_frame = config_model.list_of_sample_frame
+    list_sample_frame = config_model.list_of_sample_frame_number
     for _index, _sample_frame in enumerate(list_sample_frame):
-        list_coeff[_index] *= 
+        list_coeff[_index] *= mean_ob_frame_number / _sample_frame
 
     print(f" done!")
     return list_coeff
@@ -31,6 +31,10 @@ def update_normalize_coeff_by_roi(config_model, list_coeff, data_array):
     _left = config_model.normalization_roi.left
     _right = config_model.normalization_roi.right
 
+    ob_roi_counts = np.sum(data_array[DataType.ob][_top: _bottom+1, _left: _right+1])
+    for _index, _sample_data in enumerate(data_array[DataType.sample]):
+        sample_roi_counts = np.sum(_sample_data[_top: _bottom+1, _left: _right+1])
+        list_coeff[_index] *= ob_roi_counts / sample_roi_counts
 
     print(f" done!")
     return list_coeff
@@ -63,6 +67,7 @@ def combine_obs(config_model=None, data_ob=None):
 
 def normalize(config_model, data_array):
     
+    print(f"running normalization ...")
     data_array[DataType.ob], mean_ob_proton_charge, mean_ob_frame_number = combine_obs(config_model=config_model, 
                                                                                        data_ob=data_array[DataType.ob])
 
@@ -73,9 +78,16 @@ def normalize(config_model, data_array):
         list_coeff = update_normalize_coeff_by_pc(config_model, list_coeff, mean_ob_proton_charge)
 
     if NormalizationSettings.frame_number in list_normalization_settings_selected:
-        list_coeff = 
+        list_coeff = update_normalize_coeff_by_frame_number(config_model, list_coeff, mean_ob_frame_number)
 
     if NormalizationSettings.roi in list_normalization_settings_selected:
-        pass
+        list_coeff = update_normalize_coeff_by_roi(config_model, list_coeff, data_array)
 
-    return data_array
+    normalized_data_array = []
+
+    for _coeff, _sample_data, _ob_data in zip(list_coeff, data_array[DataType.sample], data_array[DataType.ob]):
+        _normalized = np.divide(_sample_data, _ob_data) * _coeff
+        normalized_data_array.append(_normalized)
+
+    print(f"running normalization ... done!")
+    return normalized_data_array

@@ -107,14 +107,14 @@ class Configuration(BaseModel):
 
     list_of_angles: List[float] = Field(default=None)
     list_of_sample_runs: List[str] = Field(default=None)
-    list_of_sample_frame: List[int] = Field(default=None)
+    list_of_sample_frame_number: List[int] = Field(default=[])
     list_of_sample_pc: List[float] = Field(default=None)
 
     list_of_ob_runs: List[str] = Field(default=None)
-    list_of_ob_frame: List[int] = Field(default=None)
+    list_of_ob_frame_number: List[int] = Field(default=None)
     list_of_ob_pc: List[float] = Field(default=None)
 
-    range_of_tof_to_combine: List[tuple[int, int]] = Field(default=[[]])
+    range_of_tof_to_combine: List[tuple[int, int]] = Field(default=[[0, -1]])
     
     list_clean_algorithm: List[str] = Field(default=[CleaningAlgorithm.histogram, CleaningAlgorithm.threshold])
     histogram_cleaning_settings: HistogramCleaningSettings = Field(default=HistogramCleaningSettings())

@@ -83,7 +83,8 @@ class Load(Parent):
                 _master_data.append(load_data_using_multithreading(list_tif,
                                                                    combine_tof=combine))
                 _final_list_of_pc.append(self.parent.list_of_runs[_data_type][_run][Run.proton_charge_c])
-                _final_list_of_frame_number.append(self.parent.list_of_runs[_data_type][_run][Run.frame_number])
+                if self.parent.list_of_runs[_data_type][_run][Run.frame_number]:
+                    _final_list_of_frame_number.append(self.parent.list_of_runs[_data_type][_run][Run.frame_number])
                 logging.info(f"\t\t loading done!")
             self.parent.master_3d_data_array[_data_type] = np.array(_master_data)
             final_dict_of_pc[_data_type] = _final_list_of_pc

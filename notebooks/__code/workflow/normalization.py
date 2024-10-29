@@ -209,6 +209,7 @@ class Normalization(Parent):
             list_norm_settings.append(NormalizationSettings.frame_number)
         if use_roi:
             list_norm_settings.append(NormalizationSettings.roi)
+        self.parent.configuration.list_normalization_settings = list_norm_settings
 
         for _index, _run in enumerate(list_of_runs_used[DataType.sample]):
 
