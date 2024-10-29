@@ -135,6 +135,7 @@ class Configuration(BaseModel):
     remove_all_stripe_options: RemoveAllStripe = Field(default=RemoveAllStripe())
     remove_stripe_based_interpolation_options: RemoveStripeBasedInterpolation = Field(default=RemoveStripeBasedInterpolation())
     
+    calculate_center_of_rotation: bool = Field(default=False)
     range_of_slices_for_center_of_rotation: list[int, int] = Field(default=[0, -1])
     
     svmbir_config: SvmbirConfig = Field(default=SvmbirConfig())

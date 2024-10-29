@@ -64,8 +64,9 @@ class CheckingData(Parent):
                 frame_number = get_frame_number(nexus_path)
                 list_of_frame_number.append(frame_number)
                 self.parent.list_of_runs[_data_type][_run][Run.frame_number] = frame_number
-                if frame_number is None:
+                if not frame_number:
                     self.parent.at_least_one_frame_number_not_found = True
+                
             logging.info(f"\t\t{list_of_frame_number}")
 
     def retrieve_rotation_angle(self):

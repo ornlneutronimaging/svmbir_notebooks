@@ -1,6 +1,6 @@
 import numpy as np
 import logging
-from neutompy.preproc.preproc import find_COR, correction_COR
+from neutompy.preproc.preproc import correction_COR
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
 from IPython.display import display
@@ -84,7 +84,7 @@ class CenterOfRotationAndTilt(Parent):
         y_top, y_bottom = self.display_plot.result
 
         # update configuration
-        self.parent.configuration.range_of_slices_for_center_of_rotation = [y_top, y_bottom]
+        self.parent.configuration.range_of_slices_for_center_of_rotation = list([y_top, y_bottom])
 
         mid_point = int(np.mean([y_top, y_bottom]))
         rois = ((y_top, mid_point+1), (mid_point, y_bottom))
@@ -97,3 +97,6 @@ class CenterOfRotationAndTilt(Parent):
         self.parent.corrected_images = corrected_images
 
         logging_3d_array_infos(message="after", array=self.parent.corrected_images)
+
+        # update configuration
+        self.parent.configuration.calculate_center_of_rotation = True

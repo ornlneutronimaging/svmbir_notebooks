@@ -130,9 +130,13 @@ class SvmbirHandler(Parent):
         list_of_angles_rad = np.array([np.deg2rad(float(_angle)) for _angle in list_of_angles])
         list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
         list_of_sample_pc = self.parent.final_dict_of_pc[DataType.sample]
-        list_of_sample_pc_to_use = list_of_sample_pc[:]
+        list_of_sample_pc_to_use = list_of_sample_pc
+
+        print(f"{list_of_sample_pc =}")
+
+
         list_of_sample_frame_number = self.parent.final_dict_of_frame_number[DataType.sample]
-        list_of_sample_frame_number_to_use = list_of_sample_frame_number[:]
+        list_of_sample_frame_number_to_use = list_of_sample_frame_number
         
         # looking at list of runs to reject
         list_of_index_of_runs_to_exlude, list_runs_to_exclude = self._get_list_of_index_of_runs_to_exclude()
