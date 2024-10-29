@@ -15,4 +15,4 @@ def correct_data(data_array):
     corrected_images = np.moveaxis(corrected_images, 2, 0)  
 
     print(f" done!")
-    return correct_data
+    return corrected_images

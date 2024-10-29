@@ -354,6 +354,7 @@ class RemoveStrips:
             logging.info(f"\tskipped!")
             self.parent.strip_corrected_images = self.parent.corrected_images      
 
+    @staticmethod
     def run_algo(name_of_algo, array, **kwargs):
         return name_of_algo(array, **kwargs)
 
