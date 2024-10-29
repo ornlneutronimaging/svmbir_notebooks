@@ -13,6 +13,7 @@ from __code.workflow_cli.load import load_data
 from __code.workflow_cli.combine import combine_tof_data
 from __code.workflow_cli.clean import clean_images
 from __code.workflow_cli.normalization import normalize
+from __code.workflow_cli.chips_correction import correct_data
 
 setup_logging("svmbir_reconstruction_cli")
 
@@ -38,3 +39,7 @@ if __name__ == "__main__":
 
     # normalization
     master_3d_data_array = normalize(config_model, master_3d_data_array)
+
+    # chips correction
+    master_3d_data_array = correct_data(master_3d_data_array)
+    

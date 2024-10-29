@@ -26,7 +26,7 @@ class ChipsCorrection(Parent):
         logging.info(f"\t{np.shape(normalized_images) =}")
         normalized_images_axis_swap = np.moveaxis(normalized_images, 0, 2)  # y, x, angle
         logging.info(f"\t{np.shape(normalized_images_axis_swap) =}")
-        corrected_images = self.correct_alignment(normalized_images_axis_swap,
+        corrected_images = ChipsCorrection.correct_alignment(normalized_images_axis_swap,
                                                     offsets=offset)
         self.parent.corrected_images = np.moveaxis(corrected_images, 2, 0)  # angle, y, x
         logging.info(f"\tChips correction done!")
@@ -34,7 +34,8 @@ class ChipsCorrection(Parent):
         logging_3d_array_infos(message="aftert chips correction",
                                array=self.parent.corrected_images)
 
-    def correct_alignment(self, unaligned_image=None, offsets=None, center=None, fill_gap=True, num_pix_unused=1, num_pix_neighbor=1):
+    @staticmethod
+    def correct_alignment(unaligned_image=None, offsets=None, center=None, fill_gap=True, num_pix_unused=1, num_pix_neighbor=1):
         """Function to correct alignment of the 4 segments in each image caused by the mismatch between the 4 chips.
         
         Args:
