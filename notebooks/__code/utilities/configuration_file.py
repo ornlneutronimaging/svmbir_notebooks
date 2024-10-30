@@ -16,6 +16,11 @@ class RemoveStripeDim:
     two = '2'
 
 
+class ImageSize:
+    width: int = 512
+    height: int = 512
+
+
 class RemoveStripeFw(BaseModel):
     level: str = "None"
     wname: str = Field(default=RemoveStripeFwWnameOptions.haar)
@@ -98,12 +103,15 @@ class SvmbirConfig(BaseModel):
     positivity: bool = True
     max_iterations: int = 200
     verbose: bool = False
+    top_slice: int = 0
+    bottom_slice: int = 1
 
 
 class Configuration(BaseModel):
 
     top_folder: TopFolder = Field(default=TopFolder())
     operating_mode: str = Field(default=OperatingMode.tof) 
+    image_size: ImageSize = Field(default=ImageSize())
 
     list_of_angles: List[float] = Field(default=None)
     list_of_sample_runs: List[str] = Field(default=None)

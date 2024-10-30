@@ -1,14 +1,8 @@
 from tqdm import tqdm
 
 from __code import RemoveStripeAlgo
+from __code.utilities.general import retrieve_parameters
 from __code.workflow.remove_strips import RemoveStrips
-
-
-def retrieve_parameters(instance):
-    list_all_variables = dict(instance)
-    list_variables = [var for var in list_all_variables if not var.startswith('__')]
-    my_dict = {_variable: getattr(instance, _variable) for _variable in list_variables}
-    return my_dict
 
 
 def retrieve_options(config_model, algorithm):

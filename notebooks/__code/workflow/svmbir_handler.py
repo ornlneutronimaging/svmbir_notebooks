@@ -132,9 +132,6 @@ class SvmbirHandler(Parent):
         list_of_sample_pc = self.parent.final_dict_of_pc[DataType.sample]
         list_of_sample_pc_to_use = list_of_sample_pc
 
-        print(f"{list_of_sample_pc =}")
-
-
         list_of_sample_frame_number = self.parent.final_dict_of_frame_number[DataType.sample]
         list_of_sample_frame_number_to_use = list_of_sample_frame_number
         
@@ -178,6 +175,8 @@ class SvmbirHandler(Parent):
         svmbir_config.positivity = positivity
         svmbir_config.max_iterations = max_iterations
         svmbir_config.verbose = verbose
+        svmbir_config.top_slice = top_slice
+        svmbir_config.bottom_slice = bottom_slice
         self.parent.configuration.svmbir_config = svmbir_config
 
         logging.info(f"\t{top_slice = }")
