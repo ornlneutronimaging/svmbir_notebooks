@@ -53,4 +53,7 @@ if __name__ == "__main__":
     master_3d_data_array = center_of_rotation_and_tilt(config_model, master_3d_data_array)
     
     # reconstruction
-    master_3d_data_array = svmbir_reconstruction(config_model, master_3d_data_array)
+    # master_3d_data_array = svmbir_reconstruction(config_model, master_3d_data_array)
+
+    # export
+    export_slices(config_model, master_3d_data_array)

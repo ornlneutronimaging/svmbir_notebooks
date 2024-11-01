@@ -15,7 +15,7 @@ from __code.utilities.files import make_or_reset_folder
 from __code.utilities.configuration_file import SvmbirConfig
 from __code.parent import Parent
 from __code import DataType, Run
-from __code.config import NUM_THREADS
+from __code.config import NUM_THREADS, SVMBIR_LIB_PATH
 
 
 class SvmbirHandler(Parent):
@@ -213,7 +213,7 @@ class SvmbirHandler(Parent):
                                                         max_iterations = max_iterations,
                                                         num_threads = NUM_THREADS,
                                                         verbose = verbose,
-                                                        svmbir_lib_path = "/tmp/"
+                                                        svmbir_lib_path = SVMBIR_LIB_PATH,
                                                         )
         logging.info(f"\t Done !")
 

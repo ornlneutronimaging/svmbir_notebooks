@@ -16,7 +16,7 @@ class RemoveStripeDim:
     two = '2'
 
 
-class ImageSize:
+class ImageSize(BaseModel):
     width: int = 512
     height: int = 512
 
