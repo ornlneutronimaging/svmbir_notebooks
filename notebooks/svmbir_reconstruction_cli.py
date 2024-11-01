@@ -17,6 +17,7 @@ from __code.workflow_cli.chips_correction import correct_data
 from __code.workflow_cli.stripes_removal import stripes_removal
 from __code.workflow_cli.center_of_rotation_and_tilt import center_of_rotation_and_tilt
 from __code.workflow_cli.svmbir_reconstruction import svmbir_reconstruction
+from __code.workflow_cli.export_slices import export_slices
 
 setup_logging("svmbir_reconstruction_cli")
 
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     master_3d_data_array = center_of_rotation_and_tilt(config_model, master_3d_data_array)
     
     # reconstruction
-    # master_3d_data_array = svmbir_reconstruction(config_model, master_3d_data_array)
+    master_3d_data_array = svmbir_reconstruction(config_model, master_3d_data_array)
 
     # export
     export_slices(config_model, master_3d_data_array)
