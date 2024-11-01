@@ -1,13 +1,8 @@
 import argparse
-import json
-import os
 import logging
 
-from __code.utilities.time import get_current_time_in_special_file_name_format
-from __code import OperatingMode, DataType
 from __code.utilities.logging import setup_logging
-from __code.utilities.json import load_json_string
-from __code.utilities.configuration_file import Configuration, loading_config_file_into_model
+from __code.utilities.configuration_file import loading_config_file_into_model
 
 from __code.workflow_cli.load import load_data
 from __code.workflow_cli.combine import combine_tof_data
@@ -33,27 +28,35 @@ if __name__ == "__main__":
     logging.info(f"loading config file name: {config_file_name}")
 
     # loading only the runs and ob of interest
+    # {'sample': 4d_data_array, 'ob': 4d_data_array}  with 4d_data_array being [projections angles, tof, y, x]
     master_3d_data_array = load_data(config_model)
 
     # combining the data in tof
+    # {'sample': 3d_data_array', 'ob': 3d_data_array}   with 3d_data_array being [projections angles, y, x]
     master_3d_data_array = combine_tof_data(config_model, master_3d_data_array)
 
     # clean images (histogram, threshold)
+    # {'sample': 3d_data_array', 'ob': 3d_data_array}   with 3d_data_array being [projections angles, y, x]
     master_3d_data_array = clean_images(config_model, master_3d_data_array)
 
     # normalization
+    # 3d_data_array with [projections angles, y, x]
     master_3d_data_array = normalize(config_model, master_3d_data_array)
 
     # chips correction
+    # 3d_data_array with [projections angles, y, x]
     master_3d_data_array = correct_data(master_3d_data_array)
 
     # stripes removal
+    # 3d_data_array with [projections angles, y, x]
     master_3d_data_array = stripes_removal(config_model, master_3d_data_array)
 
     # center of rotation and tilt
+    # 3d_data_array with [projections angles, y, x]
     master_3d_data_array = center_of_rotation_and_tilt(config_model, master_3d_data_array)
     
     # reconstruction
+    # 3d_data_array with [z, y, x]
     master_3d_data_array = svmbir_reconstruction(config_model, master_3d_data_array)
 
     # export
