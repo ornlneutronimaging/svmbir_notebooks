@@ -19,3 +19,7 @@ def export_slices(config_model, data_array):
     o_export = Export(image_3d=data_array,
                           output_folder=full_output_folder_name)
     o_export.run()
+
+    print(" done!")
+    print(f"Slices can be found in {full_output_folder_name}!")
+    

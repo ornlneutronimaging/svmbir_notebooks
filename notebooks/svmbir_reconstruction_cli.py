@@ -61,3 +61,6 @@ if __name__ == "__main__":
 
     # export
     export_slices(config_model, master_3d_data_array)
+
+    print("svmbir reconstruction is done!")
+    
