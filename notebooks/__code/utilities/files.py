@@ -46,3 +46,15 @@ def make_or_reset_folder(folder_name):
          shutil.rmtree(folder_name)
     os.makedirs(folder_name)
     
+
+def get_angle_value(run_full_path=None):
+    """ extract the rotation angle value from a string name looking like 
+    Run_####_20240927_date_..._148_443_######_<file_index>.tif
+    """
+    list_tiff = retrieve_list_of_tif(run_full_path)
+    if len(list_tiff) == 0:
+        return None
+    
+    first_tiff = list_tiff[0]
+    list_part = first_tiff.split("_")
+    return f"{list_part[-4]}.{list_part[-3]}"

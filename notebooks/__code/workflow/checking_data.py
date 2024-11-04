@@ -10,10 +10,9 @@ from IPython.core.display import HTML, display
 from __code.parent import Parent
 from __code.config import PROTON_CHARGE_TOLERANCE_C
 from __code import DataType, Run
-from __code.utilities.files import retrieve_list_of_runs, retrieve_list_of_tif
+from __code.utilities.files import retrieve_list_of_runs, retrieve_list_of_tif, get_angle_value
 from __code.utilities.nexus import get_proton_charge, get_frame_number
 from __code.utilities.math import calculate_most_dominant_int_value_from_list
-from __code.utilities.files import retrieve_list_of_tif
 
 
 class CheckingData(Parent):
@@ -22,14 +21,14 @@ class CheckingData(Parent):
                     DataType.ob: None}
     list_of_metadata = {}
 
-    def get_angle_value(self, run_full_path=None):
-        """ extract the rotation angle value from a string name looking like 
-        Run_####_20240927_date_..._148_443_######_<file_index>.tif
-        """
-        list_tiff = retrieve_list_of_tif(run_full_path)
-        first_tiff = list_tiff[0]
-        list_part = first_tiff.split("_")
-        return f"{list_part[-4]}.{list_part[-3]}"
+    # def get_angle_value(self, run_full_path=None):
+    #     """ extract the rotation angle value from a string name looking like 
+    #     Run_####_20240927_date_..._148_443_######_<file_index>.tif
+    #     """
+    #     list_tiff = retrieve_list_of_tif(run_full_path)
+    #     first_tiff = list_tiff[0]
+    #     list_part = first_tiff.split("_")
+    #     return f"{list_part[-4]}.{list_part[-3]}"
 
     def run(self):
 
@@ -73,7 +72,7 @@ class CheckingData(Parent):
         list_of_sample_runs = self.parent.list_of_runs[DataType.sample]
         for _run in list_of_sample_runs.keys():
             if list_of_sample_runs[_run][Run.use_it]:
-                angle_value = self.get_angle_value(run_full_path=list_of_sample_runs[_run][Run.full_path])
+                angle_value = get_angle_value(run_full_path=list_of_sample_runs[_run][Run.full_path])
                 self.parent.list_of_runs[DataType.sample][_run][Run.angle] = angle_value
 
     def retrieve_runs(self):
