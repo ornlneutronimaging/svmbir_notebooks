@@ -26,6 +26,10 @@ def retrieve_list_of_tif(folder):
     return list_tif
 
 
+def get_number_of_tif(folder):
+    return len(retrieve_list_of_tif(folder))
+
+
 def load_json(json_file_name):
     if not os.path.exists(json_file_name):
         return None

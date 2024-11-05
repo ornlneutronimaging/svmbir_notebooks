@@ -5,10 +5,12 @@ import ipywidgets as widgets
 from tqdm import tqdm
 
 from __code.utilities.file_folder_browser import FileFolderBrowser
+from __code import roi
 from __code.utilities.configuration_file import Configuration
-from __code import DataType
-from __code.utilities.files import retrieve_list_of_runs, get_angle_value
+from __code import DataType, OperatingMode, CleaningAlgorithm, NormalizationSettings
+from __code.utilities.files import retrieve_list_of_runs, get_angle_value, get_number_of_tif
 from __code.utilities.nexus import get_proton_charge, get_frame_number
+from __code.workflow.remove_strips import RemoveStrips
 
 DEBUG = True
 
@@ -18,8 +20,10 @@ class CliConfigBuilder:
     data_type = DataType.sample
     top_folder = "./"
     full_ipts_folder = None
+    nbr_images = 0  # nbr of tof bins, or TIFF images in each run folder
     
     at_least_one_run_with_no_pc_info = False
+    at_least_one_frame_number_not_found = False
 
     def __init__(self):
         self.configuration = Configuration()
@@ -148,22 +152,30 @@ class CliConfigBuilder:
         self.configuration.list_of_ob_frame_number = ob_list_frame_number
 
         # angle value
-        sample_list_of_runs = retrieve_list_of_runs(self.configuration.top_folder.sample)
         sample_list_of_angles = []
-        for _run in tqdm(sample_list_of_runs):
-            sample_list_of_angles.append(get_angle_value(_run))
+        for _run in tqdm(short_sample_list_of_runs):
+            sample_list_of_angles.append(get_angle_value(os.path.join(self.configuration.top_folder.sample, _run)))
         self.configuration.list_of_angles = sample_list_of_angles
+
+        # get number of images (tof bins)
+        self.nbr_images = get_number_of_tif(sample_list_of_runs[0])
 
         # remove bad runs (no tiff, no nexus)
         list_sample_indexes_with_none_in_proton_charge = [i for i, pc in enumerate(sample_list_proton_charge) if pc is None]
         if len(list_sample_indexes_with_none_in_proton_charge):
             self.at_least_one_run_with_no_pc_info = True
 
+        list_sample_indexes_with_none_in_frame_number = [i for i, fn in enumerate(sample_list_frame_number) if fn is None]
+        if len(list_sample_indexes_with_none_in_frame_number):
+            self.at_least_one_frame_number_not_found = True
+
         list_sample_indexes_with_none_in_angles = [i for i, angle in enumerate(sample_list_of_angles) if angle is None]
 
         size_before = len(sample_list_of_runs)
+        bad_list_of_runs = None
         if len(list_sample_indexes_with_none_in_angles) > 0:
-            bad_list_of_runs = sample_list_of_runs[list_sample_indexes_with_none_in_angles]
+            bad_list_of_runs = [os.path.basename(sample_list_of_runs[_index]) for 
+                                _index in list_sample_indexes_with_none_in_angles]
 
         for index in list_sample_indexes_with_none_in_angles[::-1]:
             del sample_list_proton_charge[index]
@@ -173,10 +185,152 @@ class CliConfigBuilder:
             del sample_list_of_runs[index]
         size_after = len(sample_list_of_runs)
 
-        if len(bad_list_of_runs) > 0:
+        if bad_list_of_runs is None:
             print(f"The program automatically removed {size_before - size_after} bad runs!")
             print(f"{bad_list_of_runs = }")
         else:
             print(f"All selected runs are good to go!")
 
+    def select_mode(self):
 
+        white_beam_layout = widgets.Label("White beam mode selected!")
+        self.tof_layout = widgets.VBox([widgets.HTML("<b>Select up to 5 TOF ranges!</b>"),          
+                                    widgets.IntRangeSlider(value=[0, self.nbr_images-1],
+                                            min=0,
+                                            max=self.nbr_images-1,
+                                            step=1,
+                                            description="Range #1",
+                                            layout=widgets.Layout(width="100%")),
+                                    widgets.IntRangeSlider(value=[0, 0],
+                                            min=0,
+                                            max=self.nbr_images-1,
+                                            step=1,
+                                            description="Range #2",
+                                            layout=widgets.Layout(width="100%")),
+                                    widgets.IntRangeSlider(value=[0, 0],
+                                            min=0,
+                                            max=self.nbr_images-1,
+                                            step=1,
+                                            description="Range #3",
+                                            layout=widgets.Layout(width="100%")),
+                                    widgets.IntRangeSlider(value=[0, 0],
+                                            min=0,
+                                            max=self.nbr_images-1,
+                                            step=1,
+                                            description="Range #4",
+                                            layout=widgets.Layout(width="100%")),
+                                    widgets.IntRangeSlider(value=[0, 0],
+                                            min=0,
+                                            max=self.nbr_images-1,
+                                            step=1,
+                                            description="Range #5",
+                                            layout=widgets.Layout(width="100%")),
+                                 ])
+
+        self.tabs = widgets.Tab()
+        self.tabs.children = [white_beam_layout, self.tof_layout]
+        self.tabs.titles = ['White beam', 'TOF']
+        display(self.tabs)
+
+    def cleanup_pixels_options(self):
+        self.histo_ui = widgets.Checkbox(value=False,
+                                         description="Histogram")
+        self.nbr_bins = widgets.IntSlider(min=10,
+                                    max=1000,
+                                    value=10,
+                                    description='Nbr bins',
+                                    continuous_update=False)
+        self.nbr_exclude = widgets.IntSlider(min=0,
+                                        max=10,
+                                        value=1,
+                                        description='Bins to excl.',
+                                        continuous_update=False,
+                                        )
+        vertical_box = widgets.VBox([self.histo_ui,
+                                     self.nbr_bins,
+                                     self.nbr_exclude])
+
+        hr = widgets.HTML("<hr>")
+        self.tomo_ui = widgets.Checkbox(value=False,
+                                        description="Threshold")
+        v_box = widgets.VBox([vertical_box, hr, self.tomo_ui])
+        display(v_box)
+
+    def normalization_settings(self):
+        self.use_proton_charge_ui = widgets.Checkbox(value=False,
+                                                description='Use proton charge',
+                                                disabled=self.at_least_one_run_with_no_pc_info)
+        self.use_frames_ui = widgets.Checkbox(value=False,
+                                         description='Use frames',
+                                         disabled=self.at_least_one_frame_number_not_found,
+                                         )
+        self.use_roi_ui = widgets.Checkbox(value=False,
+                                      description='Use ROI')
+        vertical_layout = widgets.VBox([self.use_proton_charge_ui,
+                                        self.use_frames_ui,
+                                        self.use_roi_ui])
+        display(vertical_layout)
+
+        self.left_ui = widgets.IntText(value=roi['left'],
+                                       description="left")
+        self.right_ui = widgets.IntText(value=roi['right'],
+                                        description='right')
+        self.top_ui = widgets.IntText(value=roi['top'],
+                                      description='top')
+        self.bottom_ui = widgets.IntText(value=roi['bottom'],
+                                         description='bottom')
+        vertical_box = widgets.VBox([self.left_ui,
+                                     self.right_ui,
+                                     self.top_ui,
+                                     self.bottom_ui])
+        display(vertical_box)
+
+    def remove_stripes(self):
+        o_remove = RemoveStrips(parent=self)
+        o_remove.select_algorithms()
+
+
+
+
+    def save_configuration(self):
+        if self.tabs.selected_index:
+            self.configuration.operating_mode = OperatingMode.white_beam
+        else:
+            self.configuration.operating_mode = OperatingMode.tof
+            list_of_ranges = [self.tof_layout.children[1].value,
+                              self.tof_layout.children[2].value,
+                              self.tof_layout.children[3].value,
+                              self.tof_layout.children[4].value,
+                              self.tof_layout.children[5].value]
+            clean_list_of_ranges = []
+            for _range in list_of_ranges:
+                if _range[0]==0 and _range[1]==0:
+                    continue
+                clean_list_of_ranges.append(_range)
+            self.configuration.range_of_tof_to_combine = clean_list_of_ranges
+
+        list_clean_algorithm = []
+        if self.histo_ui.value:
+            list_clean_algorithm.append(CleaningAlgorithm.histogram)
+            self.configuration.histogram_cleaning_settings.nbr_bins = self.nbr_bins.value
+            self.configuration.histogram_cleaning_settings.bins_to_exclude = self.nbr_exclude.value
+
+        if self.tomo_ui.value:
+            list_clean_algorithm.append(CleaningAlgorithm.tomo)
+
+        self.configuration.list_clean_algorithm = list_clean_algorithm
+
+        list_normalization_settings = []
+        if (not self.at_least_one_run_with_no_pc_info) and self.use_proton_charge_ui.value:
+            list_normalization_settings.append(NormalizationSettings.pc)
+
+        if (not self.at_least_one_frame_number_not_found) and self.use_frames_ui.value:
+            list_normalization_settings.append(NormalizationSettings.frame_number)
+
+        if self.use_roi_ui.value:
+            list_normalization_settings.append(NormalizationSettings.roi)
+
+        self.configuration.normalization_roi.left = self.left_ui.value
+        self.configuration.normalization_roi.right = self.right_ui.value
+        self.configuration.normalization_roi.top = self.top_ui.value
+        self.configuration.normalization_roi.bottom = self.bottom_ui.value
