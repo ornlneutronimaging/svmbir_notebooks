@@ -185,7 +185,7 @@ class CliConfigBuilder:
             del sample_list_of_runs[index]
         size_after = len(sample_list_of_runs)
 
-        if bad_list_of_runs is None:
+        if not (bad_list_of_runs is None):
             print(f"The program automatically removed {size_before - size_after} bad runs!")
             print(f"{bad_list_of_runs = }")
         else:
@@ -286,11 +286,11 @@ class CliConfigBuilder:
         display(vertical_box)
 
     def remove_stripes(self):
-        o_remove = RemoveStrips(parent=self)
-        o_remove.select_algorithms()
+        self.o_remove = RemoveStrips(parent=self)
+        self.o_remove.select_algorithms()
 
-
-
+    def define_settings(self):
+        self.o_remove.define_settings()
 
     def save_configuration(self):
         if self.tabs.selected_index:
@@ -334,3 +334,11 @@ class CliConfigBuilder:
         self.configuration.normalization_roi.right = self.right_ui.value
         self.configuration.normalization_roi.top = self.top_ui.value
         self.configuration.normalization_roi.bottom = self.bottom_ui.value
+
+        # remove stripes
+        list_algo_to_use = self.o_remove.list_to_use_widget.options
+        if list_algo_to_use:
+            for _algo in list_algo_to_use:
+                # kwargs = self.get_keyword_arguments(algorithm_name=_algo)
+                self.o_remove.saving_configuration(algorithm_name=_algo)
+
