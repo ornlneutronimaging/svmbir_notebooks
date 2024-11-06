@@ -179,7 +179,7 @@ class CliConfigBuilder:
         size_before = len(sample_list_of_runs)
         bad_list_of_runs = None
         if len(list_sample_indexes_with_none_in_angles) > 0:
-            bad_list_of_runs = [os.path.basename(sample_list_of_runs[_index]) for 
+            bad_list_of_runs = [os.path.basename(short_sample_list_of_runs[_index]) for 
                                 _index in list_sample_indexes_with_none_in_angles]
 
         for index in list_sample_indexes_with_none_in_angles[::-1]:
@@ -318,6 +318,31 @@ class CliConfigBuilder:
                               label,
                               self.range]))
 
+    def set_svmbir_settings(self):
+        self.sharpness_ui = widgets.FloatSlider(min=0,
+                                        max=1,
+                                        value=0,
+                                        description="sharpness")
+        self.snr_db_ui = widgets.FloatSlider(min=0,
+                                        max=100,
+                                        value=30.0,
+                                        description="snr db")
+        self.positivity_ui = widgets.Checkbox(value=True,
+                                            description="positivity")
+        self.max_iterations_ui = widgets.IntSlider(value=200,
+                                                min=10,
+                                                max=500,
+                                                description="max itera.")
+        self.verbose_ui = widgets.Checkbox(value=False,
+                                        description='verbose')
+        
+        vertical_widgets = widgets.VBox([self.sharpness_ui,
+                                            self.snr_db_ui,
+                                            self.positivity_ui,
+                                            self.max_iterations_ui,
+                                            self.verbose_ui])
+        display(vertical_widgets)
+
     def select_output_folder(self):
         working_dir = os.path.dirname(self.configuration.top_folder.sample)
         o_file_browser = FileFolderBrowser(working_dir=working_dir,
@@ -398,6 +423,15 @@ class CliConfigBuilder:
         slice_range = self.range.value
         self.configuration.range_of_slices_for_center_of_rotation = list(slice_range)
         
+        # svmbir settings
+        self.configuration.svmbir_config.sharpness = self.sharpness_ui.value
+        self.configuration.svmbir_config.snr_db = self.snr_db_ui.value
+        self.configuration.svmbir_config.positivity = self.positivity_ui.value
+        self.configuration.svmbir_config.max_iterations = self.max_iterations_ui.value
+        self.configuration.svmbir_config.verbose = self.verbose_ui.value
+        self.configuration.svmbir_config.top_slice = np.min(slice_range)
+        self.configuration.svmbir_config.bottom_slize = np.max(slice_range)
+
         config_json = self.configuration.model_dump_json()
         save_json(config_file_name, json_dictionary=config_json)
         print(f"config file {config_file_name}")
