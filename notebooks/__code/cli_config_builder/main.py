@@ -57,7 +57,7 @@ class CliConfigBuilder:
             self.configuration.top_folder.sample = top_folder
         else:
             self.configuration.top_folder.ob = top_folder
-        print(f"you selected for {self.data_type}: {top_folder} ")
+        print(f"As {self.data_type} folder, you selected: {top_folder} ")
 
     def select_ob_folder(self):
         if DEBUG:
