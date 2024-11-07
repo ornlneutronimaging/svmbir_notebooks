@@ -1,6 +1,7 @@
 class DataType:
     sample = 'sample'
     ob = 'ob'
+    dc = 'dc'
     ipts = 'ipts'
     top = 'top'
     nexus = 'nexus'
@@ -27,13 +28,14 @@ debug_folder = {DataType.sample: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/Se
                 DataType.reconstructed: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
                 DataType.extra: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
 }
-# debug_folder = {DataType.sample: "/HFIR/CG1D/IPTS-32519/raw/ct_scans/2024_10_18_fossil_60s/",
-#                 DataType.ob: "/HFIR/CG1D/IPTS-32519/raw/ob/2024_10_18_fossil_60s/",
-#                 DataType.cleaned_images: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
-#                 DataType.normalized: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
-#                 DataType.reconstructed: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
-#                 DataType.extra: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
-# }
+debug_folder = {DataType.sample: "/HFIR/CG1D/IPTS-32720/raw/ct_scans/2024_10_30_anodefree/",
+                DataType.ob: "/HFIR/CG1D/IPTS-32720/raw/ob/2024_10_30_anodefree/",
+                DataType.dc: "/HFIR/CG1D/IPTS-32720/raw/dc/2024_10_30_anodefree/",
+                DataType.cleaned_images: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
+                DataType.normalized: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
+                DataType.reconstructed: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
+                DataType.extra: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
+}
 
 
 roi = {'left': 0,
