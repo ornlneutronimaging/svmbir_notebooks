@@ -122,11 +122,9 @@ class CliConfigBuilder:
 
         for _sample in list_of_sample_runs_to_remove:
             short_sample_list_of_runs.remove(_sample)
-        self.configuration.list_of_sample_runs = short_sample_list_of_runs
 
         for _ob in list_of_ob_runs_to_remove:
             short_ob_list_of_runs.remove(_ob)
-        self.configuration.list_of_ob_runs = short_ob_list_of_runs
 
         # build list of NeXus
         sample_list_of_nexus = self.get_list_of_nexus(short_sample_list_of_runs, 
@@ -138,29 +136,24 @@ class CliConfigBuilder:
         sample_list_proton_charge = []
         for _nexus in tqdm(sample_list_of_nexus):
             sample_list_proton_charge.append(get_proton_charge(_nexus, units='c'))
-        self.configuration.list_of_sample_pc = sample_list_proton_charge
 
         ob_list_proton_charge = []
         for _nexus in tqdm(ob_list_of_nexus):
             ob_list_proton_charge.append(get_proton_charge(_nexus, units='c'))
-        self.configuration.list_of_ob_pc = ob_list_proton_charge
 
         # get frame number
         sample_list_frame_number = []
         for _nexus in tqdm(sample_list_of_nexus):
             sample_list_frame_number.append(get_frame_number(_nexus))
-        self.configuration.list_of_sample_frame_number = sample_list_frame_number                                            
 
         ob_list_frame_number = []
         for _nexus in tqdm(ob_list_of_nexus):
             ob_list_frame_number.append(get_frame_number(_nexus))
-        self.configuration.list_of_ob_frame_number = ob_list_frame_number
 
         # angle value
         sample_list_of_angles = []
         for _run in tqdm(short_sample_list_of_runs):
             sample_list_of_angles.append(get_angle_value(os.path.join(self.configuration.top_folder.sample, _run)))
-        self.configuration.list_of_angles = sample_list_of_angles
 
         # get number of images (tof bins)
         self.nbr_images = get_number_of_tif(sample_list_of_runs[0])
@@ -189,6 +182,21 @@ class CliConfigBuilder:
             del sample_list_of_nexus[index]
             del sample_list_of_runs[index]
         size_after = len(sample_list_of_runs)
+
+        # cleanup list
+        if None in sample_list_frame_number:
+            sample_list_frame_number = []
+
+        if None in ob_list_frame_number:
+            ob_list_frame_number = []
+
+        self.configuration.list_of_sample_pc = sample_list_proton_charge
+        self.configuration.list_of_sample_frame_number = sample_list_frame_number                                            
+        self.configuration.list_of_sample_runs = short_sample_list_of_runs
+        self.configuration.list_of_ob_frame_number = ob_list_frame_number
+        self.configuration.list_of_angles = sample_list_of_angles
+        self.configuration.list_of_ob_pc = ob_list_proton_charge
+        self.configuration.list_of_ob_runs = short_ob_list_of_runs
 
         if not (bad_list_of_runs is None):
             print(f"The program automatically removed {size_before - size_after} bad runs!")
@@ -363,7 +371,7 @@ class CliConfigBuilder:
 
     def save_export_configuration(self, output_folder):
 
-        base_folder = os.path.basename(self.configuration.top_folder.sample)
+        base_folder = os.path.basename(os.path.abspath(self.configuration.top_folder.sample))
         _time = get_current_time_in_special_file_name_format()
         config_file_name = os.path.join(output_folder, f"{base_folder}_config_{_time}.json")
 
@@ -430,7 +438,7 @@ class CliConfigBuilder:
         self.configuration.svmbir_config.max_iterations = self.max_iterations_ui.value
         self.configuration.svmbir_config.verbose = self.verbose_ui.value
         self.configuration.svmbir_config.top_slice = np.min(slice_range)
-        self.configuration.svmbir_config.bottom_slize = np.max(slice_range)
+        self.configuration.svmbir_config.bottom_slice = np.max(slice_range)
 
         config_json = self.configuration.model_dump_json()
         save_json(config_file_name, json_dictionary=config_json)
