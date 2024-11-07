@@ -277,14 +277,14 @@ class CliConfigBuilder:
         display(v_box)
 
     def normalization_settings(self):
-        self.use_proton_charge_ui = widgets.Checkbox(value=False,
+        self.use_proton_charge_ui = widgets.Checkbox(value=True,
                                                 description='Use proton charge',
                                                 disabled=self.at_least_one_run_with_no_pc_info)
         self.use_frames_ui = widgets.Checkbox(value=False,
                                          description='Use frames',
                                          disabled=self.at_least_one_frame_number_not_found,
                                          )
-        self.use_roi_ui = widgets.Checkbox(value=False,
+        self.use_roi_ui = widgets.Checkbox(value=True,
                                       description='Use ROI')
         vertical_layout = widgets.VBox([self.use_proton_charge_ui,
                                         self.use_frames_ui,

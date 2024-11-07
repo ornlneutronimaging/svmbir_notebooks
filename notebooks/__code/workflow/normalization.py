@@ -62,13 +62,13 @@ class Normalization(Parent):
 
     def normalization_settings(self):
 
-        self.use_proton_charge_ui = widgets.Checkbox(value=False,
+        self.use_proton_charge_ui = widgets.Checkbox(value=True,
                                                 description='Use proton charge')
         self.use_frames_ui = widgets.Checkbox(value=False,
                                          description='Use frames',
                                          disabled=self.parent.at_least_one_frame_number_not_found,
                                          )
-        self.use_roi_ui = widgets.Checkbox(value=False,
+        self.use_roi_ui = widgets.Checkbox(value=True,
                                       description='Use ROI')
         vertical_layout = widgets.VBox([self.use_proton_charge_ui,
                                         self.use_frames_ui,
