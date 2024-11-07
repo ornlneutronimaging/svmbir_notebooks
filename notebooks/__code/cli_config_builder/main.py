@@ -373,7 +373,7 @@ class CliConfigBuilder:
 
         base_folder = os.path.basename(os.path.abspath(self.configuration.top_folder.sample))
         _time = get_current_time_in_special_file_name_format()
-        config_file_name = os.path.join(output_folder, f"{base_folder}_config_{_time}.json")
+        config_file_name = os.path.join(output_folder, f"config_{base_folder}_{_time}.json")
 
         if self.tabs.selected_index:
             self.configuration.operating_mode = OperatingMode.white_beam
