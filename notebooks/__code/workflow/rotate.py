@@ -3,6 +3,7 @@ from IPython.display import display
 from IPython.core.display import HTML
 from ipywidgets import interactive
 from tqdm import tqdm
+import numpy as np
 from skimage import transform
 
 from __code.parent import Parent
@@ -33,4 +34,4 @@ class Rotate(Parent):
         for _data in tqdm(self.parent.normalized_images):
             new_array_rotated.append(transform.rotate(_data, angle_value))
 
-        self.parent.normalized_images = new_array_rotated
+        self.parent.normalized_images = np.array(new_array_rotated)

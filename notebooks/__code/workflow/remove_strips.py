@@ -10,7 +10,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
 
-from __code import DataType, RemoveStripeAlgo
+from __code import DataType, RemoveStripeAlgo, OperatingMode
 from __code.utilities import configuration_file
 
 
@@ -121,8 +121,8 @@ class RemoveStrips:
                                                                             description="la_size"),
                                                             widgets.IntText(value=21,
                                                                             description="sm_size"),
-                                                            widgets.Dropdown(options=['1','2'],
-                                                                            value='1',
+                                                            widgets.Dropdown(options=[1, 2],
+                                                                            value=1,
                                                                             description='dim')
                                                         ]),
                  },
@@ -322,6 +322,7 @@ class RemoveStrips:
         logging.info(f"Strip cleaning:")
         if list_algo_to_use:
             tomography_array = self.parent.corrected_images
+            print(f"{np.shape(tomography_array) = }")
             list_algo_that_failed = []
             list_algo_that_worked = []
             try:
@@ -377,7 +378,8 @@ class RemoveStrips:
 
             fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(10, 10))
 
-            fig.suptitle(f"Run: {final_list_of_runs[image_index]}, Angle: {final_list_of_angles[image_index]}")
+            if self.parent.MODE == OperatingMode.tof:
+                fig.suptitle(f"Run: {final_list_of_runs[image_index]}, Angle: {final_list_of_angles[image_index]}")
 
             axs[0][0].imshow(corrected_images[image_index], vmin=0, vmax=1)
             axs[0][0].set_title("Before correction")

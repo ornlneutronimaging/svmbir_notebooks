@@ -234,9 +234,6 @@ class SvmbirReconstruction:
         o_review = FinalProjectionsReview(parent=self)
         o_review.run(array=self.normalized_images)
 
-
-
-
     def select_export_normalized_folder(self):
         o_select = Load(parent=self)
         o_select.select_folder(data_type=DataType.normalized)
@@ -244,17 +241,9 @@ class SvmbirReconstruction:
     def export_normalized_images(self):
         self.o_norm.export_images()
 
-    # chips correction
-    def chips_correction(self):
-        o_chips = ChipsCorrection(parent=self)
-        o_chips.run()
-
-    def visualize_chips_correction(self):
-        o_chips = ChipsCorrection(parent=self)
-        o_chips.visualize_chips_correction()
-
     # strips removal
     def select_remove_strips_algorithms(self):
+        self.corrected_images = self.normalized_images
         self.o_remove = RemoveStrips(parent=self)
         self.o_remove.select_algorithms()
 

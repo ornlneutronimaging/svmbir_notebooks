@@ -13,7 +13,7 @@ class FinalProjectionsReview(Parent):
 
     def run(self, array=None):
 
-        if not array:
+        if not list(array):
             return
 
         nbr_images = len(array)
