@@ -21,10 +21,12 @@ from __code.workflow.final_projections_review import FinalProjectionsReview
 from __code.workflow.export import ExportExtra
 from __code.workflow.visualization import Visualization
 
-LOG_BASENAME_FILENAME = "svmbir_reconstruction"
+LOG_BASENAME_FILENAME = "svmbir_reconstruction_tof_mode"
 
 
 class SvmbirReconstruction:
+
+    MODE = OperatingMode.tof
 
     working_dir = {
         DataType.sample: "",

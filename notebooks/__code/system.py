@@ -24,6 +24,7 @@ class System:
     def select_working_dir(cls, debugger_folder='', system_folder='',
                            facility='SNS',
                            instrument='VENUS',
+                           ipts=None,
                            notebook="N/A"):
 
         # try:
@@ -43,17 +44,23 @@ class System:
                    """))
 
         full_list_instruments = cls.get_full_list_instrument()
+
+        if instrument in full_list_instruments:
+            default_instrument = instrument
+        else:
+            default_instrument = full_list_instruments[0]
+
         # full_list_instruments.sort()
         start_path = cls.get_start_path(debugger_folder=debugger_folder,
                                         system_folder=system_folder,
-                                        instrument=full_list_instruments[0])
+                                        instrument=default_instrument)
 
         cls.start_path = start_path
 
         select_instrument_ui = widgets.HBox([widgets.Label("Select Instrument",
                                                            layout=widgets.Layout(width='20%')),
                                              widgets.Select(options=full_list_instruments,
-                                                            value=full_list_instruments[0],
+                                                            value=default_instrument,
                                                             layout=widgets.Layout(width='20%'))])
         cls.instrument_ui = select_instrument_ui.children[1]
         cls.instrument_ui.observe(cls.check_instrument_input, names='value')
@@ -74,8 +81,11 @@ class System:
 
         list_and_default_folders = cls.get_list_folders(start_path=start_path)
         user_list_folders = list_and_default_folders['user_list_folders']
-        default_value = list_and_default_folders['default_value']
-
+        if ipts:
+            default_value = ipts
+        else:
+            default_value = list_and_default_folders['default_value']
+     
         bottom_hbox = widgets.HBox([widgets.Label("Select Folder",
                                                   layout=widgets.Layout(width="20%")),
                                     widgets.Select(options=user_list_folders,

@@ -28,7 +28,7 @@ class Load(Parent):
             working_dir = self.parent.working_dir[DataType.top]
 
         if DEBUG:
-            self.data_selected(debug_folder[data_type])
+            self.data_selected(debug_folder[self.parent.MODE][data_type])
             return
 
         if not os.path.exists(working_dir):
@@ -38,6 +38,35 @@ class Load(Parent):
                                            next_function=self.data_selected)
         o_file_browser.select_input_folder(instruction=f"Select Top Folder of {data_type}",
                                            multiple_flag=multiple_flag)
+
+    def select_images(self, data_type=DataType.ob):
+        self.parent.current_data_type = data_type
+        self.data_type = data_type
+        if data_type in [DataType.reconstructed, DataType.extra]:
+            working_dir = self.parent.working_dir[DataType.processed]
+        else:
+            working_dir = self.parent.working_dir[DataType.top]
+
+        if DEBUG:
+            working_dir = debug_folder[self.parent.MODE][data_type]
+            list_images = glob.glob(os.path.join(working_dir, "*.tif*"))
+            self.images_selected(list_images=list_images)
+            return
+
+        o_file_browser = FileFolderBrowser(working_dir=working_dir,
+                                           next_function=self.images_selected)
+        o_file_browser.select_images_with_search(instruction="Select all images ...",
+                                                 filters={"TIFF": "*.tif*"})
+    
+    def images_selected(self, list_images):
+        logging.info(f"{len(list_images)} {self.data_type} images have been selected!")
+        self.parent.list_of_images[self.data_type] = list_images
+
+
+
+
+
+
 
     def data_selected(self, top_folder):
         logging.info(f"{self.parent.current_data_type} top folder selected: {top_folder}")

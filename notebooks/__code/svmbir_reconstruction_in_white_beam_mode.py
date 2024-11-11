@@ -21,10 +21,12 @@ from __code.workflow.final_projections_review import FinalProjectionsReview
 from __code.workflow.export import ExportExtra
 from __code.workflow.visualization import Visualization
 
-LOG_BASENAME_FILENAME = "svmbir_reconstruction"
+LOG_BASENAME_FILENAME = "svmbir_reconstruction_white_beam_mode"
 
 
 class SvmbirReconstruction:
+
+    MODE = OperatingMode.white_beam
 
     working_dir = {
         DataType.sample: "",
@@ -59,8 +61,9 @@ class SvmbirReconstruction:
     #                   },
     # DataType.ob: {...},
     # }
-    list_of_runs = {DataType.sample: OrderedDict(),
-                    DataType.ob: OrderedDict(),
+    list_of_images = {DataType.sample: OrderedDict(),
+                      DataType.ob: None,
+                      DataType.dc: None,
                     }
     
     list_of_runs_checking_data = {DataType.sample: {},
@@ -161,9 +164,21 @@ class SvmbirReconstruction:
         o_load = Load(parent=self)
         o_load.select_folder(data_type=DataType.sample)
 
-    def select_top_ob_folder(self):
+    def select_ob_images(self):
         o_load = Load(parent=self)
-        o_load.select_folder(data_type=DataType.ob)
+        o_load.select_images(data_type=DataType.ob)
+
+    def select_dc_images(self):
+        o_load = Load(parent=self)
+        o_load.select_images(data_type=DataType.dc)
+
+
+
+
+
+    # def select_top_ob_folder(self):
+    #     o_load = Load(parent=self)
+    #     o_load.select_folder(data_type=DataType.ob)
 
     # Checking data (proton charge, empty runs ...)
     def checking_data(self):
