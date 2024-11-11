@@ -30,7 +30,7 @@ debug_folder = {OperatingMode.tof: {DataType.sample: "/SNS/VENUS/IPTS-33699/shar
                                     },
                 OperatingMode.white_beam: {DataType.sample: "/HFIR/CG1D/IPTS-32720/raw/ct_scans/2024_10_30_anodefree/",
                                             DataType.ob: "/HFIR/CG1D/IPTS-32720/raw/ob/2024_10_30_anodefree/",
-                                            DataType.dc: "/HFIR/CG1D/IPTS-32720/raw/dc/2024_10_30_anodefree/",
+                                            DataType.dc: "",
                                             DataType.cleaned_images: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
                                             DataType.normalized: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
                                             DataType.reconstructed: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',

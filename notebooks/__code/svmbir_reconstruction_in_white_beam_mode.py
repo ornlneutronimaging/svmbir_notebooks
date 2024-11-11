@@ -8,6 +8,7 @@ from __code.utilities.logging import setup_logging
 from __code.utilities.configuration_file import Configuration
 
 from __code.workflow.load import Load
+from __code.workflow.combine_ob_dc import CombineObDc
 from __code.workflow.checking_data import CheckingData
 from __code.workflow.recap_data import RecapData
 from __code.workflow.mode_selection import ModeSelection
@@ -87,7 +88,8 @@ class SvmbirReconstruction:
     # dictionary used just after loading the data, not knowing the mode yet
     # or the tiff images in using the white beam notebook
     master_3d_data_array = {DataType.sample: None,  # [angle, y, x]
-                            DataType.ob: None}
+                            DataType.ob: None,
+                            DataType.dc: None}
     
     # each element of the dictionary is an master_3d_data_array of each TOF range
     # {'0': {'use_it': True,
@@ -180,20 +182,22 @@ class SvmbirReconstruction:
         o_mode = Load(parent=self)
         o_mode.load_white_beam_data()
         
+    def visualize_raw_data(self):
+        o_visualization = Visualization(parent=self)
+        o_visualization.visualize_all_images_at_once()
+
+
+
+
+    # combine OB and DC
+    def combine(self):
+        o_combine = CombineObDc(parent=self)
+        o_combine.run()
 
 
 
 
 
-
-
-
-    def select_tof_ranges(self):
-        if self.operating_mode == OperatingMode.white_beam:
-            return
-
-        # self.o_tof_range_mode.select_multi_tof_range()
-        self.o_tof_range_mode.select_tof_range()
 
     def combine_tof_mode_data(self):
         if self.o_tof_range_mode:

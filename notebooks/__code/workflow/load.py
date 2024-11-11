@@ -49,7 +49,9 @@ class Load(Parent):
 
         if DEBUG:
             working_dir = debug_folder[self.parent.MODE][data_type]
-            list_images = glob.glob(os.path.join(working_dir, "*.tif*"))
+            if not os.path.exists(working_dir):
+                return
+            list_images = glob.glob(os.path.join(working_dir, "*_0045_*.tif*"))
             list_images.sort()
             self.images_selected(list_images=list_images)
             return
@@ -95,16 +97,21 @@ class Load(Parent):
         list_of_images = self.parent.list_of_images
         logging.info(f"loading the data:")
 
-        master_3d_data_array = {}
         for _data_type in list_of_images.keys():
             logging.info(f"\t{_data_type} ... ")
             _list_data = []
+            if not list_of_images[_data_type]:
+                logging.info(f" no files selected!")
+                continue
+            
             for _file in tqdm(list_of_images[_data_type]):
-                _list_data.append(load_tiff(_file))
-            master_3d_data_array[_data_type] = _list_data 
+                _data = load_tiff(_file)
+                logging.info(f"\t{_file}: {np.shape(_data)}")
+                _list_data.append(_data)
+                
+            self.parent.master_3d_data_array[_data_type] = _list_data 
+            logging.info(f"{np.shape(self.parent.master_3d_data_array[_data_type]) = }")
             logging.info(f"\t{_data_type} Done !")
-
-        self.parent.master_3d_data_array = master_3d_data_array               
 
     def load_data(self, combine=False):
         """combine is True when working with white beam (from tof notebook)"""

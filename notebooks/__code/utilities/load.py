@@ -36,7 +36,7 @@ def load_list_of_tif(list_of_tiff):
 def load_tiff(tif_file_name):
     o_norm = Normalization()
     o_norm.load(tif_file_name)
-    return o_norm.data['sample']['data']
+    return np.squeeze(o_norm.data['sample']['data'])
 
 
 def load_data_using_imread(folder):

@@ -12,8 +12,12 @@ class FinalProjectionsReview(Parent):
     list_runs_with_infos = None
 
     def run(self, array=None):
-      
+
+        if not array:
+            return
+
         nbr_images = len(array)
+
 
         list_angles = self.parent.final_list_of_angles
         list_runs = self.parent.list_of_runs_to_use[DataType.sample]

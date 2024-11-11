@@ -1,5 +1,6 @@
 from IPython.display import display
 import ipywidgets as widgets
+from IPython.core.display import HTML
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
 import numpy as np
@@ -98,3 +99,46 @@ class Visualization(Parent):
         else:
             o_review = FinalProjectionsReview(parent=self.parent)
             o_review.run(array=data_after)
+
+    def visualize_all_images_at_once(self):
+        
+        master_3d_data_array = self.parent.master_3d_data_array
+
+        nbr_cols = 8
+
+        for _data_type in master_3d_data_array.keys():
+
+            if not self.parent.list_of_images[_data_type]:
+                continue
+            
+            display(HTML(f"<b>{_data_type}</b>"))
+            array = master_3d_data_array[_data_type]
+            nbr_images = len(self.parent.list_of_images[_data_type])
+            nbr_rows = int(np.ceil(nbr_images / nbr_cols))
+
+            fig, axs =  plt.subplots(nrows=nbr_rows, ncols=nbr_cols,
+                                    figsize=(nbr_cols*2,nbr_rows*2))
+            flat_axs = axs.flatten()
+
+            _index = 0
+            list_runs_with_infos = []
+            for _row in np.arange(nbr_rows):
+                for _col in np.arange(nbr_cols):
+                    _index = _col + _row * nbr_cols
+                    if _index == (nbr_images):
+                        break
+                    # title = f"{list_runs[_index]}, {list_angles[_index]}"
+                    # list_runs_with_infos.append(title)
+                    # flat_axs[_index].set_title(title)
+                    im1 = flat_axs[_index].imshow(array[_index])
+                    plt.colorbar(im1, ax=flat_axs[_index], shrink=0.5)
+            
+            for _row in np.arange(nbr_rows):
+                for _col in np.arange(nbr_cols):
+                    _index = _col + _row * nbr_cols
+                    flat_axs[_index].axis('off')
+
+            plt.tight_layout()
+            plt.show()
+
+
