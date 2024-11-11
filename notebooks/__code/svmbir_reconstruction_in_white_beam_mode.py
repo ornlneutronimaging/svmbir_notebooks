@@ -255,9 +255,8 @@ class SvmbirReconstruction:
 
     # calculate center of rotation & tilt
     def select_sample_roi(self):
-        if self.strip_corrected_images is None:
-            # if the remove filter hasn't been ran
-            self.strip_corrected_images = self.corrected_images
+        if self.corrected_images is None:
+            self.corrected_images = self.normalized_images
 
         self.o_center_and_tilt = CenterOfRotationAndTilt(parent=self)
         self.o_center_and_tilt.select_range()

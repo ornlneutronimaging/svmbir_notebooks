@@ -92,6 +92,18 @@ class Load(Parent):
         elif self.data_type == DataType.ob:
             self.parent.configuration.top_folder.ob = top_folder
 
+    def save_list_of_angles(self, list_of_images):
+        base_list_of_images = [os.path.basename(_file) for _file in list_of_images]
+        list_of_angles = []
+        for _file in base_list_of_images:
+            _splitted_named = _file.split("_")
+            angle_degree = _splitted_named[-3]
+            angle_minute = _splitted_named[-2]
+            angle_value = float(f"{angle_degree}.{angle_minute}")
+            list_of_angles.append(angle_value)
+
+        self.parent.final_list_of_angles = np.array(list_of_angles)
+
     def load_white_beam_data(self):
         """ from white beam notebook """
         list_of_images = self.parent.list_of_images
@@ -103,14 +115,11 @@ class Load(Parent):
             if not list_of_images[_data_type]:
                 logging.info(f" no files selected!")
                 continue
-            
+
+            if _data_type == DataType.sample:
+                self.save_list_of_angles(list_of_images[_data_type])
+
             self.parent.master_3d_data_array[_data_type] = load_data_using_multithreading(list_of_images[_data_type])
-            # for _file in tqdm(list_of_images[_data_type]):
-            #     _data = load_tiff(_file)
-            #     logging.info(f"\t{_file}: {np.shape(_data)}")
-            #     _list_data.append(_data)
-                
-            # self.parent.master_3d_data_array[_data_type] = _list_data
             logging.info(f"{np.shape(self.parent.master_3d_data_array[_data_type]) = }")
             logging.info(f"\t{_data_type} Done !")
 

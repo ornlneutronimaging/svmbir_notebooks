@@ -9,7 +9,7 @@ import ipywidgets as widgets
 # from imars3d.backend.diagnostics.rotation import find_rotation_center
 
 from __code.parent import Parent
-from __code import DataType, Run
+from __code import DataType, Run, OperatingMode
 from __code.utilities.logging import logging_3d_array_infos
 
 
@@ -21,12 +21,12 @@ class CenterOfRotationAndTilt(Parent):
 
     display_plot = None
 
-    def _isolate_0_and_180_degrees_images(self):
-        list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
-        logging.info(f"\t{list_of_runs_to_use = }")
-        list_of_angles = np.array([self.parent.list_of_runs[DataType.sample][_key][Run.angle] for _key in list_of_runs_to_use])
-        self.parent.final_list_of_angles = list_of_angles
+    def _isolate_0_and_180_degrees_images_white_beam_mode(self):
+        logging.info(f"\tisolating 0 and 180 degres: ")
+        list_of_angles = self.parent.final_list_of_angles
+        self._saving_0_and_180(list_of_angles)
 
+    def _saving_0_and_180(self, list_of_angles):
         angles_minus_180 = [float(_value) - 180 for _value in list_of_angles]
         abs_angles_minus_180 = np.abs(angles_minus_180)
         minimum_value = np.min(abs_angles_minus_180)
@@ -40,8 +40,19 @@ class CenterOfRotationAndTilt(Parent):
         self.image_0_degree = self.parent.corrected_images[index_0_degree]
         self.image_180_degree = self.parent.corrected_images[index_180_degree]
 
+    def _isolate_0_and_180_degrees_images(self):
+        list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
+        logging.info(f"\t{list_of_runs_to_use = }")
+        list_of_angles = np.array([self.parent.list_of_runs[DataType.sample][_key][Run.angle] for _key in list_of_runs_to_use])
+        self.parent.final_list_of_angles = list_of_angles
+        self._saving_0_and_180(list_of_angles)
+
     def select_range(self):
-        self._isolate_0_and_180_degrees_images()
+        if self.parent.MODE == OperatingMode.tof:
+            self._isolate_0_and_180_degrees_images()
+        else:
+            self._isolate_0_and_180_degrees_images_white_beam_mode()
+
         height = self.parent.image_size['height']
 
         def plot_range(y_top, y_bottom):
