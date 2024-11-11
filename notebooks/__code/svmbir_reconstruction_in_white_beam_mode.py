@@ -203,12 +203,11 @@ class SvmbirReconstruction:
         self.o_norm.normalization_settings()
 
     def normalization_select_roi(self):
-        o_combine = CombineObDc(parent=self)
-        o_combine.run()
         self.o_norm.select_roi()
 
     def normalization(self):
-
+        o_combine = CombineObDc(parent=self)
+        o_combine.run()
         self.o_norm.run()
 
     def visualization_normalization_settings(self):
@@ -221,7 +220,7 @@ class SvmbirReconstruction:
         self.o_vizu.visualize(data_after=self.normalized_images,
                               label_before='cleaned',
                               label_after='normalized',
-                              data_before=self.master_3d_data_array_cleaned[DataType.sample],
+                              data_before=self.master_3d_data_array[DataType.sample],
                               turn_on_vrange=True)
         # self.o_norm.visualize_normalization()
 

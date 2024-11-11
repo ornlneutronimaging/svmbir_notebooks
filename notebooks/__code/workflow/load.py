@@ -114,6 +114,10 @@ class Load(Parent):
             logging.info(f"{np.shape(self.parent.master_3d_data_array[_data_type]) = }")
             logging.info(f"\t{_data_type} Done !")
 
+        [height, width] = np.shape(self.parent.master_3d_data_array[DataType.sample][0])
+        self.parent.image_size['height'] = height
+        self.parent.image_size['width'] = width
+
     def load_data(self, combine=False):
         """combine is True when working with white beam (from tof notebook)"""
         

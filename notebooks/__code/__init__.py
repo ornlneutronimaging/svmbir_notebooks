@@ -38,10 +38,15 @@ debug_folder = {OperatingMode.tof: {DataType.sample: "/SNS/VENUS/IPTS-33699/shar
                                             },
 }
 
-roi = {'left': 0,
-       'right': 74,
-       'top': 0,
-       'bottom': 49}
+roi = {OperatingMode.tof: {'left': 0,
+                            'right': 74,
+                            'top': 0,
+                            'bottom': 49},
+        OperatingMode.white_beam: {'left': 750,
+                                   'right': 5372,
+                                   'top': 3798,
+                                   'bottom': 5096},
+                                   }
 
 ANGSTROMS = u"\u212b"
 LAMBDA = u"\u03bb"

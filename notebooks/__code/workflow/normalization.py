@@ -107,10 +107,10 @@ class Normalization(Parent):
             return left, right, top, bottom                       
     
         if DEBUG:
-            default_left = roi['left']
-            default_right = roi['right']
-            default_top = roi['top']
-            defualt_bottom = roi['bottom']
+            default_left = roi[self.MODE]['left']
+            default_right = roi[self.MODE]['right']
+            default_top = roi[self.MODE]['top']
+            defualt_bottom = roi[self.MODE]['bottom']
         else:
             default_left = default_top = 0
             default_right = defualt_bottom = 20
@@ -132,48 +132,46 @@ class Normalization(Parent):
         display(self.display_roi)
 
     def run(self):
-        self.combine_obs()
-        self.normalize_runs()
+        self.normalize()
 
-    def combine_obs(self):
+    # def combine_obs(self):
         
-        logging.info(f"Combine obs:")
-        list_obs = self.parent.master_3d_data_array_cleaned[DataType.ob]
-        if len(list_obs) == 1:
-            self.obs_combined = np.array(list_obs[0])
-            logging.info(f"\tonly 1 ob, nothing to combine!")
-        else:
-            self.obs_combined = np.mean(list_obs, axis=0)
-            logging.info(f"\tcombining {len(list_obs)} obs.")
+    #     logging.info(f"Combine obs:")
+    #     list_obs = self.parent.master_3d_data_array_cleaned[DataType.ob]
+    #     if len(list_obs) == 1:
+    #         self.obs_combined = np.array(list_obs[0])
+    #         logging.info(f"\tonly 1 ob, nothing to combine!")
+    #     else:
+    #         self.obs_combined = np.mean(list_obs, axis=0)
+    #         logging.info(f"\tcombining {len(list_obs)} obs.")
         
-        temp_obs_combined = median_filter(self.obs_combined, size=2)
-        index_of_zero = np.where(self.obs_combined == 0)
-        self.obs_combined[index_of_zero] = temp_obs_combined[index_of_zero]
+    #     temp_obs_combined = median_filter(self.obs_combined, size=2)
+    #     index_of_zero = np.where(self.obs_combined == 0)
+    #     self.obs_combined[index_of_zero] = temp_obs_combined[index_of_zero]
 
-        logging_3d_array_infos(message="obs", array=self.obs_combined)
+    #     logging_3d_array_infos(message="obs", array=self.obs_combined)
 
-        list_proton_charge = []
-        for _run in self.parent.list_of_runs_to_use[DataType.ob]:
-            list_proton_charge.append(self.parent.list_of_runs[DataType.ob][_run][Run.proton_charge_c])
+    #     list_proton_charge = []
+    #     for _run in self.parent.list_of_runs_to_use[DataType.ob]:
+    #         list_proton_charge.append(self.parent.list_of_runs[DataType.ob][_run][Run.proton_charge_c])
 
-        self.mean_ob_proton_charge = np.mean(list_proton_charge)
-        logging.info(f"\tcalculated combined ob proton charge: {self.mean_ob_proton_charge}")
+    #     self.mean_ob_proton_charge = np.mean(list_proton_charge)
+    #     logging.info(f"\tcalculated combined ob proton charge: {self.mean_ob_proton_charge}")
 
-        use_frame = self.use_frames_ui.value
-        if use_frame:
-            list_frame = []
-            for _run in self.parent.list_of_runs_to_use[DataType.ob]:
-                frame_number = self.parent.list_of_runs[DataType.ob][_run][Run.frame_number]
-                if frame_number:
-                    list_frame.append(frame_number)
-                else:
-                    self.mean_ob_frame_number = 1
-            mean_frame_number = np.mean(np.array(list_frame))
-            self.mean_ob_frame_number = mean_frame_number
+    #     use_frame = self.use_frames_ui.value
+    #     if use_frame:
+    #         list_frame = []
+    #         for _run in self.parent.list_of_runs_to_use[DataType.ob]:
+    #             frame_number = self.parent.list_of_runs[DataType.ob][_run][Run.frame_number]
+    #             if frame_number:
+    #                 list_frame.append(frame_number)
+    #             else:
+    #                 self.mean_ob_frame_number = 1
+    #         mean_frame_number = np.mean(np.array(list_frame))
+    #         self.mean_ob_frame_number = mean_frame_number
     
-    def normalize_runs(self):
-        master_3d_data = self.parent.master_3d_data_array_cleaned
-        list_of_runs_used = self.parent.list_of_runs_to_use
+    def normalize(self):
+        master_3d_data = self.parent.master_3d_data_array
         normalized_data = []
 
         list_proton_charge = {DataType.sample: [],
@@ -181,15 +179,15 @@ class Normalization(Parent):
                              }
 
         logging.info(f"Normalization:")
-        logging_3d_array_infos(array=self.mean_ob_proton_charge, message="mean_ob_proton_charge")
+        # logging_3d_array_infos(array=self.mean_ob_proton_charge, message="mean_ob_proton_charge")
 
-        use_proton_charge = self.use_proton_charge_ui.value
-        use_frame = self.use_frames_ui.value
+        # use_proton_charge = self.use_proton_charge_ui.value
+        # use_frame = self.use_frames_ui.value
         use_roi = self.use_roi_ui.value
 
         logging.info(f"\tnormalization settings:")
-        logging.info(f"\t\t- use proton charge: {use_proton_charge}")
-        logging.info(f"\t\t- use_frame: {use_frame}")
+        # logging.info(f"\t\t- use proton charge: {use_proton_charge}")
+        # logging.info(f"\t\t- use_frame: {use_frame}")
         logging.info(f"\t\t- use_roi: {use_roi}")
 
         if use_roi:
@@ -199,50 +197,55 @@ class Normalization(Parent):
             self.parent.configuration.normalization_roi.left = left
             self.parent.configuration.normalization_roi.right = right
 
-        obs_combined = self.obs_combined
-        final_list_of_angles = []
-
         # update configuration
         list_norm_settings = []
-        if use_proton_charge:
-            list_norm_settings.append(NormalizationSettings.pc)
-        if use_frame:
-            list_norm_settings.append(NormalizationSettings.frame_number)
+        # if use_proton_charge:
+        #     list_norm_settings.append(NormalizationSettings.pc)
+        # if use_frame:
+        #     list_norm_settings.append(NormalizationSettings.frame_number)
         if use_roi:
             list_norm_settings.append(NormalizationSettings.roi)
         self.parent.configuration.list_normalization_settings = list_norm_settings
 
-        for _index, _run in enumerate(list_of_runs_used[DataType.sample]):
+        ob_data_combined = self.parent.master_3d_data_array[DataType.ob]
+        dc_data_combined = None if (self.parent.list_of_images[DataType.dc] is None) else self.parent.master_3d_data_array[DataType.dc]
 
-            sample_proton_charge = self.parent.list_of_runs[DataType.sample][_run][Run.proton_charge_c]
-            angle = self.parent.list_of_runs[DataType.sample][_run][Run.angle]
-            final_list_of_angles.append(angle)
-            list_proton_charge[DataType.sample].append(sample_proton_charge)
-            logging.info(f"\t{_run} has a proton charge of {sample_proton_charge} and angle of {angle}")
+        for _index, sample_data in enumerate(self.parent.master_3d_data_array[DataType.sample]):
+
+            # sample_proton_charge = self.parent.list_of_runs[DataType.sample][_run][Run.proton_charge_c]
+            # angle = self.parent.list_of_runs[DataType.sample][_run][Run.angle]
+            # final_list_of_angles.append(angle)
+            # list_proton_charge[DataType.sample].append(sample_proton_charge)
+            # logging.info(f"\t{_run} has a proton charge of {sample_proton_charge} and angle of {angle}")
             
             sample_data = np.array(master_3d_data[DataType.sample][_index])
 
             coeff = 1
-            if use_proton_charge:
-                coeff *= self.mean_ob_proton_charge / sample_proton_charge
+            # if use_proton_charge:
+            #     coeff *= self.mean_ob_proton_charge / sample_proton_charge
 
-            if use_frame:
-                _sample_frame = self.parent.list_of_runs[DataType.sample][_run][Run.frame_number]
-                coeff *= self.mean_ob_frame_number / _sample_frame
+            # if use_frame:
+            #     _sample_frame = self.parent.list_of_runs[DataType.sample][_run][Run.frame_number]
+            #     coeff *= self.mean_ob_frame_number / _sample_frame
 
             if use_roi:
                 sample_roi_counts = np.sum(sample_data[top: bottom+1, left: right+1])
-                ob_roi_counts = np.sum(obs_combined[top: bottom+1, left: right+1])
+                ob_roi_counts = np.sum(ob_data_combined[top: bottom+1, left: right+1])
                 coeff *= ob_roi_counts / sample_roi_counts
 
             logging_3d_array_infos(message="sample_data", array=sample_data)
-            normalized_sample = np.divide(sample_data, self.obs_combined) * coeff
+
+            if dc_data_combined:
+                num = np.substract(sample_data, dc_data_combined)
+                den = np.substract(ob_data_combined, dc_data_combined)
+                normalized_sample = np.divide(num, den) * coeff
+            else:
+                normalized_sample = np.divide(sample_data, ob_data_combined) * coeff
+
             logging_3d_array_infos(message="after normalization", array=normalized_sample)
             normalized_data.append(normalized_sample) 
-            logging.info(f"\tnormalization of {_run} is done!")
 
         self.parent.normalized_images = normalized_data
-        self.parent.final_list_of_angles = final_list_of_angles
 
     # def visualization_normalization_settings(self):
     #     self.display_ui = widgets.ToggleButtons(options=['1 image at a time',

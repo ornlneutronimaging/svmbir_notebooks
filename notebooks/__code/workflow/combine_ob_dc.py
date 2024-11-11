@@ -15,7 +15,7 @@ class CombineObDc(Parent):
 
         list_to_combine = [DataType.ob, DataType.dc]
         for _data_type in list_to_combine:
-            if master_3d_data_array[_data_type]:
+            if self.parent.list_of_images[_data_type]:
                 master_3d_data_array[_data_type] = np.median(master_3d_data_array[_data_type], axis=0)
                 logging.info(f"\t{_data_type} -> {np.shape(master_3d_data_array[_data_type])}")
             else:

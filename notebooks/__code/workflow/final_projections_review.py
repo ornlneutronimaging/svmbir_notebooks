@@ -18,9 +18,8 @@ class FinalProjectionsReview(Parent):
 
         nbr_images = len(array)
 
-
-        list_angles = self.parent.final_list_of_angles
-        list_runs = self.parent.list_of_runs_to_use[DataType.sample]
+        # list_angles = self.parent.final_list_of_angles
+        # list_runs = self.parent.list_of_runs_to_use[DataType.sample]
 
         nbr_cols = 5
         nbr_rows = int(np.ceil(nbr_images / nbr_cols))
@@ -30,16 +29,16 @@ class FinalProjectionsReview(Parent):
         flat_axs = axs.flatten()
 
         _index = 0
-        list_runs_with_infos = []
+        # list_runs_with_infos = []
         for _row in np.arange(nbr_rows):
             for _col in np.arange(nbr_cols):
                 _index = _col + _row * nbr_cols
                 if _index == (nbr_images):
                     break
-                title = f"{list_runs[_index]}, {list_angles[_index]}"
-                list_runs_with_infos.append(title)
-                flat_axs[_index].set_title(title)
-                im1 = flat_axs[_index].imshow(array[_index])
+                # title = f"{list_runs[_index]}, {list_angles[_index]}"
+                # list_runs_with_infos.append(title)
+                # flat_axs[_index].set_title(title)
+                im1 = flat_axs[_index].imshow(array[_index], vmin=0, vmax=1)
                 plt.colorbar(im1, ax=flat_axs[_index], shrink=0.5)
            
         for _row in np.arange(nbr_rows):
@@ -47,7 +46,7 @@ class FinalProjectionsReview(Parent):
                 _index = _col + _row * nbr_cols
                 flat_axs[_index].axis('off')
 
-        self.list_runs_with_infos = list_runs_with_infos
+        # self.list_runs_with_infos = list_runs_with_infos
 
         plt.tight_layout()
         plt.show()

@@ -23,7 +23,7 @@ class Visualization(Parent):
 
         if self.display_ui.value == '1 image at a time':
 
-            list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
+            list_of_images = self.parent.list_of_images[DataType.sample]
             
             if turn_on_vrange:
 
@@ -39,7 +39,7 @@ class Visualization(Parent):
                     fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
 
                     _norm_data = data_after[image_index]
-                    _run_number = list_of_runs_to_use[image_index]
+                    # _run_number = list_of_images[image_index]
                     _raw_data = data_before[image_index]
 
                     im0 = axs[0].imshow(_raw_data, vmin=vmin_before, vmax=vmax_before)
@@ -57,12 +57,12 @@ class Visualization(Parent):
 
                 display_plot = interactive(plot_norm,
                                         image_index=widgets.IntSlider(min=0,
-                                                                        max=len(list_of_runs_to_use)-1,
+                                                                        max=len(list_of_images)-1,
                                                                         value=0),
                                         vmin_before=widgets.IntSlider(min=vmin_before, max=vmax_before, value=vmin_before),
                                         vmax_before=widgets.IntSlider(min=vmin_before, max=vmax_before, value=vmax_before),
-                                        vmin_after=widgets.IntSlider(min=vmin_after, max=vmax_after, value=vmin_after),
-                                        vmax_after=widgets.IntSlider(min=vmin_after, max=vmax_after, value=vmax_after))
+                                        vmin_after=widgets.IntSlider(min=vmin_after, max=vmax_after, value=0),
+                                        vmax_after=widgets.IntSlider(min=vmin_after, max=vmax_after, value=1))
 
             else:
 
@@ -71,7 +71,7 @@ class Visualization(Parent):
                     fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
 
                     _norm_data = data_after[image_index]
-                    _run_number = list_of_runs_to_use[image_index]
+                    # _run_number = list_of_images[image_index]
                     _raw_data = data_before[image_index]
 
                     im0 = axs[0].imshow(_raw_data)
@@ -89,7 +89,7 @@ class Visualization(Parent):
 
                 display_plot = interactive(plot_norm,
                                         image_index=widgets.IntSlider(min=0,
-                                                                        max=len(list_of_runs_to_use)-1,
+                                                                        max=len(list_of_images)-1,
                                                                         value=0),
                 )
                 
