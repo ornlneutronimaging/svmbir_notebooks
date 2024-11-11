@@ -103,8 +103,8 @@ class SvmbirReconstruction:
     # this is the master dictionary used no matter the mode
     master_tof_3d_data_array = None
 
-    master_3d_data_array_cleaned = {DataType.sample: None,  # [angle, y, x]
-                                    DataType.ob: None}
+    # master_3d_data_array_cleaned = {DataType.sample: None,  # [angle, y, x]
+    #                                 DataType.ob: None}
 
     normalized_images = None   # after normalization
     corrected_images = None  # after chips correction
@@ -186,23 +186,6 @@ class SvmbirReconstruction:
         o_visualization = Visualization(parent=self)
         o_visualization.visualize_all_images_at_once()
 
-
-
-
-    # combine OB and DC
-    def combine(self):
-        o_combine = CombineObDc(parent=self)
-        o_combine.run()
-
-
-
-
-
-
-    def combine_tof_mode_data(self):
-        if self.o_tof_range_mode:
-            self.o_tof_range_mode.combine_tof_mode_data()
-
     # cleaning low/high pixels
     def clean_images_settings(self):
         self.o_clean = ImagesCleaner(parent=self)
@@ -214,32 +197,18 @@ class SvmbirReconstruction:
     def clean_images(self):
         self.o_clean.cleaning()
 
-    def visualization_cleaning_settings(self):
-        self.o_vizu = Visualization(parent=self)
-        self.o_vizu.settings()
-
-    def visualization_cleaning(self):
-        self.o_vizu.visualize(data_after=self.master_3d_data_array_cleaned[DataType.sample],
-                              label_after='cleaned',
-                              label_before='raw',
-                              data_before=self.master_3d_data_array[DataType.sample],
-                              turn_on_vrange=False)
-
-    def select_export_folder(self):
-        self.o_clean.select_export_folder()
-
-    def export_cleaned_images(self):
-        self.o_clean.export_clean_images()
-
     # normalization
     def normalization_settings(self):
         self.o_norm = Normalization(parent=self)
         self.o_norm.normalization_settings()
 
     def normalization_select_roi(self):
+        o_combine = CombineObDc(parent=self)
+        o_combine.run()
         self.o_norm.select_roi()
 
     def normalization(self):
+
         self.o_norm.run()
 
     def visualization_normalization_settings(self):

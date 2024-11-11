@@ -63,10 +63,11 @@ class Normalization(Parent):
     def normalization_settings(self):
 
         self.use_proton_charge_ui = widgets.Checkbox(value=True,
-                                                description='Use proton charge')
+                                                description='Use proton charge',
+                                                disabled=True)
         self.use_frames_ui = widgets.Checkbox(value=False,
                                          description='Use frames',
-                                         disabled=self.parent.at_least_one_frame_number_not_found,
+                                         disabled=True,
                                          )
         self.use_roi_ui = widgets.Checkbox(value=True,
                                       description='Use ROI')
@@ -81,7 +82,7 @@ class Normalization(Parent):
             logging.info(f"User skipped normalization ROI selection.")
             return
 
-        integrated_images = np.log(np.min(self.parent.master_3d_data_array_cleaned[DataType.sample], axis=0))
+        integrated_images = np.log(np.min(self.parent.master_3d_data_array[DataType.sample], axis=0))
         height = self.parent.image_size['height']
         width = self.parent.image_size['width']
 

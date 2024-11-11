@@ -61,17 +61,26 @@ class ImagesCleaner(Parent):
         self.parent.configuration.list_clean_algorithm = list_algo
 
         if self.histo_ui.value:
-            sample_data = self.parent.master_3d_data_array[DataType.sample]
-            ob_data = self.parent.master_3d_data_array[DataType.ob]
+            sample_data = np.array(self.parent.master_3d_data_array[DataType.sample])
+            ob_data = np.array(self.parent.master_3d_data_array[DataType.ob])
+            dc_data = None
+            if self.parent.master_3d_data_array[DataType.dc]:
+                dc_data = self.parent.master_3d_data_array[DataType.dc]
 
             sample_histogram = sample_data.sum(axis=0)[self.edge_nbr_pixels: -self.edge_nbr_pixels,
                                                     self.edge_nbr_pixels: -self.edge_nbr_pixels]
             ob_histogram = ob_data.sum(axis=0)[self.edge_nbr_pixels: -self.edge_nbr_pixels,
                                             self.edge_nbr_pixels: -self.edge_nbr_pixels]
 
+            if dc_data:
+                dc_histogram = dc_data.sum(axis=0)[self.edge_nbr_pixels: -self.edge_nbr_pixels,
+                                self.edge_nbr_pixels: -self.edge_nbr_pixels]
+
+            nrows = 2 if dc_data is None else 3
+            
             def plot_histogram(nbr_bins=10, nbr_exclude=1):
             
-                fig, axs = plt.subplots(nrows=2, ncols=1)
+                fig, axs = plt.subplots(nrows=nrows, ncols=1)
                 _, sample_bin_edges = np.histogram(sample_histogram.flatten(), bins=nbr_bins, density=False)
                 axs[0].hist(sample_histogram.flatten(), bins=nbr_bins)
                 axs[0].set_title('sample histogram')
@@ -87,6 +96,16 @@ class ImagesCleaner(Parent):
                 axs[1].axvspan(ob_bin_edges[-nbr_exclude-1], ob_bin_edges[-1], facecolor='red', alpha=0.2)
                 plt.tight_layout()
                 plt.show()
+
+                if dc_data:
+                    _, dc_bin_edges = np.histogram(dc_histogram.flatten(), bins=nbr_bins, density=False)
+                    axs[2].hist(dc_histogram.flatten(), bins=nbr_bins)
+                    axs[2].set_title('dc histogram')
+                    axs[2].set_yscale('log')
+                    axs[2].axvspan(dc_bin_edges[0], dc_bin_edges[nbr_exclude], facecolor='red', alpha=0.2)
+                    axs[2].axvspan(dc_bin_edges[-nbr_exclude-1], dc_bin_edges[-1], facecolor='red', alpha=0.2)
+                    plt.tight_layout()
+                    plt.show()
 
                 return nbr_bins, nbr_exclude
 
@@ -107,10 +126,10 @@ class ImagesCleaner(Parent):
 
     def cleaning(self):
 
-        sample_data = self.parent.master_3d_data_array[DataType.sample]
-        ob_data = self.parent.master_3d_data_array[DataType.ob]
-        self.parent.master_3d_data_array_cleaned = {DataType.sample: sample_data,
-                                                    DataType.ob: ob_data}
+        # sample_data = self.parent.master_3d_data_array[DataType.sample]
+        # ob_data = self.parent.master_3d_data_array[DataType.ob]
+        # self.parent.master_3d_data_array = {DataType.sample: sample_data,
+        #                                             DataType.ob: ob_data}
 
         self.cleaning_by_histogram()
         self.cleaning_by_imars3d()
@@ -121,14 +140,19 @@ class ImagesCleaner(Parent):
             logging.info(f"cleaning using tomopy: OFF")
             return
     
-        sample_data = np.array(self.parent.master_3d_data_array_cleaned[DataType.sample])
+        sample_data = np.array(self.parent.master_3d_data_array[DataType.sample])
         cleaned_sample = gamma_filter(arrays=sample_data)
-        self.parent.master_3d_data_array_cleaned[DataType.sample] = cleaned_sample
+        self.parent.master_3d_data_array[DataType.sample] = cleaned_sample
                 
-        ob_data = np.array(self.parent.master_3d_data_array_cleaned[DataType.ob])
+        ob_data = np.array(self.parent.master_3d_data_array[DataType.ob])
         cleaned_ob = gamma_filter(arrays=ob_data)
-        self.parent.master_3d_data_array_cleaned[DataType.ob] = cleaned_ob
+        self.parent.master_3d_data_array[DataType.ob] = cleaned_ob
 
+        if self.parent.list_of_images[DataType.dc]:
+            dc_data = np.array(self.parent.master_3d_data_array[DataType.dc])
+            cleaned_dc = gamma_filter(arrays=dc_data)
+            self.parent.master_3d_data_array[DataType.dc] = cleaned_dc
+            
     def cleaning_by_histogram(self):
 
         if not self.histo_ui.value:
@@ -141,8 +165,9 @@ class ImagesCleaner(Parent):
         self.parent.configuration.histogram_cleaning_settings.nbr_bins = self.nbr_bins
         self.parent.configuration.histogram_cleaning_settings.bins_to_exclude = nbr_bins_to_exclude
 
-        sample_data = self.parent.master_3d_data_array_cleaned[DataType.sample]
-        ob_data = self.parent.master_3d_data_array_cleaned[DataType.ob]
+        sample_data = self.parent.master_3d_data_array[DataType.sample]
+        ob_data = self.parent.master_3d_data_array[DataType.ob]
+        dc_data = self.parent.master_3d_data_array[DataType.dc]
 
         if nbr_bins_to_exclude == 0:
             logging.info(f"0 bin selected, the raw data will be used!")
@@ -162,7 +187,7 @@ class ImagesCleaner(Parent):
                                             high_gate=self.nbr_bins - nbr_bins_to_exclude,
                                             correct_radius=self.r)
                 cleaned_sample_data.append(cleaned_im)          
-            self.parent.master_3d_data_array_cleaned[DataType.sample] = cleaned_sample_data
+            self.parent.master_3d_data_array[DataType.sample] = cleaned_sample_data
             logging.info(f"\tcleaned sample!")
 
             logging.info(f"\tcleaning ob ...")
@@ -174,34 +199,46 @@ class ImagesCleaner(Parent):
                                             high_gate=self.nbr_bins - nbr_bins_to_exclude,
                                             correct_radius=self.r)
                 cleaned_ob_data.append(cleaned_im)          
-            self.parent.master_3d_data_array_cleaned[DataType.ob] = cleaned_ob_data
+            self.parent.master_3d_data_array[DataType.ob] = cleaned_ob_data
             logging.info(f"\tcleaned ob!")
-             
-    def check_cleaned_pixels(self):
 
-        sample_data = self.parent.master_3d_data_array[DataType.sample]  
-        nbr_images = len(sample_data)     
-        sample_data_cleaned = self.parent.master_3d_data_array_cleaned[DataType.sample]
+            if self.parent.list_of_images[DataType.dc]:
+                logging.info(f"\tcleaning dc ...")
+                cleaned_dc_data = []
+                for _data in tqdm(dc_data):
+                    cleaned_im = replace_pixels(im=_data.copy(),
+                                                nbr_bins=self.nbr_bins,
+                                                low_gate=nbr_bins_to_exclude,
+                                                high_gate=self.nbr_bins - nbr_bins_to_exclude,
+                                                correct_radius=self.r)
+                    cleaned_dc_data.append(cleaned_im)          
+                self.parent.master_3d_data_array[DataType.ob] = cleaned_dc_data
+                logging.info(f"\tcleaned dc!")
 
-        def plot_cleaned_pixesl(image_index):
+    # def check_cleaned_pixels(self):
+    #     sample_data = self.parent.master_3d_data_array[DataType.sample]  
+    #     nbr_images = len(sample_data)     
+    #     sample_data_cleaned = self.parent.master_3d_data_array[DataType.sample]
+
+    #     def plot_cleaned_pixesl(image_index):
             
-            fig, axs = plt.subplots(nrows=1, ncols=2)
+    #         fig, axs = plt.subplots(nrows=1, ncols=2)
 
-            im1 = axs[0].imshow(sample_data[image_index])
-            axs[0].set_title(f"Raw image #{image_index}")
-            plt.colorbar(im1, ax=axs[0])
-            im2 = axs[1].imshow(sample_data_cleaned[image_index])
-            axs[1].set_title(f"Cleaned image #{image_index}")
-            plt.colorbar(im2, ax=axs[1])
+    #         im1 = axs[0].imshow(sample_data[image_index])
+    #         axs[0].set_title(f"Raw image #{image_index}")
+    #         plt.colorbar(im1, ax=axs[0])
+    #         im2 = axs[1].imshow(sample_data_cleaned[image_index])
+    #         axs[1].set_title(f"Cleaned image #{image_index}")
+    #         plt.colorbar(im2, ax=axs[1])
 
-            plt.tight_layout()
-            plt.show()
+    #         plt.tight_layout()
+    #         plt.show()
 
-        display_comparison = interactive(plot_cleaned_pixesl,
-                                         image_index = widgets.IntSlider(min=0,
-                                                                         max=nbr_images-1,
-                                                                         value=0))
-        display(display_comparison)
+    #     display_comparison = interactive(plot_cleaned_pixesl,
+    #                                      image_index = widgets.IntSlider(min=0,
+    #                                                                      max=nbr_images-1,
+    #                                                                      value=0))
+    #     display(display_comparison)
         
     def select_export_folder(self):
         o_load = Load(parent=self.parent)

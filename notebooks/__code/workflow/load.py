@@ -109,7 +109,7 @@ class Load(Parent):
                 logging.info(f"\t{_file}: {np.shape(_data)}")
                 _list_data.append(_data)
                 
-            self.parent.master_3d_data_array[_data_type] = _list_data 
+            self.parent.master_3d_data_array[_data_type] = _list_data
             logging.info(f"{np.shape(self.parent.master_3d_data_array[_data_type]) = }")
             logging.info(f"\t{_data_type} Done !")
 
