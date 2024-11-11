@@ -4,11 +4,11 @@ import numpy as np
 import logging
 from tqdm import tqdm
 
-from __code import DataType, Run
+from __code import DataType, Run, OperatingMode
 from __code import DEBUG, debug_folder
 from __code.parent import Parent
 from __code.utilities.file_folder_browser import FileFolderBrowser
-from __code.utilities.load import load_data_using_multithreading
+from __code.utilities.load import load_data_using_multithreading, load_list_of_tif, load_tiff
 from __code.utilities.files import retrieve_list_of_tif
 
 
@@ -50,6 +50,7 @@ class Load(Parent):
         if DEBUG:
             working_dir = debug_folder[self.parent.MODE][data_type]
             list_images = glob.glob(os.path.join(working_dir, "*.tif*"))
+            list_images.sort()
             self.images_selected(list_images=list_images)
             return
 
@@ -59,26 +60,54 @@ class Load(Parent):
                                                  filters={"TIFF": "*.tif*"})
     
     def images_selected(self, list_images):
+        if list_images:
+            print(f"top {self.data_type} folder is: {os.path.dirname(list_images[0])}")
+        else:
+            print(f"no {self.data_type} selected !")
+            return
+        
+        list_images.sort()
         logging.info(f"{len(list_images)} {self.data_type} images have been selected!")
         self.parent.list_of_images[self.data_type] = list_images
-
-
-
-
-
-
 
     def data_selected(self, top_folder):
         logging.info(f"{self.parent.current_data_type} top folder selected: {top_folder}")
         self.parent.working_dir[self.data_type] = top_folder
         print(f"Top {self.data_type} folder selected: {top_folder}")
+
+        if self.parent.MODE == OperatingMode.white_beam:
+            list_tiff = glob.glob(os.path.join(top_folder, "*.tif*"))
+
+            if DEBUG:
+                list_tiff = list_tiff[0:3]
+
+            list_tiff.sort()
+            self.parent.list_of_images[self.data_type] = list_tiff
+            logging.info(f"{len(list_tiff)} {self.data_type} files will be loaded!")
+
         if self.data_type == DataType.sample:
             self.parent.configuration.top_folder.sample = top_folder
         elif self.data_type == DataType.ob:
             self.parent.configuration.top_folder.ob = top_folder
 
+    def load_white_beam_data(self):
+        """ from white beam notebook """
+        list_of_images = self.parent.list_of_images
+        logging.info(f"loading the data:")
+
+        master_3d_data_array = {}
+        for _data_type in list_of_images.keys():
+            logging.info(f"\t{_data_type} ... ")
+            _list_data = []
+            for _file in tqdm(list_of_images[_data_type]):
+                _list_data.append(load_tiff(_file))
+            master_3d_data_array[_data_type] = _list_data 
+            logging.info(f"\t{_data_type} Done !")
+
+        self.parent.master_3d_data_array = master_3d_data_array               
+
     def load_data(self, combine=False):
-        """combine is True when working with white beam"""
+        """combine is True when working with white beam (from tof notebook)"""
         
         logging.info(f"importing the data:")
        

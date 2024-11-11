@@ -10,6 +10,7 @@ from __code.utilities.files import retrieve_list_of_tif
 def _worker(fl):
     return (imread(fl).astype(np.float32)).swapaxes(0,1)
 
+
 def load_data_using_multithreading(list_tif, combine_tof=False):
     with mp.Pool(processes=40) as pool:
         data = pool.map(_worker, list_tif)
@@ -19,11 +20,24 @@ def load_data_using_multithreading(list_tif, combine_tof=False):
     else:
         return np.array(data)
 
+
 def load_data(folder):
     list_tif = retrieve_list_of_tif(folder)
     o_norm = Normalization()
     o_norm.load(list_tif)
     return o_norm.data['sample']['data']
+
+
+def load_list_of_tif(list_of_tiff):
+    o_norm = Normalization()
+    o_norm.load(list_of_tiff)
+    return o_norm.data['sample']['data']
+
+def load_tiff(tif_file_name):
+    o_norm = Normalization()
+    o_norm.load(tif_file_name)
+    return o_norm.data['sample']['data']
+
 
 def load_data_using_imread(folder):
     list_tif = retrieve_list_of_tif(folder)

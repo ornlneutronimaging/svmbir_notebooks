@@ -3,7 +3,7 @@ import logging
 from collections import OrderedDict
 
 
-from __code import DataType, OperatingMode, DEFAULT_OPERATING_MODE
+from __code import DataType, OperatingMode, DEFAULT_OPERATING_MODE, DEBUG
 from __code.utilities.logging import setup_logging
 from __code.utilities.configuration_file import Configuration
 
@@ -85,6 +85,7 @@ class SvmbirReconstruction:
     at_least_one_frame_number_not_found = False
 
     # dictionary used just after loading the data, not knowing the mode yet
+    # or the tiff images in using the white beam notebook
     master_3d_data_array = {DataType.sample: None,  # [angle, y, x]
                             DataType.ob: None}
     
@@ -158,6 +159,8 @@ class SvmbirReconstruction:
         self.working_dir[DataType.processed] = os.path.join(top_sample_dir, "shared", "processed_data")
         logging.info(f"working_dir: {self.working_dir}")
         logging.info(f"instrument: {self.instrument}")
+        if DEBUG:
+            logging.info(f"WARNING!!!! we are running using DEBUG mode!")
 
     # Selection of data
     def select_top_sample_folder(self):
@@ -172,39 +175,19 @@ class SvmbirReconstruction:
         o_load = Load(parent=self)
         o_load.select_images(data_type=DataType.dc)
 
-
-
-
-
-    # def select_top_ob_folder(self):
-    #     o_load = Load(parent=self)
-    #     o_load.select_folder(data_type=DataType.ob)
-
-    # Checking data (proton charge, empty runs ...)
-    def checking_data(self):
-        try:
-            o_checking = CheckingData(parent=self)
-            o_checking.run()
-        except ValueError:
-            logging.info("Check the input folders provided !")
-
-    def recap_data(self):
-        o_recap = RecapData(parent=self)
-        o_recap.run()
-
-    def checkin_data_entries(self):
-        o_check = CheckingData(parent=self)
-        o_check.checking_minimum_requirements()
-
-    # mode selection
-    def mode_selection(self):
-        self.o_mode = ModeSelection(parent=self)
-        self.o_mode.select()
-
     # load data
     def load_data(self):
-        self.o_mode.load()
+        o_mode = Load(parent=self)
+        o_mode.load_white_beam_data()
         
+
+
+
+
+
+
+
+
     def select_tof_ranges(self):
         if self.operating_mode == OperatingMode.white_beam:
             return
