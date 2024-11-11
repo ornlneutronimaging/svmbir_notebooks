@@ -21,6 +21,7 @@ from __code.workflow.svmbir_handler import SvmbirHandler
 from __code.workflow.final_projections_review import FinalProjectionsReview
 from __code.workflow.export import ExportExtra
 from __code.workflow.visualization import Visualization
+from __code.workflow.rotate import Rotate
 
 LOG_BASENAME_FILENAME = "svmbir_reconstruction_white_beam_mode"
 
@@ -214,15 +215,27 @@ class SvmbirReconstruction:
         self.o_vizu = Visualization(parent=self)
         self.o_vizu.settings()
 
-        # self.o_norm.visualization_normalization_settings()
-
     def visualize_normalization(self):
         self.o_vizu.visualize(data_after=self.normalized_images,
                               label_before='cleaned',
                               label_after='normalized',
                               data_before=self.master_3d_data_array[DataType.sample],
                               turn_on_vrange=True)
-        # self.o_norm.visualize_normalization()
+    
+    # rotate sample
+    def rotate_data_settings(self):
+        self.o_rotate = Rotate(parent=self)
+        self.o_rotate.set_settings()
+
+    def apply_rotation(self):
+        self.o_rotate.apply_rotation()
+
+    def visualize_after_rotation(self):
+        o_review = FinalProjectionsReview(parent=self)
+        o_review.run(array=self.normalized_images)
+
+
+
 
     def select_export_normalized_folder(self):
         o_select = Load(parent=self)
