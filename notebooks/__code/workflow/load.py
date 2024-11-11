@@ -99,17 +99,18 @@ class Load(Parent):
 
         for _data_type in list_of_images.keys():
             logging.info(f"\t{_data_type} ... ")
-            _list_data = []
+
             if not list_of_images[_data_type]:
                 logging.info(f" no files selected!")
                 continue
             
-            for _file in tqdm(list_of_images[_data_type]):
-                _data = load_tiff(_file)
-                logging.info(f"\t{_file}: {np.shape(_data)}")
-                _list_data.append(_data)
+            self.parent.master_3d_data_array[_data_type] = load_data_using_multithreading(list_of_images[_data_type])
+            # for _file in tqdm(list_of_images[_data_type]):
+            #     _data = load_tiff(_file)
+            #     logging.info(f"\t{_file}: {np.shape(_data)}")
+            #     _list_data.append(_data)
                 
-            self.parent.master_3d_data_array[_data_type] = _list_data
+            # self.parent.master_3d_data_array[_data_type] = _list_data
             logging.info(f"{np.shape(self.parent.master_3d_data_array[_data_type]) = }")
             logging.info(f"\t{_data_type} Done !")
 
