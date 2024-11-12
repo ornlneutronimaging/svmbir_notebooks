@@ -22,6 +22,7 @@ from __code.workflow.final_projections_review import FinalProjectionsReview
 from __code.workflow.export import ExportExtra
 from __code.workflow.visualization import Visualization
 from __code.workflow.rotate import Rotate
+from __code.workflow.crop import Crop
 
 LOG_BASENAME_FILENAME = "svmbir_reconstruction_white_beam_mode"
 
@@ -264,11 +265,15 @@ class SvmbirReconstruction:
     def calculate_center_of_rotation_and_tilt(self):
         self.o_center_and_tilt.run()
 
-    # last chance to reject runs
-    def final_projections_review(self):
-        o_review = FinalProjectionsReview(parent=self)
-        o_review.run(array=self.corrected_images)
-        o_review.list_runs_to_reject()
+    # crop data
+    def crop_settings(self):
+        if self.corrected_images is None:
+            self.corrected_images = self.normalized_images
+        self.o_crop = Crop(parent=self)
+        self.o_crop.set_region()
+
+    def crop(self):
+        self.o_crop.run()
 
     # run svmbir
     def svmbir_settings(self):
