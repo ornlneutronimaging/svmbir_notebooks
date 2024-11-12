@@ -47,6 +47,15 @@ roi = {OperatingMode.tof: {'left': 0,
                                    'top': 3798,
                                    'bottom': 5096},
                                    }
+crop_roi = {OperatingMode.tof: {'left': 0,
+                            'right': 74,
+                            'top': 0,
+                            'bottom': 49},
+        OperatingMode.white_beam: {'left': 2549,
+                                   'right': 5072,
+                                   'top': 549,
+                                   'bottom': 5496},
+                                   }
 
 ANGSTROMS = u"\u212b"
 LAMBDA = u"\u03bb"

@@ -37,7 +37,7 @@ class SvmbirHandler(Parent):
 
             fig, axs = plt.subplots(nrows=1, ncols=1)
 
-            axs.set_title(f"{list_runs[image_index]}, angle: {list_angles[image_index]}")
+            axs.set_title(f"angle: {list_angles[image_index]}")
             axs.imshow(corrected_array[image_index], vmin=0, vmax=1)
             axs.axhspan(top_slice, bottom_slice, color='blue', alpha=0.3)
             axs.axhline(top_slice, color='red', linestyle='--')
@@ -90,7 +90,7 @@ class SvmbirHandler(Parent):
     def display_sinograms(self):
 
         corrected_array = self.parent.corrected_images
-        height = self.parent.image_size['height']
+        height, _ = np.shape(corrected_array[0])
         
         def display_sinograms(slice_index):
 
@@ -126,33 +126,33 @@ class SvmbirHandler(Parent):
         corrected_array = self.parent.corrected_images
         height = self.parent.image_size['height']
         width = self.parent.image_size['width']
-        list_of_angles = np.array(self.parent.list_of_angles_to_use_sorted)
+        list_of_angles = np.array(self.parent.final_list_of_angles)
         list_of_angles_rad = np.array([np.deg2rad(float(_angle)) for _angle in list_of_angles])
-        list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
+        # list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
         list_of_sample_pc = self.parent.final_dict_of_pc[DataType.sample]
         list_of_sample_pc_to_use = list_of_sample_pc
 
         list_of_sample_frame_number = self.parent.final_dict_of_frame_number[DataType.sample]
         list_of_sample_frame_number_to_use = list_of_sample_frame_number
         
-        # looking at list of runs to reject
-        list_of_index_of_runs_to_exlude, list_runs_to_exclude = self._get_list_of_index_of_runs_to_exclude()
-        if list_of_index_of_runs_to_exlude:
-            logging.info(f"\tUser wants to reject the following runs: {list_runs_to_exclude}!")
-            corrected_array = np.delete(corrected_array, list_of_index_of_runs_to_exlude, axis=0)
-            list_of_angles_rad = np.delete(list_of_angles_rad, list_of_index_of_runs_to_exlude, axis=0)
-            list_of_runs_to_use = np.delete(list_of_runs_to_use, list_of_index_of_runs_to_exlude)
-            list_of_sample_pc_to_use = np.delete(list_of_sample_pc, list_of_index_of_runs_to_exlude)
-            list_of_sample_frame_number_to_use = np.delete(list_of_sample_frame_number, list_of_index_of_runs_to_exlude)
+        # # looking at list of runs to reject
+        # list_of_index_of_runs_to_exlude, list_runs_to_exclude = self._get_list_of_index_of_runs_to_exclude()
+        # if list_of_index_of_runs_to_exlude:
+        #     logging.info(f"\tUser wants to reject the following runs: {list_runs_to_exclude}!")
+        #     corrected_array = np.delete(corrected_array, list_of_index_of_runs_to_exlude, axis=0)
+        #     list_of_angles_rad = np.delete(list_of_angles_rad, list_of_index_of_runs_to_exlude, axis=0)
+        #     list_of_runs_to_use = np.delete(list_of_runs_to_use, list_of_index_of_runs_to_exlude)
+        #     list_of_sample_pc_to_use = np.delete(list_of_sample_pc, list_of_index_of_runs_to_exlude)
+        #     list_of_sample_frame_number_to_use = np.delete(list_of_sample_frame_number, list_of_index_of_runs_to_exlude)
 
             # updating configuration
             # self.parent.configuration.list_of_sample_index_to_reject = list_of_index_of_runs_to_exlude
 
-        else:
-            logging.info(f"\tNo runs rejected before final reconstruction!")
+        # else:
+        #     logging.info(f"\tNo runs rejected before final reconstruction!")
 
         # update configuration
-        self.parent.configuration.list_of_sample_runs = list(list_of_runs_to_use)
+        # self.parent.configuration.list_of_sample_runs = list(list_of_runs_to_use)
         self.parent.configuration.list_of_angles = list(list_of_angles_rad)
 
         # save pc and frame number in configuration

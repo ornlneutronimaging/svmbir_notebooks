@@ -8,7 +8,7 @@ import ipywidgets as widgets
 from matplotlib.patches import Rectangle
 
 from __code.parent import Parent
-from __code import roi as default_roi
+from __code import crop_roi as default_roi
 from __code import OperatingMode
 
 
@@ -31,7 +31,7 @@ class Crop(Parent):
 
         def plot_crop(left, right, top, bottom, vmin, vmax):
 
-            fig, axs = plt.subplots(figsize=(10,10))
+            fig, axs = plt.subplots(figsize=(7,7))
 
             axs.imshow(integrated, vmin=vmin, vmax=vmax)
 
@@ -73,5 +73,6 @@ class Crop(Parent):
 
     def run(self):
         left, right, top, bottom = self.display_roi.result
-        self.parent.corrected_images = [image[top: bottom+1, left: right+1] for image in self.parent.corrected_images]
+        self.parent.corrected_images = np.array([image[top: bottom+1, left: right+1] 
+                                                 for image in self.parent.corrected_images])
         

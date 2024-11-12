@@ -277,6 +277,8 @@ class SvmbirReconstruction:
 
     # run svmbir
     def svmbir_settings(self):
+        if self.corrected_images is None:
+            self.corrected_images = self.normalized_images
         self.o_svmbir = SvmbirHandler(parent=self)
         self.o_svmbir.set_settings()
 
