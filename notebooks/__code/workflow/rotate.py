@@ -45,13 +45,13 @@ class Rotate(Parent):
         else:
             angle_value = +90
         
-        with mp.Pool(processes=5) as pool:
-            self.parent.normalized_images = pool.map(_worker, list(self.parent.normalized_images), angle_value)
+        # with mp.Pool(processes=5) as pool:
+        #     self.parent.normalized_images = pool.map(_worker, list(self.parent.normalized_images), angle_value)
     
-        # new_array_rotated = []
-        # for _data in tqdm(self.parent.normalized_images):
-        #     new_array_rotated.append(transform.rotate(_data, angle_value))
+        new_array_rotated = []
+        for _data in tqdm(self.parent.normalized_images):
+            new_array_rotated.append(transform.rotate(_data, angle_value))
 
-        # self.parent.normalized_images = np.array(new_array_rotated)
+        self.parent.normalized_images = np.array(new_array_rotated)
 
     

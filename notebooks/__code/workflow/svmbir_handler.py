@@ -6,7 +6,9 @@ from IPython.core.display import HTML
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
 import logging
+from tqdm import tqdm
 import tomopy
+import glob
 
 import svmbir
 
@@ -16,6 +18,10 @@ from __code.utilities.configuration_file import SvmbirConfig
 from __code.parent import Parent
 from __code import DataType, Run
 from __code.config import NUM_THREADS, SVMBIR_LIB_PATH
+from __code.utilities.save import make_tiff
+from __code.utilities.time import get_current_time_in_special_file_name_format
+from __code.utilities.json import save_json, load_json
+from __code.utilities.load import load_data_using_multithreading
 
 
 class SvmbirHandler(Parent):
@@ -125,6 +131,128 @@ class SvmbirHandler(Parent):
             return list_index, list_value
         except AttributeError:
             return [], []
+
+
+    def export_pre_reconstruction_data(self):
+
+        logging.info(f"Preparing reconstruction data to export json and projections")
+
+        corrected_array = self.parent.corrected_images
+        height, width = np.shape(corrected_array[0])
+
+        list_of_angles = np.array(self.parent.final_list_of_angles)
+        list_of_angles_rad = np.array([np.deg2rad(float(_angle)) for _angle in list_of_angles])
+        # list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
+        # list_of_sample_pc = self.parent.final_dict_of_pc[DataType.sample]
+        # list_of_sample_pc_to_use = list_of_sample_pc
+
+        # list_of_sample_frame_number = self.parent.final_dict_of_frame_number[DataType.sample]
+        # list_of_sample_frame_number_to_use = list_of_sample_frame_number
+        
+        # # looking at list of runs to reject
+        # list_of_index_of_runs_to_exlude, list_runs_to_exclude = self._get_list_of_index_of_runs_to_exclude()
+        # if list_of_index_of_runs_to_exlude:
+        #     logging.info(f"\tUser wants to reject the following runs: {list_runs_to_exclude}!")
+        #     corrected_array = np.delete(corrected_array, list_of_index_of_runs_to_exlude, axis=0)
+        #     list_of_angles_rad = np.delete(list_of_angles_rad, list_of_index_of_runs_to_exlude, axis=0)
+        #     list_of_runs_to_use = np.delete(list_of_runs_to_use, list_of_index_of_runs_to_exlude)
+        #     list_of_sample_pc_to_use = np.delete(list_of_sample_pc, list_of_index_of_runs_to_exlude)
+        #     list_of_sample_frame_number_to_use = np.delete(list_of_sample_frame_number, list_of_index_of_runs_to_exlude)
+
+            # updating configuration
+            # self.parent.configuration.list_of_sample_index_to_reject = list_of_index_of_runs_to_exlude
+
+        # else:
+        #     logging.info(f"\tNo runs rejected before final reconstruction!")
+
+        # update configuration
+        # self.parent.configuration.list_of_sample_runs = list(list_of_runs_to_use)
+        self.parent.configuration.list_of_angles = list(list_of_angles_rad)
+
+        # save pc and frame number in configuration
+        # self.parent.configuration.list_of_sample_frame_number = list_of_sample_frame_number_to_use
+        # self.parent.configuration.list_of_sample_pc = list_of_sample_pc_to_use
+        # self.parent.configuration.list_of_ob_pc = self.parent.final_dict_of_pc[DataType.ob]
+        # self.parent.configuration.list_of_ob_frame_number = self.parent.final_dict_of_frame_number[DataType.ob]
+
+        top_slice, bottom_slice = self.display_corrected_range.result
+        sharpness = self.sharpness_ui.value
+        snr_db = self.snr_db_ui.value
+        positivity = self.positivity_ui.value
+        max_iterations = self.max_iterations_ui.value
+        verbose = 1 if self.verbose_ui.value else 0
+
+        # update configuration
+        svmbir_config = SvmbirConfig()
+        svmbir_config.sharpness = sharpness
+        svmbir_config.snr_db = snr_db
+        svmbir_config.positivity = positivity
+        svmbir_config.max_iterations = max_iterations
+        svmbir_config.verbose = verbose
+        svmbir_config.top_slice = top_slice
+        svmbir_config.bottom_slice = bottom_slice
+        self.parent.configuration.svmbir_config = svmbir_config
+
+        logging.info(f"\t{top_slice = }")
+        logging.info(f"\t{bottom_slice = }")
+        logging.info(f"\t{sharpness = }")
+        logging.info(f"\t{snr_db = }")
+        logging.info(f"\t{positivity = }")
+        logging.info(f"\t{max_iterations = }")
+        logging.info(f"\t{verbose = }")
+        logging.info(f"\t{list_of_angles_rad = }")
+        logging.info(f"\t{width = }")
+        logging.info(f"\t{height = }")
+        logging.info(f"\t{type(corrected_array) = }")
+        logging.info(f"\t{np.shape(corrected_array) = }")
+
+        corrected_array_log = tomopy.minus_log(corrected_array)
+
+        where_nan = np.where(np.isnan(corrected_array_log))
+        corrected_array_log[where_nan] = 0
+
+        logging.info(f"\t{np.min(corrected_array_log) =}")
+        logging.info(f"\t{np.max(corrected_array_log) =}")
+        logging.info(f"\t{np.mean(corrected_array_log) =}")
+
+        if not (self.parent.center_of_rotation is None):
+            center_offset = self.parent.center_of_rotation - int(width /2)
+        else:
+            center_offset = 0
+
+        output_folder = self.parent.working_dir[DataType.extra]
+        _time_ext = get_current_time_in_special_file_name_format()
+        base_sample_folder = os.path.basename(self.parent.working_dir[DataType.sample])
+        full_output_folder = os.path.join(output_folder, f"{base_sample_folder}_projections_pre_data_{_time_ext}")
+        os.makedirs(full_output_folder)
+        logging.info(f"\tprojections pre data are exported to {full_output_folder}!")
+
+        for _index, _data in tqdm(enumerate(corrected_array_log)):
+            short_file_name = f"pre-reconstruction_{_index:04d}.tiff"
+            full_file_name = os.path.join(full_output_folder, short_file_name)
+            make_tiff(data=_data, filename=full_file_name)
+        print(f"projections exported in {full_output_folder}")
+
+        export_dict = {'list_of_angles_rad': list(list_of_angles_rad),
+                       'height': height,
+                       'width': width,
+                       'center_offset': center_offset,
+                       'sharpness': sharpness,
+                       'snr_db': snr_db,
+                       'positivity': positivity,
+                       'max_iterations': max_iterations,
+                       'verbose': verbose,
+                       'num_threads': NUM_THREADS,
+                       'svmbir_lib_path': SVMBIR_LIB_PATH}
+        
+        json_file_name = os.path.join(output_folder, f"projections_pre_metadata_{_time_ext}.json")
+        save_json(json_file_name=json_file_name,
+                  json_dictionary=export_dict)
+        print(f"{json_file_name} exported !")
+
+   
+
+
 
     def run_reconstruction(self):
 

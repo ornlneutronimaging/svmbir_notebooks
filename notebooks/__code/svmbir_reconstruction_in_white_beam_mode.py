@@ -297,6 +297,12 @@ class SvmbirReconstruction:
         self.o_svmbir.run_reconstruction()
         self.o_svmbir.display_slices()
 
+    # # run the CLI version from the pre-reconstructed data
+    # def svmbir_run_cli(self, config_json_file, input_data_folder, output_data_folder):
+    #     SvmbirCliHandler.run_reconstruction_from_pre_data_mode(config_json_file, 
+    #                                                         input_data_folder, 
+    #                                                         output_data_folder)
+
     # def display_slices(self):
     #     self.o_svmbir.display_slices()
 
@@ -316,3 +322,4 @@ class SvmbirReconstruction:
     def export_extra_files(self):
         o_export = ExportExtra(parent=self)
         o_export.run(base_log_file_name=LOG_BASENAME_FILENAME)
+        self.o_svmbir.export_pre_reconstruction_data()
