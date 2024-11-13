@@ -4,7 +4,9 @@ from neutompy.preproc.preproc import correction_COR
 import matplotlib.pyplot as plt
 from ipywidgets import interactive
 from IPython.display import display
+from IPython.core.display import HTML
 import ipywidgets as widgets
+from skimage.transform import rotate
 
 # from imars3d.backend.diagnostics.rotation import find_rotation_center
 
@@ -13,18 +15,33 @@ from __code import DataType, Run, OperatingMode
 from __code.utilities.logging import logging_3d_array_infos
 
 
+class ImageAngles:
+    
+    degree_0 = '0 degree'
+    degree_180 = '180 degree'
+    degree_360 = '360 degree'
+
+
 class CenterOfRotationAndTilt(Parent):
 
     image_0_degree = None
     image_180_degree = None
+    image_360_degree = None
+
     height = None
 
     display_plot = None
 
+    def settings(self):
+        self.auto_mode_ui = widgets.RadioButtons(options=['Automatic', 'Manual'],
+                                                 descriptions="Mode:",
+                                                 value='Manual')
+        display(self.auto_mode_ui)
+
     def _isolate_0_and_180_degrees_images_white_beam_mode(self):
         logging.info(f"\tisolating 0 and 180 degres: ")
         list_of_angles = self.parent.final_list_of_angles
-        self._saving_0_and_180(list_of_angles)
+        self._saving_0_180_360(list_of_angles)
 
     def _saving_0_and_180(self, list_of_angles):
         angles_minus_180 = [float(_value) - 180 for _value in list_of_angles]
@@ -39,6 +56,17 @@ class CenterOfRotationAndTilt(Parent):
         # retrieve data for those indexes
         self.image_0_degree = self.parent.corrected_images[index_0_degree]
         self.image_180_degree = self.parent.corrected_images[index_180_degree]
+
+    def _saving_0_180_360(self, list_of_angles):
+        self._saving_0_and_180(list_of_angles=list_of_angles)
+
+        angles_minus_360 = [float(_value) - 360 for _value in list_of_angles]
+        abs_angles_minus_360 = np.abs(angles_minus_360)
+        minimum_value = np.min(abs_angles_minus_360)
+
+        index_360_degree = np.where(minimum_value == abs_angles_minus_360)[0][0]
+        self.image_360_degree = self.parent.corrected_images[index_360_degree]
+        logging.info(f"\t{index_360_degree = }")
 
     def _isolate_0_and_180_degrees_images(self):
         list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
@@ -77,13 +105,122 @@ class CenterOfRotationAndTilt(Parent):
                                                             value=0),
                                    y_bottom = widgets.IntSlider(min=0,
                                                             max=height-1, 
-                                                            value=height-1)
+                                                            value=height-1),
         )
 
         display(self.display_plot)
 
     def run(self):
-        self.calculate_using_neutompy()
+        if self.auto_mode_ui.value == 'Automatic':
+            self.calculate_using_neutompy()
+        else:
+            self.using_manual_mode()
+
+    def using_manual_mode(self):
+        self.manual_center_of_rotation()
+        # self.manual_tilt_correction()
+
+    def manual_center_of_rotation(self):
+        display(HTML("Center of rotation"))
+
+        width = self.parent.image_size['width']
+        vmax = np.max([self.image_0_degree, self.image_180_degree, self.image_360_degree])
+
+        def plot_images(angles, center, v_range):
+            _, axs = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
+
+            at_least_one_image_selected = False
+            list_images = []
+            if ImageAngles.degree_0 in angles:
+                list_images.append(self.image_0_degree)
+                at_least_one_image_selected = True
+            if ImageAngles.degree_180 in angles:
+                list_images.append(self.image_180_degree)
+                at_least_one_image_selected = True
+            if ImageAngles.degree_360 in angles:
+                list_images.append(self.image_360_degree)
+                at_least_one_image_selected = True
+
+            if not at_least_one_image_selected:
+                return
+
+            if len(list_images) > 1:
+                final_image = np.mean(np.array(list_images), axis=0)
+            else:
+                final_image = list_images[0]
+
+            axs.imshow(final_image, vmin=v_range[0], vmax=v_range[1], cmap='viridis')
+            axs.axvline(center, color='blue', linestyle='--')
+
+            return center
+
+        self.display_plot = interactive(plot_images,
+                                   angles=widgets.SelectMultiple(options=[ImageAngles.degree_0, ImageAngles.degree_180, ImageAngles.degree_360],
+                                                                      value=[ImageAngles.degree_0, ImageAngles.degree_180]),
+                                   center=widgets.IntSlider(min=0, 
+                                                                      max=width-1, 
+                                                                      layout=widgets.Layout(width="100%"),
+                                                                      value=int(width/2)),
+                                    v_range = widgets.FloatRangeSlider(min=0,
+                                                                       max=vmax,
+                                                                       layout=widgets.Layout(width='100%'),
+                                                                       value=[0, vmax]),
+
+                                    )                                                                     
+        display(self.display_plot)
+
+    # def manual_tilt_correction(self):
+    #     display(HTML("Tilt correction"))
+
+    #     width = self.parent.image_size['width']
+    #     vmax = np.max([self.image_0_degree, self.image_180_degree, self.image_360_degree])
+
+    #     def plot_images(angles, tilt, verti_guide, guide_width, v_range):
+    #         _, axs = plt.subplots(nrows=1, ncols=1, figsize=(8, 8))
+
+    #         at_least_one_image_selected = False
+    #         list_images = []
+    #         if ImageAngles.degree_0 in angles:
+    #             list_images.append(self.image_0_degree)
+    #             at_least_one_image_selected = True
+    #         if ImageAngles.degree_180 in angles:
+    #             list_images.append(self.image_180_degree)
+    #             at_least_one_image_selected = True
+    #         if ImageAngles.degree_360 in angles:
+    #             list_images.append(self.image_360_degree)
+    #             at_least_one_image_selected = True
+
+    #         if not at_least_one_image_selected:
+    #             return
+
+    #         if len(list_images) > 1:
+    #             final_image = np.mean(np.array(list_images), axis=0)
+    #         else:
+    #             final_image = list_images[0]
+
+    #         rotated_image = 
+
+    #         axs.imshow(final_image, vmin=v_range[0], vmax=v_range[1])
+    #         axs.axvline(verti_guide, color='blue', linestyle='--')
+    #         axs.axvline(verti_guide-int(guide_width/2), color='yellow')
+    #         axs.axvline(verti_guide+int(guide_width/2), color='yellow')
+
+    #     display_plot = interactive(plot_images,
+    #                                angles=widgets.SelectMultiple(options=[ImageAngles.degree_0, ImageAngles.degree_180, ImageAngles.degree_360],
+    #                                                                   value=[ImageAngles.degree_0, ImageAngles.degree_180]),
+    #                                tilt=widgets.FloatSlider(min=-5, max=5, value=0, step=0.01),
+    #                                verti_guide=widgets.IntSlider(min=0, 
+    #                                                                   max=width-1, 
+    #                                                                   value=int(width/2)),
+    #                                 guide_width = widgets.IntSlider(min=0,
+    #                                                                max=width,
+    #                                                                value=30),
+    #                                 v_range = widgets.FloatRangeSlider(min=0,
+    #                                                                    max=vmax,
+    #                                                                    value=[0, vmax]),
+    #                                 )                                                                     
+    #     display(display_plot)
+
 
     def calculate_using_neutompy(self):
         

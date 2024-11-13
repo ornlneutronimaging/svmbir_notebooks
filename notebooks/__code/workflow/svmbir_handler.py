@@ -90,6 +90,7 @@ class SvmbirHandler(Parent):
     def display_sinograms(self):
 
         corrected_array = self.parent.corrected_images
+        max_value = np.max(corrected_array)
         height, _ = np.shape(corrected_array[0])
         
         def display_sinograms(slice_index):
@@ -103,6 +104,12 @@ class SvmbirHandler(Parent):
                                        slice_index = widgets.IntSlider(min=0,
                                                                        max=height-1,
                                                                        value=0),
+                                        vmin=widgets.IntSlider(min=0,
+                                                               max=max_value,
+                                                               value=0),
+                                        vmax=widgets.IntSlider(min=0,
+                                                               max=max_value,
+                                                               value=max_value),
                                         )
         display(display_sinogram)
 
@@ -124,16 +131,16 @@ class SvmbirHandler(Parent):
         logging.info(f"Running reconstruction:")
 
         corrected_array = self.parent.corrected_images
-        height = self.parent.image_size['height']
-        width = self.parent.image_size['width']
+        height, width = np.shape(corrected_array[0])
+
         list_of_angles = np.array(self.parent.final_list_of_angles)
         list_of_angles_rad = np.array([np.deg2rad(float(_angle)) for _angle in list_of_angles])
         # list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
-        list_of_sample_pc = self.parent.final_dict_of_pc[DataType.sample]
-        list_of_sample_pc_to_use = list_of_sample_pc
+        # list_of_sample_pc = self.parent.final_dict_of_pc[DataType.sample]
+        # list_of_sample_pc_to_use = list_of_sample_pc
 
-        list_of_sample_frame_number = self.parent.final_dict_of_frame_number[DataType.sample]
-        list_of_sample_frame_number_to_use = list_of_sample_frame_number
+        # list_of_sample_frame_number = self.parent.final_dict_of_frame_number[DataType.sample]
+        # list_of_sample_frame_number_to_use = list_of_sample_frame_number
         
         # # looking at list of runs to reject
         # list_of_index_of_runs_to_exlude, list_runs_to_exclude = self._get_list_of_index_of_runs_to_exclude()
@@ -156,10 +163,10 @@ class SvmbirHandler(Parent):
         self.parent.configuration.list_of_angles = list(list_of_angles_rad)
 
         # save pc and frame number in configuration
-        self.parent.configuration.list_of_sample_frame_number = list_of_sample_frame_number_to_use
-        self.parent.configuration.list_of_sample_pc = list_of_sample_pc_to_use
-        self.parent.configuration.list_of_ob_pc = self.parent.final_dict_of_pc[DataType.ob]
-        self.parent.configuration.list_of_ob_frame_number = self.parent.final_dict_of_frame_number[DataType.ob]
+        # self.parent.configuration.list_of_sample_frame_number = list_of_sample_frame_number_to_use
+        # self.parent.configuration.list_of_sample_pc = list_of_sample_pc_to_use
+        # self.parent.configuration.list_of_ob_pc = self.parent.final_dict_of_pc[DataType.ob]
+        # self.parent.configuration.list_of_ob_frame_number = self.parent.final_dict_of_frame_number[DataType.ob]
 
         top_slice, bottom_slice = self.display_corrected_range.result
         sharpness = self.sharpness_ui.value
@@ -202,11 +209,16 @@ class SvmbirHandler(Parent):
         logging.info(f"\t{np.max(corrected_array_log) =}")
         logging.info(f"\t{np.mean(corrected_array_log) =}")
 
+        if not (self.parent.center_of_rotation is None):
+            center_offset = self.parent.center_of_rotation - int(width /2)
+        else:
+            center_offset = 0
+
         self.parent.reconstruction_array = svmbir.recon(sino=corrected_array_log[:, top_slice: bottom_slice+1, :],
                                                         angles=list_of_angles_rad,
                                                         num_rows = height,
                                                         num_cols = width,
-                                                        center_offset = 0,
+                                                        center_offset = center_offset,
                                                         sharpness = sharpness,
                                                         snr_db = snr_db,
                                                         positivity = positivity,

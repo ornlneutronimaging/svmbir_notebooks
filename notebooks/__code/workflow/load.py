@@ -81,7 +81,7 @@ class Load(Parent):
             list_tiff = glob.glob(os.path.join(top_folder, "*.tif*"))
 
             if DEBUG:
-                list_tiff = list_tiff[0:3]
+                list_tiff = list_tiff[0:10]
 
             list_tiff.sort()
             self.parent.list_of_images[self.data_type] = list_tiff

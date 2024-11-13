@@ -42,6 +42,8 @@ class SvmbirReconstruction:
     
     operating_mode = DEFAULT_OPERATING_MODE
 
+    center_of_rotation = None
+
     image_size = {'height': None,
                   'width': None}
 
@@ -262,8 +264,14 @@ class SvmbirReconstruction:
         self.o_center_and_tilt = CenterOfRotationAndTilt(parent=self)
         self.o_center_and_tilt.select_range()
 
-    def calculate_center_of_rotation_and_tilt(self):
+    def center_of_rotation_and_tilt_settings(self):
+        self.o_center_and_tilt.settings()
+
+    def perform_center_of_rotation_and_tilt(self):
         self.o_center_and_tilt.run()
+
+    # def calculate_and_apply_center_of_rotation_and_tilt(self):
+    #     self.o_center_and_tilt.run()
 
     # crop data
     def crop_settings(self):
