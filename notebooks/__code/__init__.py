@@ -20,7 +20,7 @@ class OperatingMode:
 DEFAULT_OPERATING_MODE = OperatingMode.tof
 NBR_TOF_RANGES = 3
 
-DEBUG = True
+DEBUG = False
 debug_folder = {OperatingMode.tof: {DataType.sample: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/September20_2024_PurpleCar_GoldenRatio_CT_5_0_C_Cd_inBeam_Resonance",
                                     DataType.ob: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/September26_2024_PurpleCar_OpenBean_5_0_C_Cd_inBeam_Resonance",
                                     DataType.cleaned_images: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
@@ -53,8 +53,8 @@ crop_roi = {OperatingMode.tof: {'left': 0,
                             'bottom': 49},
         OperatingMode.white_beam: {'left': 2549,
                                    'right': 5072,
-                                   'top': 549,
-                                   'bottom': 5496},
+                                   'top': 2198,
+                                   'bottom': 3695},
                                    }
 
 ANGSTROMS = u"\u212b"

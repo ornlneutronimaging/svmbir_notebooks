@@ -23,7 +23,7 @@ class Export:
         for _index, _data in tqdm(enumerate(self.image_3d)):
             short_file_name = f"{self.base_image_name}_{_index:04d}.tiff"
             full_file_name = os.path.join(self.output_folder, short_file_name)
-            logging.info(f"\texporting {full_file_name}")
+            # logging.info(f"\texporting {full_file_name}")
             make_tiff(data=_data, filename=full_file_name)
 
 

@@ -79,6 +79,7 @@ class Crop(Parent):
 
     def run(self):
         left, right, top, bottom = self.display_roi.result
+        self.parent.crop_region = {'left': left, 'right': right, 'top': top, 'bottom': bottom}
         self.parent.corrected_images = np.array([image[top: bottom+1, left: right+1] 
                                                  for image in self.parent.corrected_images])
         

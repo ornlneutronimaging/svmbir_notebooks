@@ -43,6 +43,11 @@ class SvmbirReconstruction:
     operating_mode = DEFAULT_OPERATING_MODE
 
     center_of_rotation = None
+    
+    crop_region = {'left': None,
+                   'right': None,
+                   'top': None,
+                   'bottom': None}
 
     image_size = {'height': None,
                   'width': None}

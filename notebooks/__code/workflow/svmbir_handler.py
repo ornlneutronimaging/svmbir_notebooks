@@ -72,24 +72,35 @@ class SvmbirHandler(Parent):
         self.sharpness_ui = widgets.FloatSlider(min=0,
                                            max=1,
                                            value=0,
+                                           layout=widgets.Layout(width="100%"),
                                            description="sharpness")
         self.snr_db_ui = widgets.FloatSlider(min=0,
                                         max=100,
                                         value=30.0,
+                                        layout=widgets.Layout(width="100%"),
                                         description="snr db")
         self.positivity_ui = widgets.Checkbox(value=True,
                                          description="positivity")
         self.max_iterations_ui = widgets.IntSlider(value=200,
                                               min=10,
                                               max=500,
+                                              layout=widgets.Layout(width="100%"),
                                               description="max itera.")
-        self.verbose_ui = widgets.Checkbox(value=False,
+        label = widgets.Label("max resolution (0-high, 4-low):")
+        self.max_resolutions_ui = widgets.IntSlider(value=0,
+                                                    min=0,
+                                                    max=4,
+                                                    description="",
+                                                    layout=widgets.Layout(width="100%"))      
+        self.verbose_ui = widgets.Checkbox(value=True,
                                       description='verbose')
+        
         
         vertical_widgets = widgets.VBox([self.sharpness_ui,
                                          self.snr_db_ui,
                                          self.positivity_ui,
                                          self.max_iterations_ui,
+                                         widgets.HBox([label, self.max_resolutions_ui]),
                                          self.verbose_ui])
         display(vertical_widgets)
 
@@ -131,7 +142,6 @@ class SvmbirHandler(Parent):
             return list_index, list_value
         except AttributeError:
             return [], []
-
 
     def export_pre_reconstruction_data(self):
 
@@ -180,6 +190,7 @@ class SvmbirHandler(Parent):
         snr_db = self.snr_db_ui.value
         positivity = self.positivity_ui.value
         max_iterations = self.max_iterations_ui.value
+        max_resolutions = self.max_resolutions_ui.value
         verbose = 1 if self.verbose_ui.value else 0
 
         # update configuration
@@ -199,6 +210,7 @@ class SvmbirHandler(Parent):
         logging.info(f"\t{snr_db = }")
         logging.info(f"\t{positivity = }")
         logging.info(f"\t{max_iterations = }")
+        logging.info(f"\t{max_resolutions = }")
         logging.info(f"\t{verbose = }")
         logging.info(f"\t{list_of_angles_rad = }")
         logging.info(f"\t{width = }")
@@ -217,21 +229,31 @@ class SvmbirHandler(Parent):
 
         if not (self.parent.center_of_rotation is None):
             center_offset = self.parent.center_of_rotation - int(width /2)
+
+            # removing left region we cropped to the offset
+            crop_left = self.parent.crop_region['left']
+            if crop_left:
+                center_offset -= crop_left
         else:
             center_offset = 0
 
         output_folder = self.parent.working_dir[DataType.extra]
         _time_ext = get_current_time_in_special_file_name_format()
         base_sample_folder = os.path.basename(self.parent.working_dir[DataType.sample])
-        full_output_folder = os.path.join(output_folder, f"{base_sample_folder}_projections_pre_data_{_time_ext}")
-        os.makedirs(full_output_folder)
-        logging.info(f"\tprojections pre data are exported to {full_output_folder}!")
+        pre_projections_export_folder = os.path.join(output_folder, f"{base_sample_folder}_projections_pre_data_{_time_ext}")
+        os.makedirs(pre_projections_export_folder)
+        logging.info(f"\tprojections pre data are exported to {pre_projections_export_folder}!")
+
+        full_output_folder = os.path.join(output_folder, f"{base_sample_folder}_reconstructed_{_time_ext}")
+
+        # go from [angle, height, width] to [angle, width, height]
+        corrected_array_log = np.moveaxis(corrected_array_log, 1, 2)  # angle, y, x -> angle, x, y
 
         for _index, _data in tqdm(enumerate(corrected_array_log)):
             short_file_name = f"pre-reconstruction_{_index:04d}.tiff"
-            full_file_name = os.path.join(full_output_folder, short_file_name)
+            full_file_name = os.path.join(pre_projections_export_folder, short_file_name)
             make_tiff(data=_data, filename=full_file_name)
-        print(f"projections exported in {full_output_folder}")
+        print(f"projections exported in {pre_projections_export_folder}")
 
         export_dict = {'list_of_angles_rad': list(list_of_angles_rad),
                        'height': height,
@@ -241,18 +263,17 @@ class SvmbirHandler(Parent):
                        'snr_db': snr_db,
                        'positivity': positivity,
                        'max_iterations': max_iterations,
+                       'max_resolutions': max_resolutions,
                        'verbose': verbose,
                        'num_threads': NUM_THREADS,
-                       'svmbir_lib_path': SVMBIR_LIB_PATH}
+                       'svmbir_lib_path': SVMBIR_LIB_PATH,
+                       'input_folder': pre_projections_export_folder,
+                       'output_folder': full_output_folder}
         
         json_file_name = os.path.join(output_folder, f"projections_pre_metadata_{_time_ext}.json")
         save_json(json_file_name=json_file_name,
                   json_dictionary=export_dict)
         print(f"{json_file_name} exported !")
-
-   
-
-
 
     def run_reconstruction(self):
 
@@ -301,6 +322,7 @@ class SvmbirHandler(Parent):
         snr_db = self.snr_db_ui.value
         positivity = self.positivity_ui.value
         max_iterations = self.max_iterations_ui.value
+        max_resolutions = self.max_resolutions_ui.value
         verbose = 1 if self.verbose_ui.value else 0
 
         # update configuration
@@ -320,6 +342,7 @@ class SvmbirHandler(Parent):
         logging.info(f"\t{snr_db = }")
         logging.info(f"\t{positivity = }")
         logging.info(f"\t{max_iterations = }")
+        logging.info(f"\t{max_resolutions = }")
         logging.info(f"\t{verbose = }")
         logging.info(f"\t{list_of_angles_rad = }")
         logging.info(f"\t{width = }")
@@ -344,14 +367,15 @@ class SvmbirHandler(Parent):
 
         self.parent.reconstruction_array = svmbir.recon(sino=corrected_array_log[:, top_slice: bottom_slice+1, :],
                                                         angles=list_of_angles_rad,
-                                                        num_rows = height,
-                                                        num_cols = width,
+                                                        # num_rows = height,
+                                                        # num_cols = width,
                                                         center_offset = center_offset,
                                                         sharpness = sharpness,
                                                         snr_db = snr_db,
                                                         positivity = positivity,
                                                         max_iterations = max_iterations,
                                                         num_threads = NUM_THREADS,
+                                                        max_resolutions = max_resolutions,
                                                         verbose = verbose,
                                                         svmbir_lib_path = SVMBIR_LIB_PATH,
                                                         )

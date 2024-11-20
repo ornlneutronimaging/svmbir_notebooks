@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from ipywidgets import interactive
 from IPython.display import display
+from IPython.core.display import HTML
 import ipywidgets as widgets
 from scipy.ndimage import median_filter
 
@@ -81,6 +82,8 @@ class Normalization(Parent):
         if not self.use_roi_ui.value:
             logging.info(f"User skipped normalization ROI selection.")
             return
+
+        display(HTML("Note: This is an integrated view of the projections allowing you to see the contours of all the angles!"))
 
         integrated_images = np.log(np.min(self.parent.master_3d_data_array[DataType.sample], axis=0))
         height = self.parent.image_size['height']

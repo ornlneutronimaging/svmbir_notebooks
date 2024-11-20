@@ -6,6 +6,8 @@ from tqdm import tqdm
 import numpy as np
 from skimage import transform
 import multiprocessing as mp 
+import logging
+from functools import partial
 
 from __code.parent import Parent
 
@@ -44,14 +46,16 @@ class Rotate(Parent):
             angle_value = 0
         else:
             angle_value = +90
-        
+
+        # worker_with_angle = partial(_worker, angle_value=angle_value)
+
+        # logging.info(f"rotating the normalized_images by {angle_value} ...")        
         # with mp.Pool(processes=5) as pool:
-        #     self.parent.normalized_images = pool.map(_worker, list(self.parent.normalized_images), angle_value)
+        #      self.parent.normalized_images = pool.map(worker_with_angle, list(self.parent.normalized_images), angle_value)
     
         new_array_rotated = []
         for _data in tqdm(self.parent.normalized_images):
             new_array_rotated.append(transform.rotate(_data, angle_value))
 
         self.parent.normalized_images = np.array(new_array_rotated)
-
-    
+        logging.info(f"rotating the normalized_images ... done!")        
