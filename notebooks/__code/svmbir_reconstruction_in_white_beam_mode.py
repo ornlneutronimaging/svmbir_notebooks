@@ -165,7 +165,7 @@ class SvmbirReconstruction:
 
         setup_logging(basename_of_log_file=LOG_BASENAME_FILENAME)        
         self.working_dir[DataType.ipts] = os.path.basename(top_sample_dir)
-        self.working_dir[DataType.top] = os.path.join(top_sample_dir, "shared", "autoreduce", "mcp")
+        self.working_dir[DataType.top] = os.path.join(top_sample_dir, "images", "qhy600")
         self.working_dir[DataType.nexus] = os.path.join(top_sample_dir, "nexus")
         self.working_dir[DataType.processed] = os.path.join(top_sample_dir, "shared", "processed_data")
         logging.info(f"working_dir: {self.working_dir}")
@@ -295,8 +295,9 @@ class SvmbirReconstruction:
         self.o_svmbir = SvmbirHandler(parent=self)
         self.o_svmbir.set_settings()
 
-    def svmbir_display_sinograms(self):
-        self.o_svmbir.display_sinograms()
+    # takes for ever !
+    # def svmbir_display_sinograms(self):
+    #     self.o_svmbir.display_sinograms()
 
     def svmbir_run(self):
         self.o_svmbir.run_reconstruction()

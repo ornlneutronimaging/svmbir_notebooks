@@ -10,6 +10,8 @@ def setup_logging(basename_of_log_file=""):
                         format='[%(levelname)s] - %(asctime)s - %(message)s',
                         level=logging.INFO)
     logging.info(f"*** Starting a new script {basename_of_log_file} ***")
+
+    print(f"logging file: {log_file_name}")
     
 
 def logging_3d_array_infos(message="", array=None):

@@ -79,22 +79,21 @@ class SvmbirHandler(Parent):
                                         value=30.0,
                                         layout=widgets.Layout(width="100%"),
                                         description="snr db")
-        self.positivity_ui = widgets.Checkbox(value=True,
+        self.positivity_ui = widgets.Checkbox(value=False,
                                          description="positivity")
-        self.max_iterations_ui = widgets.IntSlider(value=200,
+        self.max_iterations_ui = widgets.IntSlider(value=20,
                                               min=10,
                                               max=500,
                                               layout=widgets.Layout(width="100%"),
                                               description="max itera.")
         label = widgets.Label("max resolution (0-high, 4-low):")
-        self.max_resolutions_ui = widgets.IntSlider(value=0,
+        self.max_resolutions_ui = widgets.IntSlider(value=2,
                                                     min=0,
                                                     max=4,
                                                     description="",
                                                     layout=widgets.Layout(width="100%"))      
         self.verbose_ui = widgets.Checkbox(value=True,
                                       description='verbose')
-        
         
         vertical_widgets = widgets.VBox([self.sharpness_ui,
                                          self.snr_db_ui,
@@ -252,7 +251,7 @@ class SvmbirHandler(Parent):
         for _index, _data in tqdm(enumerate(corrected_array_log)):
             short_file_name = f"pre-reconstruction_{_index:04d}.tiff"
             full_file_name = os.path.join(pre_projections_export_folder, short_file_name)
-            make_tiff(data=_data, filename=full_file_name)
+            make_tiff(data=_data[top_slice:bottom_slice+1, :], filename=full_file_name)
         print(f"projections exported in {pre_projections_export_folder}")
 
         export_dict = {'list_of_angles_rad': list(list_of_angles_rad),

@@ -5,7 +5,7 @@ from __code.utilities.logging import setup_logging
 from __code.workflow_cli.svmbir_white_beam import  SvmbirCliHandler
 
 
-setup_logging("svmbir_white_beam_cli")
+setup_logging("svmbir_white_beam_cli_from_notebook_config")
 
 
 if __name__ == "__main__":

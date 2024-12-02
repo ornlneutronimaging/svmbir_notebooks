@@ -27,6 +27,8 @@ class Load(Parent):
         else:
             working_dir = self.parent.working_dir[DataType.top]
 
+        print(f"{working_dir = }")
+
         if DEBUG:
             self.data_selected(debug_folder[self.parent.MODE][data_type])
             return
@@ -117,6 +119,7 @@ class Load(Parent):
                 continue
 
             if _data_type == DataType.sample:
+                list_of_images[_data_type].sort()
                 self.save_list_of_angles(list_of_images[_data_type])
 
             self.parent.master_3d_data_array[_data_type] = load_data_using_multithreading(list_of_images[_data_type])

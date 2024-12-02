@@ -23,7 +23,10 @@ if __name__ == "__main__":
     parser.add_argument('config_file', type=str, nargs=1, help="JSON config file created by notebook")
     args = parser.parse_args()
 
+    print(f"check log file at /SNS/VENUS/shared/log/svmbir_reconstruction_cli.log")
+
     config_file_name = args.config_file[0]
+    logging.info(f"{config_file_name}")
     config_model = loading_config_file_into_model(config_file_path=config_file_name)
     logging.info(f"loading config file name: {config_file_name}")
 
