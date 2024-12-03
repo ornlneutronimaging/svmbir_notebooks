@@ -57,6 +57,9 @@ class SvmbirReconstruction:
     final_dict_of_pc = {}
     final_dict_of_frame_number = {}
 
+    # naming schema convention
+    list_states_checkbox = None
+
     # used to displya profile vs lambda in TOF mode
     # np.shape of y, x, tof
     data_3d_of_all_projections_merged = None

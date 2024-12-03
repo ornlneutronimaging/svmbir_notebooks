@@ -21,8 +21,6 @@ class Load(Parent):
                            DataType.ob: [],
     }
 
-    list_states_checkbox = None
-
     def select_folder(self, data_type=DataType.sample, multiple_flag=False):
 
         self.parent.current_data_type = data_type
@@ -96,15 +94,16 @@ class Load(Parent):
         list_splits = os.path.basename(first_file).split("_")
         self.list_checkboxes = []
         global_list_verti_box = []
+
         for _index, _split in enumerate(list_splits):
 
-            if self.list_states_checkbox is None:
+            if self.parent.list_states_checkbox is None:
                 _state = False
                 if DEBUG:
                     if _index in DEFAULT_NAMING_CONVENTION_INDICES:
                         _state = True
             else:
-                _state = self.list_states_checkbox[_index]
+                _state = self.parent.list_states_checkbox[_index]
 
             _check = widgets.Checkbox(value=_state,
                                       description=f"{_split}")
@@ -114,26 +113,41 @@ class Load(Parent):
 
         verti_box = widgets.VBox(global_list_verti_box)
         display(verti_box)
-        self.error_label = widgets.HTML("<font color='red'><b>ERROR</b>: Select 2 and only 2 checkboxes!</font>")
+
+        if self._are_2_checkboxes_selected():
+            self.error_label = widgets.HTML("")
+        else:    
+            self.error_label = widgets.HTML("<font color='red'><b>ERROR</b>: Select 2 and only 2 checkboxes!</font>")
+        
         display(self.error_label)
         display(widgets.HTML("<hr>"))
         self.widget_angle = widgets.Label("")
         display(widgets.HBox([widgets.Label("Angle value:"), self.widget_angle]))
         display(widgets.HTML("<b>Check the 2 fields to use to determine the angle value (degree.minutes)!</b>"))
-        display(widgets.HTML("<font color='blue'>Rerun the cell to test schema on another file</font>"))
 
-    def on_check_change(self, change):
-        self.list_states_checkbox = [x.value for x in self.list_checkboxes]
+    def get_list_index_of_checkboxes(self):
+        self.parent.list_states_checkbox = [x.value for x in self.list_checkboxes]
         list_index = []
-        for _index, _value in enumerate(self.list_states_checkbox):
+        for _index, _value in enumerate(self.parent.list_states_checkbox):
             if _value:
                 list_index.append(_index)
 
+        return list_index
+
+    def _are_2_checkboxes_selected(self):
+        list_index = self.get_list_index_of_checkboxes()
         if len(list_index) != 2:
+            return False
+        
+        return True
+    
+    def on_check_change(self, change):
+        if not self._are_2_checkboxes_selected():
             self.error_label.value = "<font color='red'><b>ERROR</b>: Select 2 and only 2 checkboxes!</font>"
         else:
             self.error_label.value = ""
             current_file_name = self.selected_file_label.value
+            list_index = self.get_list_index_of_checkboxes()
             first_index, second_index = list_index
             file_name_split = current_file_name.split("_")
             self.widget_angle.value = f"{file_name_split[first_index]}.{file_name_split[second_index]}"
