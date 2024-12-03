@@ -186,10 +186,14 @@ class SvmbirReconstruction:
         o_load = Load(parent=self)
         o_load.select_images(data_type=DataType.dc)
 
+    # define naming convention to easily extract angle value
+    def define_naming_schema(self):
+        self.o_load = Load(parent=self)
+        self.o_load.define_naming_convention()
+
     # load data
     def load_data(self):
-        o_mode = Load(parent=self)
-        o_mode.load_white_beam_data()
+        self.o_load.load_white_beam_data()
         
     def visualize_raw_data(self):
         o_visualization = Visualization(parent=self)

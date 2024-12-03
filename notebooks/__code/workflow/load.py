@@ -3,6 +3,8 @@ import os
 import numpy as np
 import logging
 from tqdm import tqdm
+from IPython.display import display
+import ipywidgets as widgets
 
 from __code import DataType, Run, OperatingMode
 from __code import DEBUG, debug_folder
@@ -10,6 +12,7 @@ from __code.parent import Parent
 from __code.utilities.file_folder_browser import FileFolderBrowser
 from __code.utilities.load import load_data_using_multithreading, load_list_of_tif, load_tiff
 from __code.utilities.files import retrieve_list_of_tif
+from __code.config import DEFAULT_NAMING_CONVENTION_INDICES
 
 
 class Load(Parent):
@@ -17,6 +20,8 @@ class Load(Parent):
     list_of_runs_to_use = {DataType.sample: [],
                            DataType.ob: [],
     }
+
+    list_states_checkbox = None
 
     def select_folder(self, data_type=DataType.sample, multiple_flag=False):
 
@@ -53,7 +58,8 @@ class Load(Parent):
             working_dir = debug_folder[self.parent.MODE][data_type]
             if not os.path.exists(working_dir):
                 return
-            list_images = glob.glob(os.path.join(working_dir, "*_0045_*.tif*"))
+            #list_images = glob.glob(os.path.join(working_dir, "*_0045_*.tif*"))
+            list_images = glob.glob(os.path.join(working_dir, "*.tif*"))
             list_images.sort()
             self.images_selected(list_images=list_images)
             return
@@ -73,6 +79,64 @@ class Load(Parent):
         list_images.sort()
         logging.info(f"{len(list_images)} {self.data_type} images have been selected!")
         self.parent.list_of_images[self.data_type] = list_images
+
+    def define_naming_convention(self):
+        number_of_images = len(self.parent.list_of_images[DataType.sample])
+        # random number between 0 and number_of_images
+        random_index = np.random.randint(0, number_of_images)
+
+        # random file name
+        first_file = self.parent.list_of_images[DataType.sample][random_index]
+        self.selected_file_label = widgets.Label(os.path.basename(first_file))
+
+        first_hori_box = widgets.HBox([widgets.HTML("<b>File name:</b>"),
+                                       self.selected_file_label])
+        display(first_hori_box)
+
+        list_splits = os.path.basename(first_file).split("_")
+        self.list_checkboxes = []
+        global_list_verti_box = []
+        for _index, _split in enumerate(list_splits):
+
+            if self.list_states_checkbox is None:
+                _state = False
+                if DEBUG:
+                    if _index in DEFAULT_NAMING_CONVENTION_INDICES:
+                        _state = True
+            else:
+                _state = self.list_states_checkbox[_index]
+
+            _check = widgets.Checkbox(value=_state,
+                                      description=f"{_split}")
+            self.list_checkboxes.append(_check)
+            global_list_verti_box.append(_check)
+            _check.observe(self.on_check_change, names='value')
+
+        verti_box = widgets.VBox(global_list_verti_box)
+        display(verti_box)
+        self.error_label = widgets.HTML("<font color='red'><b>ERROR</b>: Select 2 and only 2 checkboxes!</font>")
+        display(self.error_label)
+        display(widgets.HTML("<hr>"))
+        self.widget_angle = widgets.Label("")
+        display(widgets.HBox([widgets.Label("Angle value:"), self.widget_angle]))
+        display(widgets.HTML("<b>Check the 2 fields to use to determine the angle value (degree.minutes)!</b>"))
+        display(widgets.HTML("<font color='blue'>Rerun the cell to test schema on another file</font>"))
+
+    def on_check_change(self, change):
+        self.list_states_checkbox = [x.value for x in self.list_checkboxes]
+        list_index = []
+        for _index, _value in enumerate(self.list_states_checkbox):
+            if _value:
+                list_index.append(_index)
+
+        if len(list_index) != 2:
+            self.error_label.value = "<font color='red'><b>ERROR</b>: Select 2 and only 2 checkboxes!</font>"
+        else:
+            self.error_label.value = ""
+            current_file_name = self.selected_file_label.value
+            first_index, second_index = list_index
+            file_name_split = current_file_name.split("_")
+            self.widget_angle.value = f"{file_name_split[first_index]}.{file_name_split[second_index]}"
 
     def data_selected(self, top_folder):
         logging.info(f"{self.parent.current_data_type} top folder selected: {top_folder}")
@@ -95,12 +159,22 @@ class Load(Parent):
             self.parent.configuration.top_folder.ob = top_folder
 
     def save_list_of_angles(self, list_of_images):
+
+        list_checkboxes = self.list_checkboxes
+        list_indices = []
+        for _index, _checkbox in enumerate(list_checkboxes):
+            if _checkbox.value:
+                list_indices.append(_index)
+
+        if len(list_indices) != 2:
+            raise ValueError("You need to select 2 fields to determine the angle value (degree.minutes)")
+
         base_list_of_images = [os.path.basename(_file) for _file in list_of_images]
         list_of_angles = []
         for _file in base_list_of_images:
             _splitted_named = _file.split("_")
-            angle_degree = _splitted_named[-3]
-            angle_minute = _splitted_named[-2]
+            angle_degree = _splitted_named[list_indices[0]]
+            angle_minute = _splitted_named[list_indices[1]]
             angle_value = float(f"{angle_degree}.{angle_minute}")
             list_of_angles.append(angle_value)
 

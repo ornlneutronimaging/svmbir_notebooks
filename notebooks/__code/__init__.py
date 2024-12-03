@@ -17,10 +17,10 @@ class OperatingMode:
     white_beam = 'white_beam'
 
 
-DEFAULT_OPERATING_MODE = OperatingMode.tof
+DEFAULT_OPERATING_MODE = OperatingMode.white_beam
 NBR_TOF_RANGES = 3
 
-DEBUG = False
+DEBUG = True
 debug_folder = {OperatingMode.tof: {DataType.sample: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/September20_2024_PurpleCar_GoldenRatio_CT_5_0_C_Cd_inBeam_Resonance",
                                     DataType.ob: "/SNS/VENUS/IPTS-33699/shared/autoreduce/mcp/September26_2024_PurpleCar_OpenBean_5_0_C_Cd_inBeam_Resonance",
                                     DataType.cleaned_images: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
@@ -28,13 +28,13 @@ debug_folder = {OperatingMode.tof: {DataType.sample: "/SNS/VENUS/IPTS-33699/shar
                                     DataType.reconstructed: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
                                     DataType.extra: '/SNS/VENUS/IPTS-33699/shared/processed_data/jean_test',
                                     },
-                OperatingMode.white_beam: {DataType.sample: "/HFIR/CG1D/IPTS-32720/raw/ct_scans/2024_10_30_anodefree/",
-                                            DataType.ob: "/HFIR/CG1D/IPTS-32720/raw/ob/2024_10_30_anodefree/",
+                OperatingMode.white_beam: {DataType.sample: "/SNS/VENUS/IPTS-33531/shared/processed_data/November8_2024_PlantE/",
+                                            DataType.ob: "/SNS/VENUS/IPTS-33531/shared/processed_data/ob_PlantE/",
                                             DataType.dc: "",
-                                            DataType.cleaned_images: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
-                                            DataType.normalized: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
-                                            DataType.reconstructed: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
-                                            DataType.extra: '/HFIR/CG1D/IPTS-32519/shared/processed_data/jean_test',
+                                            DataType.cleaned_images: '/SNS/VENUS/IPTS-33531/shared/processed_data/jean_test',
+                                            DataType.normalized: '/SNS/VENUS/IPTS-33531/shared/processed_data/jean_test',
+                                            DataType.reconstructed: '/SNS/VENUS/IPTS-33531/shared/processed_data/jean_test',
+                                            DataType.extra: '/SNS/VENUS/IPTS-33531/shared/processed_data/jean_test',
                                             },
 }
 
