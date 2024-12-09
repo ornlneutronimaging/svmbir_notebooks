@@ -52,3 +52,6 @@ SVMBIR_LIB_PATH = "/tmp/"
 
 # if x percent of a pixel value is still above median, remove it
 TOMOPY_REMOVE_OUTLIER_THRESHOLD_RATIO = 0.1
+
+# percentage of data to use for the reconstruction
+PERCENTAGE_OF_DATA_TO_USE_FOR_RECONSTRUCTION = 50

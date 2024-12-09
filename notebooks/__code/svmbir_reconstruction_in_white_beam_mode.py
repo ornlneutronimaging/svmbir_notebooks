@@ -194,6 +194,10 @@ class SvmbirReconstruction:
         self.o_load = Load(parent=self)
         self.o_load.define_naming_convention()
 
+    # pecentage of data to use
+    def select_percentage_of_data_to_use(self):
+        self.o_load.select_percentage_of_data_to_use()
+
     # load data
     def load_data(self):
         self.o_load.load_white_beam_data()

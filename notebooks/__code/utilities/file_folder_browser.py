@@ -23,6 +23,17 @@ class FileFolderBrowser:
                                                                next=self.next_function)
         self.list_images_ui.show()
 
+    def select_file(self, instruction="Select file ...",
+                    filters={"All": "*.*"},
+                    default_filter="All"):
+        self.list_files_ui = myfileselector.MyFileSelectorPanel(instruction=instruction,
+                                                               start_dir=self.working_dir,
+                                                               multiple=False,
+                                                               filters=filters,
+                                                               default_filter=default_filter,
+                                                               next=self.next_function)
+        self.list_files_ui.show()
+
     def select_images_with_search(self, instruction='Select Images ...',
                                   multiple_flag=True,
                                   filters={"All": "*.*"},

@@ -12,7 +12,7 @@ from __code.parent import Parent
 from __code.utilities.file_folder_browser import FileFolderBrowser
 from __code.utilities.load import load_data_using_multithreading, load_list_of_tif, load_tiff
 from __code.utilities.files import retrieve_list_of_tif
-from __code.config import DEFAULT_NAMING_CONVENTION_INDICES
+from __code.config import DEFAULT_NAMING_CONVENTION_INDICES, PERCENTAGE_OF_DATA_TO_USE_FOR_RECONSTRUCTION
 
 
 class Load(Parent):
@@ -77,6 +77,26 @@ class Load(Parent):
         list_images.sort()
         logging.info(f"{len(list_images)} {self.data_type} images have been selected!")
         self.parent.list_of_images[self.data_type] = list_images
+
+    def select_percentage_of_data_to_use(self):
+        self.percentage_to_use = widgets.IntSlider(value=PERCENTAGE_OF_DATA_TO_USE_FOR_RECONSTRUCTION,
+                                    min=1,
+                                    max=100,
+                                    step=1)
+        display(self.percentage_to_use)
+
+        list_of_tiff = self.parent.list_of_images[DataType.sample]
+        percentage = self.percentage_to_use.value
+        nbr_images = int(percentage / 100 * len(list_of_tiff))
+        self.number_of_images_to_use = widgets.Label(f"{nbr_images} images will be used for the reconstruction")
+        display(self.number_of_images_to_use)
+        self.percentage_to_use.observe(self.on_percentage_to_use_change, names='value') 
+
+    def on_percentage_to_use_change(self, change):
+        new_value = change['new']
+        list_tiff = self.parent.list_of_images[DataType.sample]
+        nbr_images = int(new_value / 100 * len(list_tiff))
+        self.number_of_images_to_use.value = f"{nbr_images} images will be used for the reconstruction"
 
     def define_naming_convention(self):
         number_of_images = len(self.parent.list_of_images[DataType.sample])
@@ -159,13 +179,9 @@ class Load(Parent):
 
         if self.parent.MODE == OperatingMode.white_beam:
             list_tiff = glob.glob(os.path.join(top_folder, "*.tif*"))
-
-            # if DEBUG:
-            #     list_tiff = list_tiff[0:10]
-
             list_tiff.sort()
             self.parent.list_of_images[self.data_type] = list_tiff
-            logging.info(f"{len(list_tiff)} {self.data_type} files will be loaded!")
+            logging.info(f"{len(list_tiff)} {self.data_type} files!")
 
         if self.data_type == DataType.sample:
             self.parent.configuration.top_folder.sample = top_folder
@@ -208,7 +224,14 @@ class Load(Parent):
 
             if _data_type == DataType.sample:
                 list_of_images[_data_type].sort()
-                self.save_list_of_angles(list_of_images[_data_type])
+                list_tiff = list_of_images[_data_type]
+                nbr_images_to_use = int(self.percentage_to_use.value / 100 * len(list_of_images[_data_type]))
+                list_tiff_index_to_use = np.random.randint(0, len(list_of_images[_data_type]), nbr_images_to_use)
+                list_tiff_index_to_use.sort()
+                list_tiff = [list_tiff[_index] for _index in list_tiff_index_to_use]
+                self.parent.list_of_images[_data_type] = list_tiff
+                list_of_images[_data_type] = list_tiff
+                self.save_list_of_angles(list_tiff)
 
             self.parent.master_3d_data_array[_data_type] = load_data_using_multithreading(list_of_images[_data_type])
             logging.info(f"{np.shape(self.parent.master_3d_data_array[_data_type]) = }")

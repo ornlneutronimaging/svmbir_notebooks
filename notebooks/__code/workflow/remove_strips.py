@@ -320,8 +320,12 @@ class RemoveStrips:
     def perform_cleaning(self):
         list_algo_to_use = self.list_to_use_widget.options
         logging.info(f"Strip cleaning:")
+
+        self.parent.before_corrected_images = self.parent.corrected_images      
+
         if list_algo_to_use:
-            tomography_array = self.parent.corrected_images
+            tomography_array = np.array(self.parent.corrected_images)
+            logging.info(f"\t{type(tomography_array) =}")
             print(f"{np.shape(tomography_array) = }")
             list_algo_that_failed = []
             list_algo_that_worked = []
@@ -340,7 +344,7 @@ class RemoveStrips:
                 list_algo_that_failed.append(_algo)
 
             self.nothing_to_display = False
-            self.parent.strip_corrected_images = tomography_array
+            self.parent.corrected_images = tomography_array
         
             if list_algo_that_failed:
                 display(HTML("<font color=red><b>List of algo that failed:</b></font>"))
@@ -353,8 +357,7 @@ class RemoveStrips:
         
         else:
             logging.info(f"\tskipped!")
-            self.parent.strip_corrected_images = self.parent.corrected_images      
-
+            
     @staticmethod
     def run_algo(name_of_algo, array, **kwargs):
         return name_of_algo(array, **kwargs)
@@ -363,13 +366,13 @@ class RemoveStrips:
         if self.nothing_to_display:
             return
 
-        strip_corrected_images = self.parent.strip_corrected_images
-        sinogram_before = self.calculate_sinogram(strip_corrected_images)
+        corrected_images_before = self.parent.corrected_images
+        sinogram_before = self.calculate_sinogram(corrected_images_before)
 
-        corrected_images = self.parent.corrected_images
-        sinogram_after = self.calculate_sinogram(corrected_images)
+        corrected_images_after = self.parent.corrected_images
+        sinogram_after = self.calculate_sinogram(corrected_images_after)
 
-        nbr_projections, height, _ = np.shape(corrected_images)
+        nbr_projections, height, _ = np.shape(corrected_images_after)
 
         final_list_of_angles = self.parent.list_of_angles_to_use_sorted
         final_list_of_runs = self.parent.list_of_runs_to_use[DataType.sample]
@@ -381,11 +384,11 @@ class RemoveStrips:
             if self.parent.MODE == OperatingMode.tof:
                 fig.suptitle(f"Run: {final_list_of_runs[image_index]}, Angle: {final_list_of_angles[image_index]}")
 
-            axs[0][0].imshow(corrected_images[image_index], vmin=0, vmax=1)
+            axs[0][0].imshow(corrected_images_before[image_index], vmin=0, vmax=1)
             axs[0][0].set_title("Before correction")
             axs[0][0].axhline(slice_index, color='red', linestyle='--')
 
-            axs[0][1].imshow(strip_corrected_images[image_index], vmin=0, vmax=1)
+            axs[0][1].imshow(corrected_images_after[image_index], vmin=0, vmax=1)
             axs[0][1].set_title("After correction")
             axs[0][1].axhline(slice_index, color='red', linestyle='--')
 

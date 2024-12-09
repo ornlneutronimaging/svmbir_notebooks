@@ -47,7 +47,9 @@ class ImagesCleaner(Parent):
                                          description="Histogram")
         self.tomo_ui = widgets.Checkbox(value=False,
                                         description="Threshold")
-        v_box = widgets.VBox([self.histo_ui, self.tomo_ui])
+        self.median_filter_ui = widgets.Checkbox(value=False,
+                                                 description="Median filter")
+        v_box = widgets.VBox([self.histo_ui, self.tomo_ui, self.median_filter_ui])
         display(v_box)
 
     def cleaning_setup(self):
@@ -133,6 +135,24 @@ class ImagesCleaner(Parent):
 
         self.cleaning_by_histogram()
         self.cleaning_by_imars3d()
+        self.cleaning_by_median_filter()
+
+    def cleaning_by_median_filter(self):
+
+        if not self.median_filter_ui.value:
+            logging.info(f"cleaning using median filter: OFF")
+            return  
+        
+        logging.info(f"cleaning using median filter ...")
+        _size = (1, 3, 3)
+        self.parent.master_3d_data_array[DataType.sample] = median_filter(self.parent.master_3d_data_array[DataType.sample], size=_size)
+        self.parent.master_3d_data_array[DataType.ob] = median_filter(self.parent.master_3d_data_array[DataType.ob], size=_size)
+        # self.parent.master_3d_data_array[DataType.sample] = [median_filter(_data, size=_size) for _data in self.parent.master_3d_data_array[DataType.sample]]  
+        # self.parent.master_3d_data_array[DataType.ob] = [median_filter(_data, size=_size) for _data in self.parent.master_3d_data_array[DataType.ob]]
+        if self.parent.list_of_images[DataType.dc]:
+            self.parent.master_3d_data_array[DataType.dc] = median_filter(self.parent.master_3d_data_array[DataType.dc], size=_size)
+            # self.parent.master_3d_data_array[DataType.dc] = [median_filter(_data, size=_size) for _data in self.parent.master_3d_data_array[DataType.dc]]   
+        logging.info(f"cleaning using median filter ... done!")
 
     def cleaning_by_imars3d(self):
         
@@ -140,6 +160,10 @@ class ImagesCleaner(Parent):
             logging.info(f"cleaning using tomopy: OFF")
             return
     
+        logging.info(f"cleaning using tomopy ...")
+        sample_data = np.array(self.parent.master_3d_data_array[DataType.sample])
+
+
         sample_data = np.array(self.parent.master_3d_data_array[DataType.sample])
         cleaned_sample = gamma_filter(arrays=sample_data)
         self.parent.master_3d_data_array[DataType.sample] = cleaned_sample
@@ -152,6 +176,8 @@ class ImagesCleaner(Parent):
             dc_data = np.array(self.parent.master_3d_data_array[DataType.dc])
             cleaned_dc = gamma_filter(arrays=dc_data)
             self.parent.master_3d_data_array[DataType.dc] = cleaned_dc
+
+        logging.info(f"cleaning using tomopy ... done!")
             
     def cleaning_by_histogram(self):
 
@@ -159,6 +185,7 @@ class ImagesCleaner(Parent):
             logging.info(f"cleaning by histogram: OFF")
             return
 
+        logging.info(f"cleaning by histogram ...")
         self.nbr_bins, nbr_bins_to_exclude = self.parent.display_histogram.result
 
         # update configuration
@@ -214,6 +241,7 @@ class ImagesCleaner(Parent):
                     cleaned_dc_data.append(cleaned_im)          
                 self.parent.master_3d_data_array[DataType.ob] = cleaned_dc_data
                 logging.info(f"\tcleaned dc!")
+        logging.info(f"cleaning by histogram ... done!")
 
     # def check_cleaned_pixels(self):
     #     sample_data = self.parent.master_3d_data_array[DataType.sample]  

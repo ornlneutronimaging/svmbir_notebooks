@@ -38,6 +38,8 @@ class SvmbirHandler(Parent):
         display(widgets.HTML("<font size=5>Select range of slices to reconstruct</font"))
 
         [default_top, default_bottom] = self.parent.configuration.range_of_slices_for_center_of_rotation
+        if default_bottom == 0:
+            default_bottom = -1
 
         def plot_range(image_index, top_slice, bottom_slice):
 
@@ -241,14 +243,21 @@ class SvmbirHandler(Parent):
         base_sample_folder = os.path.basename(self.parent.working_dir[DataType.sample])
         pre_projections_export_folder = os.path.join(output_folder, f"{base_sample_folder}_projections_pre_data_{_time_ext}")
         os.makedirs(pre_projections_export_folder)
-        logging.info(f"\tprojections pre data are exported to {pre_projections_export_folder}!")
+        logging.info(f"\tprojections pre data will be exported to {pre_projections_export_folder}!")
 
         full_output_folder = os.path.join(output_folder, f"{base_sample_folder}_reconstructed_{_time_ext}")
 
         # go from [angle, height, width] to [angle, width, height]
-        corrected_array_log = np.moveaxis(corrected_array_log, 1, 2)  # angle, y, x -> angle, x, y
+        # corrected_array_log = np.moveaxis(corrected_array_log, 1, 2)  # angle, y, x -> angle, x, y
+        logging.info(f"\t{np.shape(corrected_array_log) =}")
 
         for _index, _data in tqdm(enumerate(corrected_array_log)):
+
+            if _index == 0:
+                logging.info(f"\t{np.shape(_data) = }")
+                logging.info(f"\t{top_slice = }")
+                logging.info(f"\t{bottom_slice = }")
+
             short_file_name = f"pre-reconstruction_{_index:04d}.tiff"
             full_file_name = os.path.join(pre_projections_export_folder, short_file_name)
             make_tiff(data=_data[top_slice:bottom_slice+1, :], filename=full_file_name)

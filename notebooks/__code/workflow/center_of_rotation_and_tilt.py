@@ -238,8 +238,8 @@ class CenterOfRotationAndTilt(Parent):
         rois = ((y_top, mid_point+1), (mid_point, y_bottom))
 
         corrected_images = correction_COR(self.parent.corrected_images,
-                       self.image_0_degree,
-                       self.image_180_degree,
+                       np.array(self.image_0_degree),
+                       np.array(self.image_180_degree),
                        rois=rois)
         logging.info(f"{np.shape(corrected_images) =}")
         self.parent.corrected_images = corrected_images

@@ -3,6 +3,7 @@ from typing import List
 
 from __code.utilities.json import load_json_string
 from __code import CleaningAlgorithm, NormalizationSettings, OperatingMode
+from __code.utilities.file_folder_browser import FileFolderBrowser
 
 
 class RemoveStripeFwWnameOptions:
@@ -154,3 +155,11 @@ def loading_config_file_into_model(config_file_path):
     config_dictionary = load_json_string(config_file_path)
     my_model = Configuration.parse_obj(config_dictionary)
     return my_model
+
+
+def select_file(top_folder=None, next_function=None):
+    o_file = FileFolderBrowser(working_dir=top_folder,
+                               next_function=next_function)
+    o_file.select_file(instruction="Select configuration file ...",
+                       filters={"Json": "*.json"},
+                       default_filter="Json")

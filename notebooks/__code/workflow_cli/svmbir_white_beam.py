@@ -41,7 +41,12 @@ class SvmbirCliHandler:
         svmbir_lib_path = config['svmbir_lib_path']
         max_resolutions = config['max_resolutions']
 
+        logging.info(f"Before switching y and x coordinates:")
         logging.info(f"{np.shape(corrected_array_log) = }")
+        corrected_array_log = np.swapaxes(corrected_array_log, 1, 2)
+        logging.info(f"After switching y and x coordinates:")
+        logging.info(f"{np.shape(corrected_array_log) = }")
+
         logging.info(f"{list_of_angles_rad = }")
         logging.info(f"{height = }")
         logging.info(f"{width = }")
