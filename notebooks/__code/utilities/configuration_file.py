@@ -149,6 +149,7 @@ class Configuration(BaseModel):
     
     svmbir_config: SvmbirConfig = Field(default=SvmbirConfig())
     output_folder: str = Field(default="")
+    projections_pre_processing_folder: str = Field(default="")
 
 
 def loading_config_file_into_model(config_file_path):

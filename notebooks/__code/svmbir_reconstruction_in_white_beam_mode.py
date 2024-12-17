@@ -337,6 +337,7 @@ class SvmbirReconstruction:
         o_select.select_folder(data_type=DataType.extra)
 
     def export_extra_files(self):
+        self.o_svmbir.export_pre_reconstruction_data()
         o_export = ExportExtra(parent=self)
         o_export.run(base_log_file_name=LOG_BASENAME_FILENAME)
-        self.o_svmbir.export_pre_reconstruction_data()
+        

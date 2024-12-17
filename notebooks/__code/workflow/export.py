@@ -2,6 +2,8 @@ from tqdm import tqdm
 import os
 import logging
 import shutil
+from IPython.display import display
+from IPython.core.display import HTML
 
 from __code.utilities.save import make_tiff
 from __code.utilities.json import save_json
@@ -38,8 +40,14 @@ class ExportExtra(Parent):
 
         configuration = self.parent.configuration
         base_sample_folder = os.path.basename(self.parent.working_dir[DataType.sample])
+
         _time_ext = get_current_time_in_special_file_name_format()
-        config_file_name = f"/SNS/VENUS/shared/log/{base_sample_folder}_{_time_ext}.json"
+        # config_file_name = f"/SNS/VENUS/shared/log/{base_sample_folder}_{_time_ext}.json"
+        config_file_name = os.path.join(output_folder, f"{base_sample_folder}_{_time_ext}.json")
+        
         config_json = configuration.model_dump_json()
         save_json(config_file_name, json_dictionary=config_json)
         print(f"\t\tconfig file {config_file_name}")
+
+        display(HTML("Move to the next notebook <font color='red'>step2_svmbir_reconstruction_in_white_beam_mode</font> and " +
+                     f"load the configuration file you just exported (<font color='red'>{config_file_name}</font>)"))

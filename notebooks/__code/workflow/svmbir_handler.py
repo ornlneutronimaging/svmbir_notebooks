@@ -28,48 +28,54 @@ class SvmbirHandler(Parent):
 
     def set_settings(self):
 
-        corrected_array = self.parent.corrected_images
-        nbr_images = len(corrected_array)
-        height = self.parent.image_size['height']
+        # corrected_array = self.parent.corrected_images
+        # nbr_images = len(corrected_array)
+        # height, _ = np.shape(corrected_array[0])
 
-        list_angles = self.parent.final_list_of_angles
-        list_runs = self.parent.list_of_runs_to_use[DataType.sample]
+        # list_angles = self.parent.final_list_of_angles
+        # list_runs = self.parent.list_of_runs_to_use[DataType.sample]
 
-        display(widgets.HTML("<font size=5>Select range of slices to reconstruct</font"))
+        # display(widgets.HTML("<font size=5>Select range of slices to reconstruct</font"))
 
-        [default_top, default_bottom] = self.parent.configuration.range_of_slices_for_center_of_rotation
-        if default_bottom == 0:
-            default_bottom = -1
+        # [default_top, default_bottom] = self.parent.configuration.range_of_slices_for_center_of_rotation
+        # if default_bottom == 0:
+        #     default_bottom = height - 1
 
-        def plot_range(image_index, top_slice, bottom_slice):
+        # if default_top > height:
+        #     default_top = 0
 
-            fig, axs = plt.subplots(nrows=1, ncols=1)
+        # if default_bottom > height:
+        #     default_bottom = height - 1
 
-            axs.set_title(f"angle: {list_angles[image_index]}")
-            axs.imshow(corrected_array[image_index], vmin=0, vmax=1)
-            axs.axhspan(top_slice, bottom_slice, color='blue', alpha=0.3)
-            axs.axhline(top_slice, color='red', linestyle='--')
-            axs.axhline(bottom_slice, color='red', linestyle='--')
+        # def plot_range(image_index, top_slice, bottom_slice):
 
-            plt.tight_layout()
-            plt.show()
+        #     fig, axs = plt.subplots(nrows=1, ncols=1)
 
-            return top_slice, bottom_slice
+        #     axs.set_title(f"angle: {list_angles[image_index]}")
+        #     axs.imshow(corrected_array[image_index], vmin=0, vmax=1)
+        #     axs.axhspan(top_slice, bottom_slice, color='blue', alpha=0.3)
+        #     axs.axhline(top_slice, color='red', linestyle='--')
+        #     axs.axhline(bottom_slice, color='red', linestyle='--')
 
-        self.display_corrected_range = interactive(plot_range,
-                                                    image_index = widgets.IntSlider(min=0,
-                                                                                    max=nbr_images-1,
-                                                                                    value=0),
-                                                   top_slice = widgets.IntSlider(min=0,
-                                                                                 max=height-1,
-                                                                                 value=default_top),
-                                                    bottom_slice = widgets.IntSlider(min=0,
-                                                                                     max=height-1,
-                                                                                     value=default_bottom),
-                                                    )
-        display(self.display_corrected_range)
-        display(widgets.HTML("<hr>"))
-        display(widgets.HTML("<font size=5>Define reconstruction settings</font"))
+        #     plt.tight_layout()
+        #     plt.show()
+
+        #     return top_slice, bottom_slice
+
+        # self.display_corrected_range = interactive(plot_range,
+        #                                             image_index = widgets.IntSlider(min=0,
+        #                                                                             max=nbr_images-1,
+        #                                                                             value=0),
+        #                                            top_slice = widgets.IntSlider(min=0,
+        #                                                                          max=height-1,
+        #                                                                          value=default_top),
+        #                                             bottom_slice = widgets.IntSlider(min=0,
+        #                                                                              max=height-1,
+        #                                                                              value=default_bottom),
+        #                                             )
+        # display(self.display_corrected_range)
+        # display(widgets.HTML("<hr>"))
+        # display(widgets.HTML("<font size=5>Define reconstruction settings</font"))
 
         self.sharpness_ui = widgets.FloatSlider(min=0,
                                            max=1,
@@ -186,7 +192,7 @@ class SvmbirHandler(Parent):
         # self.parent.configuration.list_of_ob_pc = self.parent.final_dict_of_pc[DataType.ob]
         # self.parent.configuration.list_of_ob_frame_number = self.parent.final_dict_of_frame_number[DataType.ob]
 
-        top_slice, bottom_slice = self.display_corrected_range.result
+        # top_slice, bottom_slice = self.display_corrected_range.result
         sharpness = self.sharpness_ui.value
         snr_db = self.snr_db_ui.value
         positivity = self.positivity_ui.value
@@ -201,12 +207,12 @@ class SvmbirHandler(Parent):
         svmbir_config.positivity = positivity
         svmbir_config.max_iterations = max_iterations
         svmbir_config.verbose = verbose
-        svmbir_config.top_slice = top_slice
-        svmbir_config.bottom_slice = bottom_slice
+        # svmbir_config.top_slice = top_slice
+        # svmbir_config.bottom_slice = bottom_slice
         self.parent.configuration.svmbir_config = svmbir_config
 
-        logging.info(f"\t{top_slice = }")
-        logging.info(f"\t{bottom_slice = }")
+        # logging.info(f"\t{top_slice = }")
+        # logging.info(f"\t{bottom_slice = }")
         logging.info(f"\t{sharpness = }")
         logging.info(f"\t{snr_db = }")
         logging.info(f"\t{positivity = }")
@@ -244,6 +250,7 @@ class SvmbirHandler(Parent):
         pre_projections_export_folder = os.path.join(output_folder, f"{base_sample_folder}_projections_pre_data_{_time_ext}")
         os.makedirs(pre_projections_export_folder)
         logging.info(f"\tprojections pre data will be exported to {pre_projections_export_folder}!")
+        self.parent.configuration.projections_pre_processing_folder = pre_projections_export_folder
 
         full_output_folder = os.path.join(output_folder, f"{base_sample_folder}_reconstructed_{_time_ext}")
 
@@ -255,12 +262,13 @@ class SvmbirHandler(Parent):
 
             if _index == 0:
                 logging.info(f"\t{np.shape(_data) = }")
-                logging.info(f"\t{top_slice = }")
-                logging.info(f"\t{bottom_slice = }")
+                # logging.info(f"\t{top_slice = }")
+                # logging.info(f"\t{bottom_slice = }")
 
             short_file_name = f"pre-reconstruction_{_index:04d}.tiff"
             full_file_name = os.path.join(pre_projections_export_folder, short_file_name)
-            make_tiff(data=_data[top_slice:bottom_slice+1, :], filename=full_file_name)
+            # make_tiff(data=_data[top_slice:bottom_slice+1, :], filename=full_file_name)
+            make_tiff(data=_data, filename=full_file_name)
         print(f"projections exported in {pre_projections_export_folder}")
 
         export_dict = {'list_of_angles_rad': list(list_of_angles_rad),
@@ -276,7 +284,9 @@ class SvmbirHandler(Parent):
                        'num_threads': NUM_THREADS,
                        'svmbir_lib_path': SVMBIR_LIB_PATH,
                        'input_folder': pre_projections_export_folder,
-                       'output_folder': full_output_folder}
+                       'output_folder': full_output_folder,
+                       'projections_pre_processing_folder': pre_projections_export_folder,
+                       }
         
         json_file_name = os.path.join(output_folder, f"projections_pre_metadata_{_time_ext}.json")
         save_json(json_file_name=json_file_name,
