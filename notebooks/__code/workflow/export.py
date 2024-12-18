@@ -32,11 +32,10 @@ class Export:
 class ExportExtra(Parent):
 
     def run(self, base_log_file_name=None):
-        print(f"Files exported:")
         log_file_name = f"/SNS/VENUS/shared/log/{base_log_file_name}.log"
         output_folder = self.parent.working_dir[DataType.extra]
         shutil.copy(log_file_name, output_folder)
-        print(f"\tlog file from {log_file_name} to {output_folder}!")
+        # display(HTML(f"\tlog file from {log_file_name} to {output_folder}!"))
 
         configuration = self.parent.configuration
         base_sample_folder = os.path.basename(self.parent.working_dir[DataType.sample])
@@ -47,7 +46,5 @@ class ExportExtra(Parent):
         
         config_json = configuration.model_dump_json()
         save_json(config_file_name, json_dictionary=config_json)
-        print(f"\t\tconfig file {config_file_name}")
-
         display(HTML("Move to the next notebook <font color='red'>step2_svmbir_reconstruction_in_white_beam_mode</font> and " +
                      f"load the configuration file you just exported (<font color='red'>{config_file_name}</font>)"))

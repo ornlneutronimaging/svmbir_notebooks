@@ -13,8 +13,8 @@ class RemoveStripeFwWnameOptions:
 
 
 class RemoveStripeDim:
-    one = '1'
-    two = '2'
+    one = 1
+    two = 2
 
 
 class ImageSize(BaseModel):
@@ -40,13 +40,13 @@ class RemoveStripeSf(BaseModel):
 
 class RemoveStripeBasedSorting(BaseModel):
     size: str = "None"
-    dim: str = Field(default=RemoveStripeDim.one)
+    dim: int = Field(default=RemoveStripeDim.one)
 
 
 class RemoveStripeBasedFiltering(BaseModel):
     sigma: float = 3
     size: str = "None"
-    dim: str = Field(default=RemoveStripeDim.one)
+    dim: int = Field(default=RemoveStripeDim.one)
 
 
 class RemoveStripeBasedFitting(BaseModel):
@@ -71,7 +71,7 @@ class RemoveAllStripe(BaseModel):
     snr: float = 3
     la_size: int = 61
     sm_size: int = 21
-    dim: str = Field(default=RemoveStripeDim.one)
+    dim: int = Field(default=RemoveStripeDim.one)
 
 
 class RemoveStripeBasedInterpolation(BaseModel):
@@ -114,14 +114,14 @@ class Configuration(BaseModel):
     operating_mode: str = Field(default=OperatingMode.tof) 
     image_size: ImageSize = Field(default=ImageSize())
 
-    list_of_angles: List[float] = Field(default=None)
-    list_of_sample_runs: List[str] = Field(default=None)
+    list_of_angles: List[float] = Field(default=[])
+    list_of_sample_runs: List[str] = Field(default=[])
     list_of_sample_frame_number: List[int] = Field(default=[])
-    list_of_sample_pc: List[float] = Field(default=None)
+    list_of_sample_pc: List[float] = Field(default=[])
 
-    list_of_ob_runs: List[str] = Field(default=None)
-    list_of_ob_frame_number: List[int] = Field(default=None)
-    list_of_ob_pc: List[float] = Field(default=None)
+    list_of_ob_runs: List[str] = Field(default=[])
+    list_of_ob_frame_number: List[int] = Field(default=[])
+    list_of_ob_pc: List[float] = Field(default=[])
 
     range_of_tof_to_combine: List[tuple[int, int]] = Field(default=[[0, -1]])
     
@@ -154,6 +154,7 @@ class Configuration(BaseModel):
 
 def loading_config_file_into_model(config_file_path):
     config_dictionary = load_json_string(config_file_path)
+    print(config_dictionary)
     my_model = Configuration.parse_obj(config_dictionary)
     return my_model
 
