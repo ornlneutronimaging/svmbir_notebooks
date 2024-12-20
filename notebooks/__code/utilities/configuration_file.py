@@ -125,6 +125,8 @@ class Configuration(BaseModel):
 
     range_of_tof_to_combine: List[tuple[int, int]] = Field(default=[[0, -1]])
     
+    list_of_slices_to_reconstruct: List[tuple[int, int]] = Field(default=[[0, -1]])
+
     list_clean_algorithm: List[str] = Field(default=[CleaningAlgorithm.histogram, CleaningAlgorithm.threshold])
     histogram_cleaning_settings: HistogramCleaningSettings = Field(default=HistogramCleaningSettings())
     list_normalization_settings: List[str] = Field(default=[NormalizationSettings.pc, 
@@ -154,7 +156,6 @@ class Configuration(BaseModel):
 
 def loading_config_file_into_model(config_file_path):
     config_dictionary = load_json_string(config_file_path)
-    print(config_dictionary)
     my_model = Configuration.parse_obj(config_dictionary)
     return my_model
 
