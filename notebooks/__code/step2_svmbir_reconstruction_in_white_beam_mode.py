@@ -9,7 +9,7 @@ import numpy as np
 from matplotlib.patches import Rectangle
 from IPython.core.display import HTML
 
-from __code import DEBUG, debug_folder, OperatingMode, DataType
+from __code import DEBUG, debug_folder, OperatingMode, DataType, STEP3_SCRIPTS
 from __code.utilities.configuration_file import Configuration, select_file, loading_config_file_into_model
 from __code.utilities.logging import setup_logging
 from __code.utilities.files import retrieve_list_of_tif
@@ -44,6 +44,10 @@ class Step2SvmbirReconstructionInWhiteBeamMode:
         self.configuration = loading_config_file_into_model(config_file_path)
         self.images_path = self.configuration.projections_pre_processing_folder
 
+    def load_and_select_slices(self):
+        self.load_images()
+        self.select_range_of_slices()
+
     def load_images(self):
         logging.info(f"images_path: {self.images_path}")
         list_tiff = retrieve_list_of_tif(self.images_path)
@@ -57,13 +61,13 @@ class Step2SvmbirReconstructionInWhiteBeamMode:
         
         _, width = np.shape(self.data[0])
 
-        def plot_images(image_index, top_slice, bottom_slice, nbr_of_ranges):
+        def plot_images(image_index, top_slice, bottom_slice, nbr):
             fig, ax = plt.subplots()
             ax.imshow(self.data[image_index], cmap='jet')
             
-            range_size = int((np.abs(top_slice - bottom_slice)) / nbr_of_ranges)
+            range_size = int((np.abs(top_slice - bottom_slice)) / nbr)
 
-            for _range_index in np.arange(nbr_of_ranges):
+            for _range_index in np.arange(nbr):
                 _top_slice = top_slice + _range_index * range_size
 
                 ax.add_patch(Rectangle((0, _top_slice), width, range_size,
@@ -76,32 +80,43 @@ class Step2SvmbirReconstructionInWhiteBeamMode:
                 )     
 
             ax.axhline(top_slice, color='red')
-            ax.axhline(nbr_of_ranges * range_size, color='red')
+            ax.axhline(nbr * range_size, color='red')
                   
             plt.show()
 
-            return top_slice, bottom_slice, nbr_of_ranges
+            return top_slice, bottom_slice, nbr
 
         self.display_plot_images = interactive(plot_images,
-                                          image_index=widgets.IntSlider(min=0, max=self.data.shape[0]-1, step=1, value=0),
-                                          top_slice=widgets.IntSlider(min=0, max=self.data.shape[1]-1, step=1, value=0),
-                                          bottom_slice=widgets.IntSlider(min=0, max=self.data.shape[1]-1, step=1, value=self.data.shape[1]-1),
-                                          nbr_of_ranges=widgets.IntSlider(min=1, max=10, step=1, value=1))
+                                          image_index=widgets.IntSlider(min=0, max=self.data.shape[0]-1, step=1, value=0,
+                                                                        layout=widgets.Layout(width='50%')),
+                                          top_slice=widgets.IntSlider(min=0, max=self.data.shape[1]-1, step=1, value=0,
+                                                                      layout=widgets.Layout(width='50%')),
+                                          bottom_slice=widgets.IntSlider(min=0, max=self.data.shape[1]-1, 
+                                                                         step=1, value=self.data.shape[1]-1,
+                                                                         layout=widgets.Layout(width='50%')),
+                                          nbr=widgets.IntSlider(min=1, max=10, step=1, value=1,
+                                                                          layout=widgets.Layout(width='50%')))
         display(self.display_plot_images)
 
     def export_config_file(self):
-        top_slice, bottom_slice, nbr_of_ranges = self.display_plot_images.result
+        top_slice, bottom_slice, nbr = self.display_plot_images.result
         logging.info(f"Exporting config file:")
         logging.info(f"\ttop_slice: {top_slice}")
         logging.info(f"\tbottom_slice: {bottom_slice}")
-        logging.info(f"\tnbr_of_ranges: {nbr_of_ranges}")
+        logging.info(f"\tnbr_of_ranges: {nbr}")
 
-        range_size = int((np.abs(top_slice - bottom_slice)) / nbr_of_ranges)
+        range_size = int((np.abs(top_slice - bottom_slice)) / nbr)
 
         list_slices = []
-        for _range_index in np.arange(nbr_of_ranges):
+        for _range_index in np.arange(nbr):
             _top_slice = top_slice + _range_index * range_size
-            _bottom_slice = _top_slice + range_size
+            if _top_slice > 0:
+                _top_slice -= 1  # to make sure we have a 2 pixels overlap between ranges of slices
+
+            _bottom_slice = top_slice + _range_index * range_size + range_size
+            if _bottom_slice < (self.data.shape[1] - 1):
+                _bottom_slice += 1 # to make sure we have a 2 pixels overlap between ranges of slices
+
             list_slices.append((_top_slice, _bottom_slice))
             self.configuration.list_of_slices_to_reconstruct = list_slices
             
@@ -113,5 +128,5 @@ class Step2SvmbirReconstructionInWhiteBeamMode:
         save_json(full_config_file_name, json_dictionary=config_json)
         logging.info(f"config file saved: {full_config_file_name}")
 
-        display(HTML("Move to the next step by running the command <font color='blue'>python step3_svmbir_reconstruction_in_white_beam_mode.py</font> " +
-                     f"<font color='blue'>{full_config_file_name}</font>"))
+        display(HTML(f"Move to the next step by running the command <font color='red'>python {STEP3_SCRIPTS}</font> " +
+                     f"<font color='red'>{full_config_file_name}</font>"))

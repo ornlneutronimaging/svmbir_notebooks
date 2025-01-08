@@ -49,6 +49,12 @@ def make_or_reset_folder(folder_name):
     if os.path.exists(folder_name):
          shutil.rmtree(folder_name)
     os.makedirs(folder_name)
+
+
+def make_folder(folder_name):
+    if os.path.exists(folder_name):
+        return
+    os.makedirs(folder_name)
     
 
 def get_angle_value(run_full_path=None):

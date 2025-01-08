@@ -17,6 +17,9 @@ class OperatingMode:
     white_beam = 'white_beam'
 
 
+STEP3_SCRIPTS = "/SNS/VENUS/shared/software/git/svmbir_notebooks/notebooks/step3_svmbir_reconstruction_in_white_beam_mode.py"
+
+
 DEFAULT_OPERATING_MODE = OperatingMode.white_beam
 NBR_TOF_RANGES = 3
 

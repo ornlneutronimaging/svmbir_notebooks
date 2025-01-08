@@ -4,6 +4,7 @@ from typing import List
 from __code.utilities.json import load_json_string
 from __code import CleaningAlgorithm, NormalizationSettings, OperatingMode
 from __code.utilities.file_folder_browser import FileFolderBrowser
+from __code.config import SVMBIR_LIB_PATH
 
 
 class RemoveStripeFwWnameOptions:
@@ -103,6 +104,7 @@ class SvmbirConfig(BaseModel):
     snr_db: float = 30.0
     positivity: bool = True
     max_iterations: int = 200
+    max_resolutions: int = 3
     verbose: bool = False
     top_slice: int = 0
     bottom_slice: int = 1
@@ -151,6 +153,7 @@ class Configuration(BaseModel):
     
     svmbir_config: SvmbirConfig = Field(default=SvmbirConfig())
     output_folder: str = Field(default="")
+    reconstructed_output_folder: str = Field(default="")
     projections_pre_processing_folder: str = Field(default="")
 
 

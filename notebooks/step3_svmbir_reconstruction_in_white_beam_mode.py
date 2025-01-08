@@ -4,8 +4,13 @@ import logging
 from __code.utilities.logging import setup_logging
 from __code.workflow_cli.svmbir_white_beam import  SvmbirCliHandler
 
+# this requires to activate first the hsnt conda environment
+# ----------------------------------------------------------
+# source /opt/anaconda/etc/profile.d/conda.sh
+# conda activate hsnt
+# ----------------------------------------------------------
 
-setup_logging("svmbir_white_beam_cli_from_notebook_config")
+setup_logging("step3_svmbir_reconstruction_in_white_beam_mode")
 
 
 if __name__ == "__main__":
@@ -23,6 +28,6 @@ if __name__ == "__main__":
 
     SvmbirCliHandler.run_reconstruction_from_pre_data_mode(config_json_file=config_json_file)
 
-    print("svmbir reconstruction is done and report can be found in /SNS/VENUS/shared/log/svmbir_white_beam_cli.log!")
+    print("svmbir reconstruction is done and report can be found in /SNS/VENUS/shared/log/step3_svmbir_reconstruction_in_white_beam_mode.log!")
     logging.info(f"full reconstruction is done!")
     

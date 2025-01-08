@@ -31,18 +31,25 @@ class Export:
 
 class ExportExtra(Parent):
 
-    def run(self, base_log_file_name=None):
+    def run(self, base_log_file_name=None, prefix=""):
         log_file_name = f"/SNS/VENUS/shared/log/{base_log_file_name}.log"
         output_folder = self.parent.working_dir[DataType.extra]
         shutil.copy(log_file_name, output_folder)
         # display(HTML(f"\tlog file from {log_file_name} to {output_folder}!"))
 
         configuration = self.parent.configuration
-        base_sample_folder = os.path.basename(self.parent.working_dir[DataType.sample])
+
+        # update configuration
+        configuration.output_folder = output_folder
+
+        base_sample_folder = os.path.basename(os.path.abspath(self.parent.working_dir[DataType.sample]))
 
         _time_ext = get_current_time_in_special_file_name_format()
         # config_file_name = f"/SNS/VENUS/shared/log/{base_sample_folder}_{_time_ext}.json"
-        config_file_name = os.path.join(output_folder, f"{base_sample_folder}_{_time_ext}.json")
+        if prefix:
+            config_file_name = os.path.join(output_folder, f"{prefix}_{base_sample_folder}_{_time_ext}.json")   
+        else:
+            config_file_name = os.path.join(output_folder, f"{base_sample_folder}_{_time_ext}.json")
         
         config_json = configuration.model_dump_json()
         save_json(config_file_name, json_dictionary=config_json)

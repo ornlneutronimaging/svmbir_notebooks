@@ -13,6 +13,7 @@ import glob
 import svmbir
 
 from __code.workflow.export import Export
+# from __code.utilities.configuration import Configuration
 from __code.utilities.files import make_or_reset_folder
 from __code.utilities.configuration_file import SvmbirConfig
 from __code.parent import Parent
@@ -250,6 +251,8 @@ class SvmbirHandler(Parent):
         pre_projections_export_folder = os.path.join(output_folder, f"{base_sample_folder}_projections_pre_data_{_time_ext}")
         os.makedirs(pre_projections_export_folder)
         logging.info(f"\tprojections pre data will be exported to {pre_projections_export_folder}!")
+        logging.info(f"\toutput folder: {output_folder}")
+        
         self.parent.configuration.projections_pre_processing_folder = pre_projections_export_folder
 
         full_output_folder = os.path.join(output_folder, f"{base_sample_folder}_reconstructed_{_time_ext}")
@@ -270,155 +273,166 @@ class SvmbirHandler(Parent):
             # make_tiff(data=_data[top_slice:bottom_slice+1, :], filename=full_file_name)
             make_tiff(data=_data, filename=full_file_name)
         print(f"projections exported in {pre_projections_export_folder}")
+        print(f"top output folder: {output_folder}")
 
-        export_dict = {'list_of_angles_rad': list(list_of_angles_rad),
-                       'height': height,
-                       'width': width,
-                       'center_offset': center_offset,
-                       'sharpness': sharpness,
-                       'snr_db': snr_db,
-                       'positivity': positivity,
-                       'max_iterations': max_iterations,
-                       'max_resolutions': max_resolutions,
-                       'verbose': verbose,
-                       'num_threads': NUM_THREADS,
-                       'svmbir_lib_path': SVMBIR_LIB_PATH,
-                       'input_folder': pre_projections_export_folder,
-                       'output_folder': full_output_folder,
-                       'projections_pre_processing_folder': pre_projections_export_folder,
-                       }
+        # export_dict = Configuration()
+        # export_dict.list_of_angles = list(list_of_angles_rad)
+        # export_dict.image_size = height
+        # export_dict.width = width
+
+        # configuration = self.parent.configuration
+        # configuration.list_of_angles = list(list_of_angles_rad)
+
+        # export_dict = {'list_of_angles_rad': list(list_of_angles_rad),
+        #                'height': height,
+        #                'width': width,
+        #                'center_offset': center_offset,
+        #                'sharpness': sharpness,
+        #                'snr_db': snr_db,
+        #                'positivity': positivity,
+        #                'max_iterations': max_iterations,
+        #                'max_resolutions': max_resolutions,
+        #                'verbose': verbose,
+        #                'svmbir_lib_path': SVMBIR_LIB_PATH,
+        #                'input_folder': pre_projections_export_folder,
+        #                'reconstructed_output_folder': output_folder,
+        #                'output_folder': full_output_folder,
+        #                'projections_pre_processing_folder': pre_projections_export_folder,
+        #                }
         
-        json_file_name = os.path.join(output_folder, f"projections_pre_metadata_{_time_ext}.json")
-        save_json(json_file_name=json_file_name,
-                  json_dictionary=export_dict)
-        print(f"{json_file_name} exported !")
+        # self.parent.export_dict = export_dict
 
-    def run_reconstruction(self):
+        # json_file_name = os.path.join(output_folder, f"projections_pre_metadata_{_time_ext}.json")
+        # save_json(json_file_name=json_file_name,
+        #           json_dictionary=export_dict)
+        # print(f"{json_file_name} exported !")
 
-        logging.info(f"Running reconstruction:")
+    # def run_reconstruction(self):
 
-        corrected_array = self.parent.corrected_images
-        height, width = np.shape(corrected_array[0])
+    #     logging.info(f"Running reconstruction:")
 
-        list_of_angles = np.array(self.parent.final_list_of_angles)
-        list_of_angles_rad = np.array([np.deg2rad(float(_angle)) for _angle in list_of_angles])
-        # list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
-        # list_of_sample_pc = self.parent.final_dict_of_pc[DataType.sample]
-        # list_of_sample_pc_to_use = list_of_sample_pc
+    #     corrected_array = self.parent.corrected_images
+    #     height, width = np.shape(corrected_array[0])
 
-        # list_of_sample_frame_number = self.parent.final_dict_of_frame_number[DataType.sample]
-        # list_of_sample_frame_number_to_use = list_of_sample_frame_number
+    #     list_of_angles = np.array(self.parent.final_list_of_angles)
+    #     list_of_angles_rad = np.array([np.deg2rad(float(_angle)) for _angle in list_of_angles])
+    #     # list_of_runs_to_use = self.parent.list_of_runs_to_use[DataType.sample]
+    #     # list_of_sample_pc = self.parent.final_dict_of_pc[DataType.sample]
+    #     # list_of_sample_pc_to_use = list_of_sample_pc
+
+    #     # list_of_sample_frame_number = self.parent.final_dict_of_frame_number[DataType.sample]
+    #     # list_of_sample_frame_number_to_use = list_of_sample_frame_number
         
-        # # looking at list of runs to reject
-        # list_of_index_of_runs_to_exlude, list_runs_to_exclude = self._get_list_of_index_of_runs_to_exclude()
-        # if list_of_index_of_runs_to_exlude:
-        #     logging.info(f"\tUser wants to reject the following runs: {list_runs_to_exclude}!")
-        #     corrected_array = np.delete(corrected_array, list_of_index_of_runs_to_exlude, axis=0)
-        #     list_of_angles_rad = np.delete(list_of_angles_rad, list_of_index_of_runs_to_exlude, axis=0)
-        #     list_of_runs_to_use = np.delete(list_of_runs_to_use, list_of_index_of_runs_to_exlude)
-        #     list_of_sample_pc_to_use = np.delete(list_of_sample_pc, list_of_index_of_runs_to_exlude)
-        #     list_of_sample_frame_number_to_use = np.delete(list_of_sample_frame_number, list_of_index_of_runs_to_exlude)
+    #     # # looking at list of runs to reject
+    #     # list_of_index_of_runs_to_exlude, list_runs_to_exclude = self._get_list_of_index_of_runs_to_exclude()
+    #     # if list_of_index_of_runs_to_exlude:
+    #     #     logging.info(f"\tUser wants to reject the following runs: {list_runs_to_exclude}!")
+    #     #     corrected_array = np.delete(corrected_array, list_of_index_of_runs_to_exlude, axis=0)
+    #     #     list_of_angles_rad = np.delete(list_of_angles_rad, list_of_index_of_runs_to_exlude, axis=0)
+    #     #     list_of_runs_to_use = np.delete(list_of_runs_to_use, list_of_index_of_runs_to_exlude)
+    #     #     list_of_sample_pc_to_use = np.delete(list_of_sample_pc, list_of_index_of_runs_to_exlude)
+    #     #     list_of_sample_frame_number_to_use = np.delete(list_of_sample_frame_number, list_of_index_of_runs_to_exlude)
 
-            # updating configuration
-            # self.parent.configuration.list_of_sample_index_to_reject = list_of_index_of_runs_to_exlude
+    #         # updating configuration
+    #         # self.parent.configuration.list_of_sample_index_to_reject = list_of_index_of_runs_to_exlude
 
-        # else:
-        #     logging.info(f"\tNo runs rejected before final reconstruction!")
+    #     # else:
+    #     #     logging.info(f"\tNo runs rejected before final reconstruction!")
 
-        # update configuration
-        # self.parent.configuration.list_of_sample_runs = list(list_of_runs_to_use)
-        self.parent.configuration.list_of_angles = list(list_of_angles_rad)
+    #     # update configuration
+    #     # self.parent.configuration.list_of_sample_runs = list(list_of_runs_to_use)
+    #     self.parent.configuration.list_of_angles = list(list_of_angles_rad)
 
-        # save pc and frame number in configuration
-        # self.parent.configuration.list_of_sample_frame_number = list_of_sample_frame_number_to_use
-        # self.parent.configuration.list_of_sample_pc = list_of_sample_pc_to_use
-        # self.parent.configuration.list_of_ob_pc = self.parent.final_dict_of_pc[DataType.ob]
-        # self.parent.configuration.list_of_ob_frame_number = self.parent.final_dict_of_frame_number[DataType.ob]
+    #     # save pc and frame number in configuration
+    #     # self.parent.configuration.list_of_sample_frame_number = list_of_sample_frame_number_to_use
+    #     # self.parent.configuration.list_of_sample_pc = list_of_sample_pc_to_use
+    #     # self.parent.configuration.list_of_ob_pc = self.parent.final_dict_of_pc[DataType.ob]
+    #     # self.parent.configuration.list_of_ob_frame_number = self.parent.final_dict_of_frame_number[DataType.ob]
 
-        top_slice, bottom_slice = self.display_corrected_range.result
-        sharpness = self.sharpness_ui.value
-        snr_db = self.snr_db_ui.value
-        positivity = self.positivity_ui.value
-        max_iterations = self.max_iterations_ui.value
-        max_resolutions = self.max_resolutions_ui.value
-        verbose = 1 if self.verbose_ui.value else 0
+    #     top_slice, bottom_slice = self.display_corrected_range.result
+    #     sharpness = self.sharpness_ui.value
+    #     snr_db = self.snr_db_ui.value
+    #     positivity = self.positivity_ui.value
+    #     max_iterations = self.max_iterations_ui.value
+    #     max_resolutions = self.max_resolutions_ui.value
+    #     verbose = 1 if self.verbose_ui.value else 0
 
-        # update configuration
-        svmbir_config = SvmbirConfig()
-        svmbir_config.sharpness = sharpness
-        svmbir_config.snr_db = snr_db
-        svmbir_config.positivity = positivity
-        svmbir_config.max_iterations = max_iterations
-        svmbir_config.verbose = verbose
-        svmbir_config.top_slice = top_slice
-        svmbir_config.bottom_slice = bottom_slice
-        self.parent.configuration.svmbir_config = svmbir_config
+    #     # update configuration
+    #     svmbir_config = SvmbirConfig()
+    #     svmbir_config.sharpness = sharpness
+    #     svmbir_config.snr_db = snr_db
+    #     svmbir_config.positivity = positivity
+    #     svmbir_config.max_iterations = max_iterations
+    #     svmbir_config.verbose = verbose
+    #     svmbir_config.top_slice = top_slice
+    #     svmbir_config.bottom_slice = bottom_slice
+    #     self.parent.configuration.svmbir_config = svmbir_config
 
-        logging.info(f"\t{top_slice = }")
-        logging.info(f"\t{bottom_slice = }")
-        logging.info(f"\t{sharpness = }")
-        logging.info(f"\t{snr_db = }")
-        logging.info(f"\t{positivity = }")
-        logging.info(f"\t{max_iterations = }")
-        logging.info(f"\t{max_resolutions = }")
-        logging.info(f"\t{verbose = }")
-        logging.info(f"\t{list_of_angles_rad = }")
-        logging.info(f"\t{width = }")
-        logging.info(f"\t{height = }")
-        logging.info(f"\t{type(corrected_array) = }")
-        logging.info(f"\t{np.shape(corrected_array) = }")
-        logging.info(f"\t launching reconstruction ...")
+    #     logging.info(f"\t{top_slice = }")
+    #     logging.info(f"\t{bottom_slice = }")
+    #     logging.info(f"\t{sharpness = }")
+    #     logging.info(f"\t{snr_db = }")
+    #     logging.info(f"\t{positivity = }")
+    #     logging.info(f"\t{max_iterations = }")
+    #     logging.info(f"\t{max_resolutions = }")
+    #     logging.info(f"\t{verbose = }")
+    #     logging.info(f"\t{list_of_angles_rad = }")
+    #     logging.info(f"\t{width = }")
+    #     logging.info(f"\t{height = }")
+    #     logging.info(f"\t{type(corrected_array) = }")
+    #     logging.info(f"\t{np.shape(corrected_array) = }")
+    #     logging.info(f"\t launching reconstruction ...")
 
-        corrected_array_log = tomopy.minus_log(corrected_array)
+    #     corrected_array_log = tomopy.minus_log(corrected_array)
 
-        where_nan = np.where(np.isnan(corrected_array_log))
-        corrected_array_log[where_nan] = 0
+    #     where_nan = np.where(np.isnan(corrected_array_log))
+    #     corrected_array_log[where_nan] = 0
 
-        logging.info(f"\t{np.min(corrected_array_log) =}")
-        logging.info(f"\t{np.max(corrected_array_log) =}")
-        logging.info(f"\t{np.mean(corrected_array_log) =}")
+    #     logging.info(f"\t{np.min(corrected_array_log) =}")
+    #     logging.info(f"\t{np.max(corrected_array_log) =}")
+    #     logging.info(f"\t{np.mean(corrected_array_log) =}")
 
-        if not (self.parent.center_of_rotation is None):
-            center_offset = self.parent.center_of_rotation - int(width /2)
-        else:
-            center_offset = 0
+    #     if not (self.parent.center_of_rotation is None):
+    #         center_offset = self.parent.center_of_rotation - int(width /2)
+    #     else:
+    #         center_offset = 0
 
-        self.parent.reconstruction_array = svmbir.recon(sino=corrected_array_log[:, top_slice: bottom_slice+1, :],
-                                                        angles=list_of_angles_rad,
-                                                        # num_rows = height,
-                                                        # num_cols = width,
-                                                        center_offset = center_offset,
-                                                        sharpness = sharpness,
-                                                        snr_db = snr_db,
-                                                        positivity = positivity,
-                                                        max_iterations = max_iterations,
-                                                        num_threads = NUM_THREADS,
-                                                        max_resolutions = max_resolutions,
-                                                        verbose = verbose,
-                                                        svmbir_lib_path = SVMBIR_LIB_PATH,
-                                                        )
-        logging.info(f"\t Done !")
+    #     self.parent.reconstruction_array = svmbir.recon(sino=corrected_array_log[:, top_slice: bottom_slice+1, :],
+    #                                                     angles=list_of_angles_rad,
+    #                                                     # num_rows = height,
+    #                                                     # num_cols = width,
+    #                                                     center_offset = center_offset,
+    #                                                     sharpness = sharpness,
+    #                                                     snr_db = snr_db,
+    #                                                     positivity = positivity,
+    #                                                     max_iterations = max_iterations,
+    #                                                     num_threads = NUM_THREADS,
+    #                                                     max_resolutions = max_resolutions,
+    #                                                     verbose = verbose,
+    #                                                     svmbir_lib_path = SVMBIR_LIB_PATH,
+    #                                                     )
+    #     logging.info(f"\t Done !")
 
-    def display_slices(self):
+    # def display_slices(self):
 
-        reconstruction_array = self.parent.reconstruction_array
+    #     reconstruction_array = self.parent.reconstruction_array
 
-        height = self.parent.image_size['height']
+    #     height = self.parent.image_size['height']
         
-        def display_slices(slice_index):
+    #     def display_slices(slice_index):
 
-            fig, axs = plt.subplots(nrows=1, ncols=1)
-            im1 = axs.imshow(reconstruction_array[:, slice_index, :])
-            plt.colorbar(im1, ax=axs, shrink=0.5)
-            plt.tight_layout()
-            plt.show()
+    #         fig, axs = plt.subplots(nrows=1, ncols=1)
+    #         im1 = axs.imshow(reconstruction_array[:, slice_index, :])
+    #         plt.colorbar(im1, ax=axs, shrink=0.5)
+    #         plt.tight_layout()
+    #         plt.show()
 
-        display_svmbir_slices = interactive(display_slices,
-                                            slice_index = widgets.IntSlider(min=0,
-                                                                            max=height-1,
-                                                                            value=0),
-                                                )
-        display(display_svmbir_slices)
+    #     display_svmbir_slices = interactive(display_slices,
+    #                                         slice_index = widgets.IntSlider(min=0,
+    #                                                                         max=height-1,
+    #                                                                         value=0),
+    #                                             )
+    #     display(display_svmbir_slices)
 
     def export_images(self):
         
