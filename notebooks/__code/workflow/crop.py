@@ -8,6 +8,7 @@ import ipywidgets as widgets
 from matplotlib.patches import Rectangle
 
 from __code.parent import Parent
+from __code.utilities.configuration_file import CropRegion
 from __code import crop_roi as default_roi
 from __code import OperatingMode
 
@@ -80,6 +81,7 @@ class Crop(Parent):
     def run(self):
         left, right, top, bottom = self.display_roi.result
         self.parent.crop_region = {'left': left, 'right': right, 'top': top, 'bottom': bottom}
+        self.parent.config['crop_region'] = CropRegion(left=left, right=right, top=top, bottom=bottom)
         self.parent.corrected_images = np.array([image[top: bottom+1, left: right+1] 
                                                  for image in self.parent.corrected_images])
         

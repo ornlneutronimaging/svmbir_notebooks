@@ -15,6 +15,51 @@ from __code.utilities.time import get_current_time_in_special_file_name_format
 
 class SvmbirCliHandler:
 
+
+    @staticmethod
+    def merge_reconstructed_slices(output_data_folder=None, top_slice=0, list_of_output_folders=None, list_of_slices_to_reconstruct=None):
+        
+        final_output_folder = os.path.join(output_data_folder, "merged")
+        make_or_reset_folder(final_output_folder)
+
+        logging.info(f"merge reconstructed slices ...")
+        logging.info(f"\t{output_data_folder = }")
+        logging.info(f"\t{top_slice = }")
+        logging.info(f"\t{list_of_output_folders = }")
+        logging.info(f"\t{list_of_slices_to_reconstruct = }")
+
+        list_folder_tiff = {}
+        for _index, _folder in enumerate(list_of_output_folders):
+            _list_tiff = glob.glob(os.path.join(_folder, '*.tiff'))
+            if len(_list_tiff) == 0:
+                raise ValueError(f"no tiff files found in {_folder}")
+            
+            _list_tiff.sort()
+            list_folder_tiff[_index] = _list_tiff
+
+        list_slices_already_processed = []
+        for _index, [top_slice_index, bottom_slice_index] in enumerate(list_of_slices_to_reconstruct):
+            logging.info(f"working with folder: {os.path.dirname(list_folder_tiff[_index][0])}")
+            logging.info(f"\tfrom slice #{top_slice_index} to slice #{bottom_slice_index}")
+
+            list_slices = np.arange(top_slice_index, bottom_slice_index)
+            for _tiff_index, _slice_index in enumerate(list_slices):
+                if _slice_index in list_slices_already_processed:
+                    continue
+
+                else:
+                    list_slices_already_processed.append(_slice_index)
+                    logging.info(f"moving slice #{_slice_index} ({os.path.basename(list_folder_tiff[_index][_tiff_index])}) -> #image_{_slice_index + top_slice:03d}.tiff ... ")
+
+
+
+        # for loop over the list of folders to merge
+        #  get list of tiff files
+        #  copy and rename them to the final output folder using the initial slice number
+        #  nb: do not copy the overlapped slices
+
+
+
     @staticmethod
     def run_reconstruction_from_pre_data_mode(config_json_file):
 
@@ -46,6 +91,7 @@ class SvmbirCliHandler:
         svmbir_lib_path = SVMBIR_LIB_PATH
         max_resolutions = config['svmbir_config']['max_resolutions']
         list_of_slices_to_reconstruct = config['list_of_slices_to_reconstruct']
+        top_slice = config['crop_region']['top']
 
         logging.info(f"Before switching y and x coordinates:")
         logging.info(f"{np.shape(corrected_array_log) = }")
@@ -74,44 +120,55 @@ class SvmbirCliHandler:
         # make_or_reset_folder(output_data_folder)
         make_or_reset_folder(output_data_folder)
 
+        list_of_output_folders = []
         if list_of_slices_to_reconstruct:
 
-            for [index, [top_slice, bottom_slice]] in enumerate(list_of_slices_to_reconstruct):
-                print(f"working with set of slices #{index}: from {top_slice} to {bottom_slice-1}. ", end="") 
-                logging.info(f"working with set of slices #{index}: from {top_slice} to {bottom_slice-1}")
+            for [index, [top_slice_index, bottom_slice_index]] in enumerate(list_of_slices_to_reconstruct):
+                print(f"working with set of slices #{index}: from {top_slice} to {bottom_slice_index-1}. ", end="") 
+                logging.info(f"working with set of slices #{index}: from {top_slice} to {bottom_slice_index-1}")
                 print(f"launching svmbir #{index} ... ", end="")
                 logging.info(f"launching svmbir #{index} ...")
         
-                _sino = corrected_array_log[:, top_slice:bottom_slice, :]
+                # _sino = corrected_array_log[:, top_slice:bottom_slice_index, :]
         
-                logging.info(f"\t{np.shape(_sino) = }")
-                reconstruction_array = svmbir.recon(sino=_sino,
-                                                    angles=list_of_angles_rad,
-                                                    # num_rows = height,
-                                                    # num_cols = width,
-                                                    center_offset = center_offset,
-                                                    max_resolutions = max_resolutions,
-                                                    sharpness = sharpness,
-                                                    snr_db = snr_db,
-                                                    positivity = positivity,
-                                                    max_iterations = max_iterations,
-                                                    num_threads = NUM_THREADS,
-                                                    verbose = verbose,
-                                                    svmbir_lib_path = svmbir_lib_path,
-                                                    )
-                print(f"done! ")
-                logging.info(f"done with #{index}!")
+                # logging.info(f"\t{np.shape(_sino) = }")
+                # reconstruction_array = svmbir.recon(sino=_sino,
+                #                                     angles=list_of_angles_rad,
+                #                                     # num_rows = height,
+                #                                     # num_cols = width,
+                #                                     center_offset = center_offset,
+                #                                     max_resolutions = max_resolutions,
+                #                                     sharpness = sharpness,
+                #                                     snr_db = snr_db,
+                #                                     positivity = positivity,
+                #                                     max_iterations = max_iterations,
+                #                                     num_threads = NUM_THREADS,
+                #                                     verbose = verbose,
+                #                                     svmbir_lib_path = svmbir_lib_path,
+                #                                     )
+                # print(f"done! ")
+                # logging.info(f"done with #{index}!")
                 _index = f"{index:03d}"
-                print(f"exporting reconstructed slices set #{_index} ... ", end="")
-                logging.info(f"\t{np.shape(reconstruction_array) = }")
-                logging.info(f"exporting reconstructed data set #{_index} ...")
+                # print(f"exporting reconstructed slices set #{_index} ... ", end="")
+                # logging.info(f"\t{np.shape(reconstruction_array) = }")
+                # logging.info(f"exporting reconstructed data set #{_index} ...")
+
+                # REMOVE THIS LINE
+                output_data_folder = "/SNS/VENUS/IPTS-33531/shared/processed_data/jean_test/reconstructed_data_01m_08d_2025y_10h_27mn"
+
                 _output_data_folder = os.path.join(output_data_folder, f"set_{_index}")
-                logging.info(f"making or resetting folder {_output_data_folder}")
-                make_or_reset_folder(_output_data_folder)
-                o_export = Export(image_3d=reconstruction_array,
-                                  output_folder=_output_data_folder)
-                o_export.run()
+                # logging.info(f"making or resetting folder {_output_data_folder}")
+                list_of_output_folders.append(_output_data_folder)
+                # make_or_reset_folder(_output_data_folder)
+                # o_export = Export(image_3d=reconstruction_array,
+                #                   output_folder=_output_data_folder)
+                # o_export.run()
                 print(f"done!")
+
+            SvmbirCliHandler.merge_reconstructed_slices(output_data_folder=output_data_folder, 
+                                                        top_slice=top_slice,
+                                                        list_of_output_folders=list_of_output_folders,
+                                                        list_of_slices_to_reconstruct=list_of_slices_to_reconstruct)
 
         else:
 
@@ -143,5 +200,4 @@ class SvmbirCliHandler:
             o_export.run()
             print(f"done!")
 
-   
         logging.info(f"exporting reconstructed data ... done!")

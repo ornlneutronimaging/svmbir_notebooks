@@ -110,11 +110,19 @@ class SvmbirConfig(BaseModel):
     bottom_slice: int = 1
 
 
+class CropRegion(BaseModel):
+    left: int = 0
+    right: int = 1
+    top: int = 0
+    bottom: int = 1
+
+
 class Configuration(BaseModel):
 
     top_folder: TopFolder = Field(default=TopFolder())
     operating_mode: str = Field(default=OperatingMode.tof) 
     image_size: ImageSize = Field(default=ImageSize())
+    crop_region: CropRegion = Field(default=CropRegion())
 
     list_of_angles: List[float] = Field(default=[])
     list_of_sample_runs: List[str] = Field(default=[])
