@@ -82,7 +82,8 @@ class Load(Parent):
         self.percentage_to_use = widgets.IntSlider(value=PERCENTAGE_OF_DATA_TO_USE_FOR_RECONSTRUCTION,
                                     min=1,
                                     max=100,
-                                    step=1)
+                                    step=1,
+                                    layout=widgets.Layout(width='100%'))
         display(self.percentage_to_use)
 
         list_of_tiff = self.parent.list_of_images[DataType.sample]

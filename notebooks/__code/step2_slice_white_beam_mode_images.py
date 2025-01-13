@@ -9,7 +9,7 @@ import numpy as np
 from matplotlib.patches import Rectangle
 from IPython.core.display import HTML
 
-from __code import DEBUG, debug_folder, OperatingMode, DataType, STEP3_SCRIPTS
+from __code import DEBUG, debug_folder, OperatingMode, DataType, STEP3_SVMBIR_SCRIPTS
 from __code.utilities.configuration_file import Configuration, select_file, loading_config_file_into_model
 from __code.utilities.logging import setup_logging
 from __code.utilities.files import retrieve_list_of_tif
@@ -29,7 +29,8 @@ class Step2SvmbirReconstructionInWhiteBeamMode:
 
         self.instrument = system.System.get_instrument_selected()
 
-        setup_logging(basename_of_log_file=os.path.basename(__file__).replace('.py', ''))      
+        file_name, _ = os.path.splitext(os.path.basename(__file__))
+        setup_logging(file_name)      
         logging.info(f"working_dir: {self.working_dir}")
         logging.info(f"instrument: {self.instrument}")
         if DEBUG:
@@ -128,5 +129,5 @@ class Step2SvmbirReconstructionInWhiteBeamMode:
         save_json(full_config_file_name, json_dictionary=config_json)
         logging.info(f"config file saved: {full_config_file_name}")
 
-        display(HTML(f"Move to the next step by running the command <font color='red'>python {STEP3_SCRIPTS}</font> " +
+        display(HTML(f"Move to the next step by running the command <font color='red'>python {STEP3_SVMBIR_SCRIPTS}</font> " +
                      f"<font color='red'>{full_config_file_name}</font>"))

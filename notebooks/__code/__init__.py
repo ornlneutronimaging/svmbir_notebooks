@@ -17,10 +17,12 @@ class OperatingMode:
     white_beam = 'white_beam'
 
 
-STEP3_SCRIPTS = "/SNS/VENUS/shared/software/git/svmbir_notebooks/notebooks/step3_svmbir_reconstruction_in_white_beam_mode.py"
+STEP3_SVMBIR_SCRIPTS = "/SNS/VENUS/shared/software/git/svmbir_notebooks/notebooks/step3_reconstruction_white_beam_mode_images_using_svmbir.py"
+STEP3_FPB_SCRIPTS = "/SNS/VENUS/shared/software/git/svmbir_notebooks/notebooks/step3_reconstruction_white_beam_mode_images_using_fbp.py"
 
 
 DEFAULT_OPERATING_MODE = OperatingMode.white_beam
+DEFAULT_RECONSTRUCTION_ALGORITHM = "fbp"
 NBR_TOF_RANGES = 3
 
 

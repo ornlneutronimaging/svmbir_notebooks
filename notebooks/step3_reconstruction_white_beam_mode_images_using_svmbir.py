@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 
 from __code.utilities.logging import setup_logging
 from __code.workflow_cli.svmbir_white_beam import  SvmbirCliHandler
@@ -10,7 +11,8 @@ from __code.workflow_cli.svmbir_white_beam import  SvmbirCliHandler
 # conda activate hsnt
 # ----------------------------------------------------------
 
-setup_logging("step3_svmbir_reconstruction_in_white_beam_mode")
+file_name, ext = os.path.splitext(os.path.basename(__file__))
+setup_logging(file_name)
 
 
 if __name__ == "__main__":

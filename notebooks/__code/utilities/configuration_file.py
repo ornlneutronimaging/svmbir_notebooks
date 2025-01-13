@@ -117,7 +117,14 @@ class CropRegion(BaseModel):
     bottom: int = 1
 
 
+class ReconstructionAlgorithm:
+    svmbir: str = "svmbir"
+    fbp: str = "fbp"
+
+
 class Configuration(BaseModel):
+
+    reconstruction_algorithm: str = Field(default=ReconstructionAlgorithm.svmbir)
 
     top_folder: TopFolder = Field(default=TopFolder())
     operating_mode: str = Field(default=OperatingMode.tof) 

@@ -12,6 +12,7 @@ from __code.workflow.combine_ob_dc import CombineObDc
 from __code.workflow.checking_data import CheckingData
 from __code.workflow.recap_data import RecapData
 from __code.workflow.mode_selection import ModeSelection
+from __code.workflow.reconstruction_selection import ReconstructionSelection
 from __code.workflow.images_cleaner import ImagesCleaner
 from __code.workflow.normalization import Normalization
 from __code.workflow.chips_correction import ChipsCorrection
@@ -23,11 +24,12 @@ from __code.workflow.export import ExportExtra
 from __code.workflow.visualization import Visualization
 from __code.workflow.rotate import Rotate
 from __code.workflow.crop import Crop
+from __code.utilities.configuration_file import ReconstructionAlgorithm
 
-LOG_BASENAME_FILENAME = "svmbir_reconstruction_white_beam_mode"
+LOG_BASENAME_FILENAME, _ = os.path.splitext(os.path.basename(__file__))
 
 
-class SvmbirReconstruction:
+class Step1PrepareWhiteBeamModeImages:
 
     MODE = OperatingMode.white_beam
 
@@ -299,13 +301,23 @@ class SvmbirReconstruction:
     def crop(self):
         self.o_crop.run()
 
+    # select reconstruction method
+    def select_reconstruction_method(self):
+        self.o_mode = ReconstructionSelection(parent=self)
+        self.o_mode.select()
+
     # run svmbir
-    def svmbir_settings(self):
+    def reconstruction_settings(self):
         if self.corrected_images is None:
             self.corrected_images = self.normalized_images
-        self.o_svmbir = SvmbirHandler(parent=self)
-        self.o_svmbir.set_settings()
-
+        if self.configuration.reconstruction_algorithm == ReconstructionAlgorithm.svmbir:
+            self.o_svmbir = SvmbirHandler(parent=self)
+            self.o_svmbir.set_settings()
+        elif self.configuration.reconstruction_algorithm == ReconstructionAlgorithm.fbp:
+            pass
+        else:
+            raise NotImplementedError(f"Reconstruction algorithm {self.configuration.reconstruction_algorithm} not implemented yet!")
+        
     # takes for ever !
     # def svmbir_display_sinograms(self):
     #     self.o_svmbir.display_sinograms()
