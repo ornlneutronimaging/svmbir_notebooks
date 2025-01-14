@@ -217,10 +217,10 @@ class Load(Parent):
         logging.info(f"loading the data:")
 
         for _data_type in list_of_images.keys():
-            logging.info(f"\t{_data_type} ... ")
+            logging.info(f"\tworking with {_data_type} ... ")
 
             if not list_of_images[_data_type]:
-                logging.info(f" no files selected!")
+                logging.info(f" nothing to load for {_data_type}, no files have been selected!")
                 continue
 
             if _data_type == DataType.sample:
@@ -236,7 +236,7 @@ class Load(Parent):
 
             self.parent.master_3d_data_array[_data_type] = load_data_using_multithreading(list_of_images[_data_type])
             logging.info(f"{np.shape(self.parent.master_3d_data_array[_data_type]) = }")
-            logging.info(f"\t{_data_type} Done !")
+            logging.info(f"\tloading {_data_type} ... done !")
 
         [height, width] = np.shape(self.parent.master_3d_data_array[DataType.sample][0])
         self.parent.image_size['height'] = height

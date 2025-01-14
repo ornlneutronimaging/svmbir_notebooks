@@ -86,7 +86,8 @@ class Normalization(Parent):
         display(HTML("Note: This is an integrated view of the projections allowing you to see the contours of all the angles!"))
 
         # integrated_images = np.log(np.min(self.parent.master_3d_data_array[DataType.sample], axis=0))
-        integrated_images = self.parent.master_3d_data_array[DataType.sample][0]
+        sample_images = self.parent.master_3d_data_array[DataType.sample]
+        integrated_images = np.min(sample_images, axis=0)
 
         height = self.parent.image_size['height']
         width = self.parent.image_size['width']

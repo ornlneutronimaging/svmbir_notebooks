@@ -3,8 +3,12 @@ import os
 import glob
 import logging
 import svmbir
+import tomopy
+
+from imars3d.backend.reconstruction import recon
 
 from __code.workflow.export import Export
+from __code.config import NUM_THREADS
 from __code.utilities.logging import setup_logging
 from __code.utilities.files import make_or_reset_folder, make_folder
 from __code.config import NUM_THREADS, SVMBIR_LIB_PATH
@@ -15,7 +19,24 @@ from __code.utilities.time import get_current_time_in_special_file_name_format
 
 class FbpCliHandler:
 
- 
+    @staticmethod
+    def _run_reconstruction(_sino, center_of_rotation, list_of_angles_rad, algorithm, max_workers):
+        
+        logging.info(f"\t -> {np.shape(_sino) = }")
+        logging.info(f"\t -> {center_of_rotation = }")
+        logging.info(f"\t -> {list_of_angles_rad = }")
+        logging.info(f"\t -> {algorithm = }")
+        logging.info(f"\t -> recon(array=_sino, center=center_offset, theta=list_of_angles_rad, algorithm=algorithm)")
+
+        reconstruction_array = recon(arrays=_sino,
+                                        center=center_of_rotation,
+                                        theta=list_of_angles_rad,
+                                        algorithm=algorithm)
+                                    #  max_workers=NUM_THREADS)
+
+        return reconstruction_array
+    
+
     @staticmethod
     def run_reconstruction_from_pre_data_mode(config_json_file):
 
@@ -34,74 +55,55 @@ class FbpCliHandler:
         logging.info(f"loading {len(list_tiff)} images ... done")
       
         list_of_angles_rad = np.array(config['list_of_angles'])
-        # height = config['image_size']['height']
-        # width = config['image_size']['width']
-        # center_offset = config['center_offset']
-        center_offset = 0
-
-        sharpness = config['svmbir_config']['sharpness']
-        snr_db = config['svmbir_config']['snr_db']
-        positivity = config['svmbir_config']['positivity']
-        max_iterations = config['svmbir_config']['max_iterations']
-        verbose = config['svmbir_config']['verbose']
-        svmbir_lib_path = SVMBIR_LIB_PATH
-        max_resolutions = config['svmbir_config']['max_resolutions']
+        
         list_of_slices_to_reconstruct = config['list_of_slices_to_reconstruct']
         top_slice = config['crop_region']['top']
+        algorithm = 'gridrec'
 
-        logging.info(f"Before switching y and x coordinates:")
-        logging.info(f"{np.shape(corrected_array_log) = }")
+        center_of_rotation = config['center_of_rotation']
+        if center_of_rotation == -1:
+            center_of_rotation = None
+
+        logging.info(f"before swapping I have (angle, x, y): {np.shape(corrected_array_log) = }")
+        nbr_angles, nbr_slices, nbr_pixels_wide = np.shape(corrected_array_log)
+        logging.info(f"{nbr_angles = }, {nbr_slices = }, {nbr_pixels_wide = }")
         corrected_array_log = np.swapaxes(corrected_array_log, 1, 2)
-        logging.info(f"After switching y and x coordinates:")
-        logging.info(f"{np.shape(corrected_array_log) = }")
+        logging.info(f"after swapping I should have (angles, y, x): {np.shape(corrected_array_log) = }")
 
         logging.info(f"{list_of_angles_rad = }")
-        # logging.info(f"{height = }")
-        # logging.info(f"{width = }")
-        logging.info(f"{center_offset = }")
-        logging.info(f"{sharpness = }")
-        logging.info(f"{snr_db = }")
-        logging.info(f"{positivity = }")
-        logging.info(f"{max_iterations = }")
-        logging.info(f"{max_resolutions = }")
-        logging.info(f"{verbose = }")
-        logging.info(f"{svmbir_lib_path = }")
         logging.info(f"{input_data_folder = }")
         logging.info(f"{base_output_folder = }")
         logging.info(f"{list_of_slices_to_reconstruct = }")
-        
-        output_data_folder = os.path.join(base_output_folder, f"reconstructed_data_{get_current_time_in_special_file_name_format()}")
+        logging.info(f"{NUM_THREADS = }")
+        logging.info(f"{center_of_rotation}")
+       
+        output_data_folder = os.path.join(base_output_folder, f"fbp_reconstructed_data_{get_current_time_in_special_file_name_format()}")
         logging.info(f"{output_data_folder = }")
 
         # make_or_reset_folder(output_data_folder)
         make_or_reset_folder(output_data_folder)
 
+        if (len(list_of_slices_to_reconstruct) == 1) and (list_of_slices_to_reconstruct[0][0] == 0) and \
+        (list_of_slices_to_reconstruct[0][1] == nbr_slices):
+            list_of_slices_to_reconstruct = None
+
         list_of_output_folders = []
         if list_of_slices_to_reconstruct:
 
             for [index, [top_slice_index, bottom_slice_index]] in enumerate(list_of_slices_to_reconstruct):
-                print(f"working with set of slices #{index}: from {top_slice} to {bottom_slice_index-1}. ", end="") 
-                logging.info(f"working with set of slices #{index}: from {top_slice} to {bottom_slice_index-1}")
-                print(f"launching svmbir #{index} ... ", end="")
-                logging.info(f"launching svmbir #{index} ...")
+                print(f"working with set of slices #{index}: from {top_slice_index} to {bottom_slice_index-1}. ", end="") 
+                logging.info(f"working with set of slices #{index}: from {top_slice_index} to {bottom_slice_index-1}")
+                print(f"launching reconstruction using {algorithm} #{index} ... ", end="")
+                logging.info(f"launching reconstruction using {algorithm} #{index} ...")
         
                 _sino = corrected_array_log[:, top_slice_index:bottom_slice_index, :]
         
-                logging.info(f"\t{np.shape(_sino) = }")
-                reconstruction_array = svmbir.recon(sino=_sino,
-                                                    angles=list_of_angles_rad,
-                                                    # num_rows = height,
-                                                    # num_cols = width,
-                                                    center_offset = center_offset,
-                                                    max_resolutions = max_resolutions,
-                                                    sharpness = sharpness,
-                                                    snr_db = snr_db,
-                                                    positivity = positivity,
-                                                    max_iterations = max_iterations,
-                                                    num_threads = NUM_THREADS,
-                                                    verbose = verbose,
-                                                    svmbir_lib_path = svmbir_lib_path,
-                                                    )
+                reconstruction_array = FbpCliHandler._run_reconstruction(_sino=_sino,
+                                                                         center_of_rotation=center_of_rotation,
+                                                                         list_of_angles_rad=list_of_angles_rad,
+                                                                         algorithm=algorithm,
+                                                                         max_workers=NUM_THREADS)
+                              
                 print(f"done with #{index}!")
                 logging.info(f"done with #{index}!")
                 _index = f"{index:03d}"
@@ -125,23 +127,15 @@ class FbpCliHandler:
 
         else:
 
-            print(f"launching svmbir with all slices ... ", end="")
-            logging.info(f"launching svmbir with all slices ...")
-       
-            reconstruction_array = svmbir.recon(sino=corrected_array_log,
-                                                angles=list_of_angles_rad,
-                                                # num_rows = height,
-                                                # num_cols = width,
-                                                center_offset = center_offset,
-                                                max_resolutions = max_resolutions,
-                                                sharpness = sharpness,
-                                                snr_db = snr_db,
-                                                positivity = positivity,
-                                                max_iterations = max_iterations,
-                                                num_threads = NUM_THREADS,
-                                                verbose = verbose,
-                                                svmbir_lib_path = svmbir_lib_path,
-                                                )
+            print(f"launching reconstruction using {algorithm} with all slices ... ", end="")
+            logging.info(f"launching reconstruction using {algorithm} with all slices ...")
+             
+            reconstruction_array = FbpCliHandler._run_reconstruction(_sino=corrected_array_log,
+                                                                     center_of_rotation=center_of_rotation,
+                                                                     list_of_angles_rad=list_of_angles_rad,
+                                                                     algorithm=algorithm,
+                                                                     max_workers=NUM_THREADS)
+
             print(f"done! ")
             logging.info(f"done with!")
 

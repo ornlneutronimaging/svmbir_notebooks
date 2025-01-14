@@ -42,6 +42,10 @@ class ExportExtra(Parent):
         # update configuration
         configuration.output_folder = output_folder
 
+        # center of rotation if manual mode used
+        if self.parent.o_center_and_tilt.is_manual_mode():
+            configuration.center_of_rotation = self.parent.o_center_and_tilt.get_center_of_rotation()
+
         base_sample_folder = os.path.basename(os.path.abspath(self.parent.working_dir[DataType.sample]))
 
         _time_ext = get_current_time_in_special_file_name_format()

@@ -8,6 +8,7 @@ from skimage import transform
 import multiprocessing as mp 
 import logging
 from functools import partial
+import matplotlib.pyplot as plt
 
 from __code.parent import Parent
 
@@ -30,6 +31,21 @@ class Rotate(Parent):
         
         vbox = widgets.VBox([title_ui, self.angle_ui])
         display(vbox)
+
+        fig, axs = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
+
+        image_rot_minus_90 = transform.rotate(self.parent.normalized_data[0], -90)
+        image_normal = self.parent.normalized_data[0]
+        image_rot_plut_90 = transform.rotate(self.parent.normalized_data[0], +90)
+
+        axs[0].imshow(image_rot_minus_90, cmap='viridis', vmin=0, vmax=1)
+        axs[0].set_title('-90 degrees')
+
+        axs[1].imshow(image_normal, cmap='viridis', vmin=0, vmax=1)
+        axs[1].set_title('0 degree')
+
+        axs[2].imshow(image_rot_plut_90, cmap='viridis', vmin=0, vmax=1)
+        axs[2].set_title('+90 degrees')
 
     def _worker(self, _data, angle_value):
         data = transform.rotate(_data, angle_value)
@@ -54,8 +70,8 @@ class Rotate(Parent):
         #      self.parent.normalized_images = pool.map(worker_with_angle, list(self.parent.normalized_images), angle_value)
     
         new_array_rotated = []
-        for _data in tqdm(self.parent.normalized_images):
+        for _data in tqdm(self.parent.corrected_images):
             new_array_rotated.append(transform.rotate(_data, angle_value))
 
-        self.parent.normalized_images = np.array(new_array_rotated)
+        self.parent.normalized_data = np.array(new_array_rotated)
         logging.info(f"rotating the normalized_images ... done!")        

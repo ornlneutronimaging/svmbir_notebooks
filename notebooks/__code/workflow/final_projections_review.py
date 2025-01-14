@@ -51,6 +51,17 @@ class FinalProjectionsReview(Parent):
         plt.tight_layout()
         plt.show()
 
+    def single_image(self, image: np.ndarray = None):
+
+        if image is None:
+            return
+
+        fig, ax = plt.subplots()
+        im1 = ax.imshow(image, vmin=0, vmax=1)
+        plt.colorbar(im1, ax=ax, shrink=0.5)
+        ax.axis('off')
+        plt.show()
+
     def list_runs_to_reject(self):
         
         label_ui = widgets.HTML("<b>Select runs you want to exclude from the final reconstruction:</b>")

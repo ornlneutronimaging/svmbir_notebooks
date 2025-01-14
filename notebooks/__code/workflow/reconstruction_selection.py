@@ -17,7 +17,6 @@ class ReconstructionSelection(Parent):
                                                                           ReconstructionAlgorithm.svmbir],
                                            value=DEFAULT_RECONSTRUCTION_ALGORITHM)
         display(self.reconstruction_selection_ui)
-
         self.reconstruction_selection_ui.observe(self.on_change, names='value')
 
     def on_change(self, change):

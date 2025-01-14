@@ -111,7 +111,7 @@ class SvmbirCliHandler:
         logging.info(f"{base_output_folder = }")
         logging.info(f"{list_of_slices_to_reconstruct = }")
         
-        output_data_folder = os.path.join(base_output_folder, f"reconstructed_data_{get_current_time_in_special_file_name_format()}")
+        output_data_folder = os.path.join(base_output_folder, f"svmbir_reconstructed_data_{get_current_time_in_special_file_name_format()}")
         logging.info(f"{output_data_folder = }")
 
         # make_or_reset_folder(output_data_folder)

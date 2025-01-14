@@ -19,6 +19,7 @@ from __code.workflow.chips_correction import ChipsCorrection
 from __code.workflow.center_of_rotation_and_tilt import CenterOfRotationAndTilt
 from __code.workflow.remove_strips import RemoveStrips
 from __code.workflow.svmbir_handler import SvmbirHandler
+from __code.workflow.fbp_handler import FbpHandler
 from __code.workflow.final_projections_review import FinalProjectionsReview
 from __code.workflow.export import ExportExtra
 from __code.workflow.visualization import Visualization
@@ -170,7 +171,7 @@ class Step1PrepareWhiteBeamModeImages:
 
         setup_logging(basename_of_log_file=LOG_BASENAME_FILENAME)        
         self.working_dir[DataType.ipts] = os.path.basename(top_sample_dir)
-        self.working_dir[DataType.top] = os.path.join(top_sample_dir, "images", "qhy600")
+        self.working_dir[DataType.top] = os.path.join(top_sample_dir)
         self.working_dir[DataType.nexus] = os.path.join(top_sample_dir, "nexus")
         self.working_dir[DataType.processed] = os.path.join(top_sample_dir, "shared", "processed_data")
         logging.info(f"working_dir: {self.working_dir}")
@@ -243,6 +244,22 @@ class Step1PrepareWhiteBeamModeImages:
                               data_before=self.master_3d_data_array[DataType.sample],
                               turn_on_vrange=True)
     
+    def select_export_normalized_folder(self):
+        o_select = Load(parent=self)
+        o_select.select_folder(data_type=DataType.normalized)
+
+    def export_normalized_images(self):
+        self.o_norm.export_images()
+
+
+  # crop data
+    def crop_settings(self):
+        self.o_crop = Crop(parent=self)
+        self.o_crop.set_region()
+
+    def crop(self):
+        self.o_crop.run()
+
     # rotate sample
     def rotate_data_settings(self):
         self.o_rotate = Rotate(parent=self)
@@ -253,14 +270,7 @@ class Step1PrepareWhiteBeamModeImages:
 
     def visualize_after_rotation(self):
         o_review = FinalProjectionsReview(parent=self)
-        o_review.run(array=self.normalized_images)
-
-    def select_export_normalized_folder(self):
-        o_select = Load(parent=self)
-        o_select.select_folder(data_type=DataType.normalized)
-
-    def export_normalized_images(self):
-        self.o_norm.export_images()
+        o_review.single_image(image=self.normalized_data[0])
 
     # strips removal
     def select_remove_strips_algorithms(self):
@@ -290,16 +300,6 @@ class Step1PrepareWhiteBeamModeImages:
 
     # def calculate_and_apply_center_of_rotation_and_tilt(self):
     #     self.o_center_and_tilt.run()
-
-    # crop data
-    def crop_settings(self):
-        if self.corrected_images is None:
-            self.corrected_images = self.normalized_images
-        self.o_crop = Crop(parent=self)
-        self.o_crop.set_region()
-
-    def crop(self):
-        self.o_crop.run()
 
     # select reconstruction method
     def select_reconstruction_method(self):
@@ -348,8 +348,15 @@ class Step1PrepareWhiteBeamModeImages:
         o_select = Load(parent=self)
         o_select.select_folder(data_type=DataType.extra)
 
+    def export_pre_reconstruction_data(self):
+        if self.o_svmbir is None:
+            o_fbp = FbpHandler(parent=self)
+            o_fbp.export_pre_reconstruction_data()
+        else:
+            self.o_svmbir.export_pre_reconstruction_data()
+
     def export_extra_files(self, prefix=""):
-        self.o_svmbir.export_pre_reconstruction_data()
+        self.export_pre_reconstruction_data()
         o_export = ExportExtra(parent=self)
         o_export.run(base_log_file_name=LOG_BASENAME_FILENAME,
                      prefix=prefix)

@@ -28,15 +28,28 @@ class CenterOfRotationAndTilt(Parent):
     image_180_degree = None
     image_360_degree = None
 
+    manual_center_selection = None
+
+    is_manual_mode = True
+
     height = None
 
     display_plot = None
 
     def settings(self):
+
+        if self.is_manual_mode:
+            value = 'Manual'
+        else:
+            value= 'Automatic'
+
         self.auto_mode_ui = widgets.RadioButtons(options=['Automatic', 'Manual'],
                                                  descriptions="Mode:",
-                                                 value='Manual')
+                                                 value=value)
         display(self.auto_mode_ui)
+
+    def is_manual_mode(self):
+        return self.auto_mode_ui.value == "Manual"
 
     def _isolate_0_and_180_degrees_images_white_beam_mode(self):
         logging.info(f"\tisolating 0 and 180 degres: ")
@@ -120,6 +133,9 @@ class CenterOfRotationAndTilt(Parent):
         self.manual_center_of_rotation()
         # self.manual_tilt_correction()
 
+    def get_center_of_rotation(self):
+        return self.manual_center_selection.result
+
     def manual_center_of_rotation(self):
         display(HTML("Center of rotation"))
 
@@ -154,7 +170,7 @@ class CenterOfRotationAndTilt(Parent):
 
             return center
 
-        self.display_plot = interactive(plot_images,
+        self.manual_center_selection = interactive(plot_images,
                                    angles=widgets.SelectMultiple(options=[ImageAngles.degree_0, ImageAngles.degree_180, ImageAngles.degree_360],
                                                                       value=[ImageAngles.degree_0, ImageAngles.degree_180]),
                                    center=widgets.IntSlider(min=0, 
@@ -167,7 +183,7 @@ class CenterOfRotationAndTilt(Parent):
                                                                        value=[0, vmax]),
 
                                     )                                                                     
-        display(self.display_plot)
+        display(self.manual_center_selection)
 
     # def manual_tilt_correction(self):
     #     display(HTML("Tilt correction"))
@@ -229,6 +245,8 @@ class CenterOfRotationAndTilt(Parent):
 
         logging_3d_array_infos(message="before", array=self.parent.corrected_images)
 
+        corrected_images = np.array(self.parent.corrected_images) if type(self.parent.corrected_images) == list else self.parent.corrected_images
+
         y_top, y_bottom = self.display_plot.result
 
         # update configuration
@@ -237,7 +255,7 @@ class CenterOfRotationAndTilt(Parent):
         mid_point = int(np.mean([y_top, y_bottom]))
         rois = ((y_top, mid_point+1), (mid_point, y_bottom))
 
-        corrected_images = correction_COR(self.parent.corrected_images,
+        corrected_images = correction_COR(corrected_images,
                        np.array(self.image_0_degree),
                        np.array(self.image_180_degree),
                        rois=rois)

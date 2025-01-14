@@ -124,7 +124,7 @@ class ReconstructionAlgorithm:
 
 class Configuration(BaseModel):
 
-    reconstruction_algorithm: str = Field(default=ReconstructionAlgorithm.svmbir)
+    reconstruction_algorithm: str = Field(default=ReconstructionAlgorithm.fbp)
 
     top_folder: TopFolder = Field(default=TopFolder())
     operating_mode: str = Field(default=OperatingMode.tof) 
@@ -165,6 +165,8 @@ class Configuration(BaseModel):
     
     calculate_center_of_rotation: bool = Field(default=False)
     range_of_slices_for_center_of_rotation: list[int, int] = Field(default=[0, -1])
+    center_of_rotation: float = Field(default=-1)
+    center_offset: float = Field(default=0)
     
     svmbir_config: SvmbirConfig = Field(default=SvmbirConfig())
     output_folder: str = Field(default="")

@@ -9,16 +9,18 @@ import numpy as np
 from matplotlib.patches import Rectangle
 from IPython.core.display import HTML
 
-from __code import DEBUG, debug_folder, OperatingMode, DataType, STEP3_SVMBIR_SCRIPTS
-from __code.utilities.configuration_file import Configuration, select_file, loading_config_file_into_model
+from __code import DEBUG, debug_folder, OperatingMode, DataType, STEP3_SVMBIR_SCRIPTS, STEP3_FPB_SCRIPTS
+from __code.utilities.configuration_file import select_file, loading_config_file_into_model
 from __code.utilities.logging import setup_logging
 from __code.utilities.files import retrieve_list_of_tif
 from __code.utilities.load import load_data_using_multithreading
 from __code.utilities.time import get_current_time_in_special_file_name_format
 from __code.utilities.json import save_json
 
+BASENAME_FILENAME, _ = os.path.splitext(os.path.basename(__file__))
 
-class Step2SvmbirReconstructionInWhiteBeamMode:
+
+class Step2SliceWhiteBeamModeImages:
 
     def __init__(self, system=None):
 
@@ -29,8 +31,7 @@ class Step2SvmbirReconstructionInWhiteBeamMode:
 
         self.instrument = system.System.get_instrument_selected()
 
-        file_name, _ = os.path.splitext(os.path.basename(__file__))
-        setup_logging(file_name)      
+        setup_logging(BASENAME_FILENAME)      
         logging.info(f"working_dir: {self.working_dir}")
         logging.info(f"instrument: {self.instrument}")
         if DEBUG:
@@ -123,11 +124,20 @@ class Step2SvmbirReconstructionInWhiteBeamMode:
             
         working_dir = self.working_dir
         current_time = get_current_time_in_special_file_name_format()
-        config_file_name = f"step2_svmbir_reconstruction_in_white_beam_mode_config_{current_time}.json"
+        config_file_name = f"{BASENAME_FILENAME}_{current_time}.json"
         full_config_file_name = os.path.join(working_dir, config_file_name)
         config_json = self.configuration.model_dump_json()
         save_json(full_config_file_name, json_dictionary=config_json)
         logging.info(f"config file saved: {full_config_file_name}")
 
-        display(HTML(f"Move to the next step by running the command <font color='red'>python {STEP3_SVMBIR_SCRIPTS}</font> " +
-                     f"<font color='red'>{full_config_file_name}</font>"))
+        reconstruction_algorithm = self.configuration.reconstruction_algorithm
+
+        if reconstruction_algorithm == "svmbir":
+            display(HTML(f"Move to the next step by running the command <font color='red'>python {STEP3_SVMBIR_SCRIPTS}</font> " +
+                         f"<font color='red'>{full_config_file_name}</font>"))
+        elif reconstruction_algorithm == "fbp":
+            display(HTML(f"Move to the next step by running the command <font color='red'>python {STEP3_FPB_SCRIPTS}</font> " +
+                         f"<font color='red'>{full_config_file_name}</font>"))
+        else:
+            raise NotImplementedError(f"reconstruction_algorithm: {reconstruction_algorithm} is not implemented!")
+        
