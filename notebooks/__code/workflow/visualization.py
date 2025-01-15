@@ -61,8 +61,8 @@ class Visualization(Parent):
                                                                         value=0),
                                         vmin_before=widgets.IntSlider(min=vmin_before, max=vmax_before, value=vmin_before),
                                         vmax_before=widgets.IntSlider(min=vmin_before, max=vmax_before, value=vmax_before),
-                                        vmin_after=widgets.IntSlider(min=vmin_after, max=vmax_after, value=0),
-                                        vmax_after=widgets.IntSlider(min=vmin_after, max=vmax_after, value=1))
+                                        vmin_after=widgets.FloatSlider(min=vmin_after, max=vmax_after, value=0),
+                                        vmax_after=widgets.FloatSlider(min=vmin_after, max=vmax_after, value=1))
 
             else:
 

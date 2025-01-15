@@ -251,7 +251,6 @@ class Step1PrepareWhiteBeamModeImages:
     def export_normalized_images(self):
         self.o_norm.export_images()
 
-
   # crop data
     def crop_settings(self):
         self.o_crop = Crop(parent=self)
@@ -270,7 +269,7 @@ class Step1PrepareWhiteBeamModeImages:
 
     def visualize_after_rotation(self):
         o_review = FinalProjectionsReview(parent=self)
-        o_review.single_image(image=self.normalized_data[0])
+        o_review.single_image(image=self.normalized_images[0])
 
     # strips removal
     def select_remove_strips_algorithms(self):

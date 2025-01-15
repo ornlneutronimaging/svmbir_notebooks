@@ -25,7 +25,7 @@ class Crop(Parent):
         default_top = default_roi[OperatingMode.white_beam]['top']
         default_bottom = default_roi[OperatingMode.white_beam]['bottom'] 
 
-        normalized_data = self.parent.normalized_data
+        normalized_data = self.parent.normalized_images
         integrated = np.min(normalized_data, axis=0)
 
         max_value = np.max(integrated)
@@ -82,6 +82,6 @@ class Crop(Parent):
         left, right, top, bottom = self.display_roi.result
         self.parent.crop_region = {'left': left, 'right': right, 'top': top, 'bottom': bottom}
         self.parent.configuration.crop_region = CropRegion(left=left, right=right, top=top, bottom=bottom)
-        self.parent.normalized_data = np.array([image[top: bottom+1, left: right+1] 
-                                                 for image in self.parent.normalized_data])
+        self.parent.normalized_images = np.array([image[top: bottom+1, left: right+1] 
+                                                 for image in self.parent.normalized_images])
         

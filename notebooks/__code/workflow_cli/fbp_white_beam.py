@@ -15,6 +15,7 @@ from __code.config import NUM_THREADS, SVMBIR_LIB_PATH
 from __code.utilities.json import load_json_string
 from __code.utilities.load import load_data_using_multithreading
 from __code.utilities.time import get_current_time_in_special_file_name_format
+from __code.workflow_cli.merge_reconstructed_slices import merge_reconstructed_slices
 
 
 class FbpCliHandler:
@@ -36,7 +37,6 @@ class FbpCliHandler:
 
         return reconstruction_array
     
-
     @staticmethod
     def run_reconstruction_from_pre_data_mode(config_json_file):
 
@@ -104,7 +104,7 @@ class FbpCliHandler:
                                                                          algorithm=algorithm,
                                                                          max_workers=NUM_THREADS)
                               
-                print(f"done with #{index}!")
+                print(f"done!")
                 logging.info(f"done with #{index}!")
                 _index = f"{index:03d}"
                 print(f"exporting reconstructed slices set #{_index} ... ", end="")
@@ -120,11 +120,15 @@ class FbpCliHandler:
                 o_export.run()
                 print(f"done!")
 
-            # SvmbirCliHandler.merge_reconstructed_slices(output_data_folder=output_data_folder, 
-            #                                             top_slice=top_slice,
-            #                                             list_of_output_folders=list_of_output_folders,
-            #                                             list_of_slices_to_reconstruct=list_of_slices_to_reconstruct)
+                logging.info(f"Cleaning up ...")
+                del reconstruction_array
+                del _sino
 
+
+            merge_reconstructed_slices(output_data_folder=output_data_folder, 
+                                       top_slice=top_slice,
+                                       list_of_output_folders=list_of_output_folders,
+                                       list_of_slices_to_reconstruct=list_of_slices_to_reconstruct)
         else:
 
             print(f"launching reconstruction using {algorithm} with all slices ... ", end="")
@@ -136,8 +140,8 @@ class FbpCliHandler:
                                                                      algorithm=algorithm,
                                                                      max_workers=NUM_THREADS)
 
-            print(f"done! ")
-            logging.info(f"done with!")
+            print(f"done!")
+            logging.info(f"done!")
 
             print(f"exporting reconstructed slices ... ", end="")
             logging.info(f"{np.shape(reconstruction_array) = }")
