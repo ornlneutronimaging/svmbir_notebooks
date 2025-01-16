@@ -45,6 +45,7 @@ class Step2SliceWhiteBeamModeImages:
         logging.info(f"configuration file loaded: {config_file_path}")
         self.configuration = loading_config_file_into_model(config_file_path)
         self.images_path = self.configuration.projections_pre_processing_folder
+        print(f"Configuration file {os.path.basename(config_file_path)} loaded!")
 
     def load_and_select_slices(self):
         self.load_images()
@@ -82,7 +83,7 @@ class Step2SliceWhiteBeamModeImages:
                 )     
 
             ax.axhline(top_slice, color='red')
-            ax.axhline(nbr * range_size, color='red')
+            ax.axhline(bottom_slice, color='red')
                   
             plt.show()
 
