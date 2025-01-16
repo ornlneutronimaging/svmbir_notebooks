@@ -66,20 +66,23 @@ class Normalization(Parent):
         self.use_proton_charge_ui = widgets.Checkbox(value=True,
                                                 description='Use proton charge',
                                                 disabled=True)
-        self.use_frames_ui = widgets.Checkbox(value=False,
-                                         description='Use frames',
-                                         disabled=True,
-                                         )
+        # self.use_frames_ui = widgets.Checkbox(value=False,
+        #                                  description='Use frames',
+        #                                  disabled=True,
+        #                                  )
         self.use_roi_ui = widgets.Checkbox(value=True,
-                                      description='Use ROI')
+                                      description='Use ROI (sample / ob)')
+        self.use_sample_roi_ui = widgets.Checkbox(value=True,
+                                        description='Use ROI (sample)')
         vertical_layout = widgets.VBox([self.use_proton_charge_ui,
-                                        self.use_frames_ui,
-                                        self.use_roi_ui])
+                                        # self.use_frames_ui,
+                                        self.use_roi_ui,
+                                        self.use_sample_roi_ui])
         display(vertical_layout)
 
     def select_roi(self):
 
-        if not self.use_roi_ui.value:
+        if (not self.use_roi_ui.value) and (not self.use_sample_roi_ui.value):
             logging.info(f"User skipped normalization ROI selection.")
             return
 
@@ -190,13 +193,16 @@ class Normalization(Parent):
         # use_proton_charge = self.use_proton_charge_ui.value
         # use_frame = self.use_frames_ui.value
         use_roi = self.use_roi_ui.value
+        use_sample_roi = self.use_sample_roi_ui.value
 
         logging.info(f"\tnormalization settings:")
         # logging.info(f"\t\t- use proton charge: {use_proton_charge}")
         # logging.info(f"\t\t- use_frame: {use_frame}")
         logging.info(f"\t\t- use_roi: {use_roi}")
+        logging.info(f"\t\t- use_sample_roi: {use_sample_roi}")
 
-        if use_roi:
+        # roi sample/ob or roi sample only
+        if use_roi or use_sample_roi:
             left, right, top, bottom = self.display_roi.result
             self.parent.configuration.normalization_roi.top = top
             self.parent.configuration.normalization_roi.bottom = bottom
@@ -211,6 +217,10 @@ class Normalization(Parent):
         #     list_norm_settings.append(NormalizationSettings.frame_number)
         if use_roi:
             list_norm_settings.append(NormalizationSettings.roi)
+        
+        if use_sample_roi:
+            list_norm_settings.append(NormalizationSettings.sample_roi)
+
         self.parent.configuration.list_normalization_settings = list_norm_settings
 
         ob_data_combined = self.parent.master_3d_data_array[DataType.ob]
@@ -227,12 +237,6 @@ class Normalization(Parent):
             sample_data = np.array(master_3d_data[DataType.sample][_index])
 
             coeff = 1
-            # if use_proton_charge:
-            #     coeff *= self.mean_ob_proton_charge / sample_proton_charge
-
-            # if use_frame:
-            #     _sample_frame = self.parent.list_of_runs[DataType.sample][_run][Run.frame_number]
-            #     coeff *= self.mean_ob_frame_number / _sample_frame
 
             if use_roi:
                 sample_roi_counts = np.sum(sample_data[top: bottom+1, left: right+1])
@@ -247,6 +251,11 @@ class Normalization(Parent):
                 normalized_sample = np.divide(num, den) * coeff
             else:
                 normalized_sample = np.divide(sample_data, ob_data_combined) * coeff
+
+            if use_sample_roi:
+                sample_roi_counts = np.median(normalized_sample[top: bottom+1, left: right+1])
+                coeff = 1 / sample_roi_counts
+                normalized_sample = normalized_sample * coeff
 
             logging_3d_array_infos(message="after normalization", array=normalized_sample)
             normalized_data.append(normalized_sample) 

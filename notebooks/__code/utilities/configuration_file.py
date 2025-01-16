@@ -148,6 +148,7 @@ class Configuration(BaseModel):
     histogram_cleaning_settings: HistogramCleaningSettings = Field(default=HistogramCleaningSettings())
     list_normalization_settings: List[str] = Field(default=[NormalizationSettings.pc, 
                                               NormalizationSettings.frame_number,
+                                              NormalizationSettings.sample_roi,
                                               NormalizationSettings.roi])
     normalization_roi: NormalizationRoi = Field(default=NormalizationRoi())
     

@@ -56,10 +56,10 @@ roi = {OperatingMode.tof: {'left': 0,
                             'right': 74,
                             'top': 0,
                             'bottom': 49},
-        OperatingMode.white_beam: {'left': 800,
-                                   'right': 1222,
-                                   'top': 595,
-                                   'bottom': 826},
+        OperatingMode.white_beam: {'left': 0,
+                                   'right': 549,
+                                   'top': 131,
+                                   'bottom': 8177},
                                    }
 crop_roi = {OperatingMode.tof: {'left': 0,
                             'right': 74,
@@ -93,6 +93,7 @@ class NormalizationSettings:
     pc = 'proton charge'
     frame_number = 'frame number'
     roi = 'roi'
+    sample_roi = 'roi_sample'
 
 
 class RemoveStripeAlgo:

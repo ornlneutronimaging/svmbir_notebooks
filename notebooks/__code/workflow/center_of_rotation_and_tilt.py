@@ -49,7 +49,10 @@ class CenterOfRotationAndTilt(Parent):
         display(self.auto_mode_ui)
 
     def is_manual_mode(self):
-        return self.auto_mode_ui.value == "Manual"
+        try:
+            return self.auto_mode_ui.value == "Manual"
+        except AttributeError:
+            return "Manual"
 
     def _isolate_0_and_180_degrees_images_white_beam_mode(self):
         logging.info(f"\tisolating 0 and 180 degres: ")

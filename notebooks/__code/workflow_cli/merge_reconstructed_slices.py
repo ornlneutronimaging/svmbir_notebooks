@@ -31,7 +31,7 @@ def merge_reconstructed_slices(output_data_folder=None, top_slice=0, list_of_out
         list_slices = np.arange(top_slice_index, bottom_slice_index)
         for _tiff_index, _slice_index in enumerate(list_slices):
             if _slice_index in list_slices_already_processed:
-                continue
+                os.remove(list_folder_tiff[_index][_tiff_index]) # no need to move that slice, already processed
 
             else:
                 list_slices_already_processed.append(_slice_index)
